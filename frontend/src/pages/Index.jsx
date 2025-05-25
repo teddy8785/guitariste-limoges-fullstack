@@ -45,6 +45,13 @@ function Index() {
           >
             Voir tous les guitaristes
           </NavLink>
+          <NavLink
+            className="header__link"
+            to={`/connexion`}
+            onClick={toggleMenu}
+          >
+            Se connecter
+          </NavLink>
           <div className="header__ancre--container">
             <HashLink
               smooth

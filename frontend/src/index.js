@@ -9,6 +9,7 @@ import {
 import "./styles/index.css";
 import Index from "./pages/Index";
 import Presentation from "./pages/Presentation.jsx";
+import Connexion from "./pages/Connexion.jsx";
 import Erreur from "./pages/Erreur.jsx";
 import Artistes from "./pages/Artistes.jsx";
 
@@ -22,6 +23,7 @@ root.render(
         <Route path="/index" element={<Index />} />
         <Route path="/gallery" element={<Artistes />} />
         <Route path="/artiste/:id" element={<Presentation />} />
+        <Route path="/connexion" element={<Connexion />} />
         <Route path="*" element={<Erreur />} />
       </Routes>
     </Router>
