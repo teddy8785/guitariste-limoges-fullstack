@@ -1,0 +1,30 @@
+[
+  {
+    "id": "1",
+    "nom": "Coeur Rock",
+    "photo": "photos/coeurrock.jpg",
+    "photoDown": "photoDown/coeurrock.webP",
+    "style": ["hard rock", "southern rock", "blues"],
+    "audio": "audio/guitarRockPower.mp3",
+    "histoire": "Fan de rock, je joue de la guitare depuis quelques années pour m'amuser.",
+    "mail": "",
+    "lienx": "",
+    "lieninstagram": "",
+    "lienyoutube": "",
+    "annonce": ""
+  },
+  {
+    "id": "2",
+    "nom": "Marianne Florentin",
+    "photo": "",
+    "photoDown": "",
+    "style": ["classique"],
+    "audio": "audio/MF-audio-final.mp3",
+    "histoire": "J'ai une expérience de 10 ans de guitare classique. Avec une connaissance qui fait de l'impro au piano, je lui enregistre des morceaux courts de 3 à 5 minutes de guitare.",
+    "mail": "",
+    "lienx": "",
+    "lieninstagram": "",
+    "lienyoutube": "",
+    "annonce": ""
+  }
+]

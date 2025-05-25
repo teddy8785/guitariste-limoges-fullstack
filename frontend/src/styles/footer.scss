@@ -1,0 +1,19 @@
+.footer {
+  margin: 0;
+  height: 100px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+
+  &__copyright {
+    color: white;
+    margin: 0;
+  }
+
+  &__bottom {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+}

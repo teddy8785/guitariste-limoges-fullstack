@@ -1,0 +1,39 @@
+.heroheader {
+  margin: 168px 0px 350px 0px;
+}
+.heroheader__title {
+  font-family: "Nova Square", sans-serif;
+  color: white;
+  text-align: center;
+  font-size: 80px;
+}
+.heroheader__welcome {
+  font-size: 35px;
+  color: white;
+  font-family: "Nova Square", sans-serif;
+  margin: 0px 30px;
+  text-align: center;
+}
+@media (max-width: 957px) {
+  .heroheader {
+    margin: 150px 0px 250px 0px;
+  }
+}
+@media (max-width: 768px) {
+  .heroheader {
+    margin: 120px 0px 225px 0px;
+  }
+  .heroheader__title {
+    font-size: 60px;
+    margin-bottom: 100px;
+  }
+}
+@media (max-width: 435px) {
+  .heroheader__title {
+    font-size: 50px;
+    margin-bottom: 80px;
+  }
+  .heroheader__welcome {
+    font-size: 30px;
+  }
+}/*# sourceMappingURL=heroheader.css.map */

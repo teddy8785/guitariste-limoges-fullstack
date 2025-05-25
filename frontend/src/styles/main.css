@@ -1,0 +1,35 @@
+.main {
+  margin-top: 50px;
+  flex: 1;
+}
+.main__title {
+  font-family: "Nova Square", sans-serif;
+  font-size: 40px;
+  color: white;
+  text-align: center;
+  margin-bottom: 50px;
+}
+.main__gallery {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 50px;
+}
+.main #new {
+  scroll-margin-top: 40px;
+}
+.main__pagination {
+  margin: 20px 0px;
+}
+.main__pagination--button {
+  width: 50px;
+  font-size: 20px;
+  color: black;
+  border-radius: 2px;
+  border: 1px solid black;
+}
+@media (min-width: 768px) and (max-width: 1008px) {
+  .main__link {
+    margin: 7%;
+  }
+}/*# sourceMappingURL=main.css.map */
