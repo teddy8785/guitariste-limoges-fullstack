@@ -28,6 +28,8 @@ root.render(
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/connexion" element={<Connexion />} />
         <Route path="/profil" element={<CreateProfil />} />
+        <Route path="/profil/:id?" element={<CreateProfil />} />
+        <Route path="/erreur" element={<Erreur />} />
         <Route path="*" element={<Erreur />} />
       </Routes>
     </Router>

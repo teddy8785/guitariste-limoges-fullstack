@@ -4,6 +4,7 @@ import Header from "../components/Header";
 import Main from "../components/Main";
 import Footer from "../components/Footer";
 import { gestionErreurPhoto } from "../components/Card";
+import "../styles/presentation.css";
 
 function Presentation() {
   const { id } = useParams();
@@ -14,7 +15,6 @@ function Presentation() {
   const [error, setError] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
 
-  // Supposons que l'ID utilisateur connecté est dans le localStorage
   const userId = localStorage.getItem("userId");
 
   useEffect(() => {
@@ -39,11 +39,11 @@ function Presentation() {
 
   if (loading) return <p>Chargement...</p>;
 
-  if (error) return <Navigate to="/Error/" />;
+  if (error) return <Navigate to="/erreur" />;
 
-  if (!post) return null; // Sécurité
+  if (!post) return null;
 
-  const isOwner = userId === post.userId; // adapte selon ton backend
+  const isOwner = userId === post.userId;
 
   return (
     <div className="footer__bottom">
@@ -51,10 +51,8 @@ function Presentation() {
         <nav>
           <button
             className="header__button"
-            href="#"
-            onClick={(e) => {
-              e.preventDefault();
-              window.history.back();
+            onClick={() => {
+              navigate("/index");
             }}
           >
             Retour
@@ -62,8 +60,7 @@ function Presentation() {
           {isLogged && isOwner && (
             <button
               className="header__button"
-              onClick={() => navigate(`/edit/${id}`)}
-              style={{ marginLeft: "1rem" }}
+              onClick={() => navigate(`/profil/${id}`)}
             >
               Modifier mon profil
             </button>
@@ -78,63 +75,75 @@ function Presentation() {
             {post.annonce}
           </div>
         )}
-
         <section className="presentation">
           <>
             {post.photo && (
-              <img
-                className="presentation__image"
-                src={`${process.env.PUBLIC_URL}/${post.photo}`}
-                alt={post.nom}
-                onError={gestionErreurPhoto}
-              ></img>
+              <picture>
+                {post.photoDown && (
+                  <source
+                    srcSet={post.photoDown}
+                    type="image/webp"
+                    media="(max-width: 767px)"
+                  />
+                )}
+                <source
+                  srcSet={post.photo}
+                  type="image/jpeg"
+                  media="(min-width: 768px)"
+                />
+                <img
+                  className="presentation__image"
+                  src={post.photo} // fallback
+                  alt={post.nom}
+                  onError={gestionErreurPhoto}
+                />
+              </picture>
             )}
-
-            {(post.lienx ||
-              post.lieninstagram ||
-              post.lienyoutube ||
-              post.mail) && (
-              <div className="presentation__contactcontent">
-                <h3>CONTACT</h3>
-                <div className="presentation__contact">
-                  {post.lienx && (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={post.lienx}
-                    >
-                      <i className="fa-brands fa-twitter"></i>
-                    </a>
-                  )}
-                  {post.lieninstagram && (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={post.lieninstagram}
-                    >
-                      <i className="fa-brands fa-instagram"></i>
-                    </a>
-                  )}
-                  {post.lienyoutube && (
-                    <a
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={post.lienyoutube}
-                    >
-                      <i className="fa-brands fa-youtube"></i>
-                    </a>
-                  )}
-                </div>
-                <div>{post.mail && <p>{post.mail}</p>}</div>
+            {post.histoire && (
+              <div className="presentation__histoire">
+                <>
+                  <h3>HISTOIRE</h3>
+                  <p>{post.histoire}</p>
+                </>
               </div>
             )}
           </>
-          {post.histoire && (
-            <div className="presentation__histoire">
-              <>
-                <h3>HISTOIRE</h3>
-                <p>{post.histoire}</p>
-              </>
+          {(post.lienx ||
+            post.lieninstagram ||
+            post.lienyoutube ||
+            post.mail) && (
+            <div className="presentation__contactcontent">
+              <h3>CONTACT</h3>
+              <div className="presentation__contact">
+                {post.lienx && (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={post.lienx}
+                  >
+                    <i className="fa-brands fa-twitter"></i>
+                  </a>
+                )}
+                {post.lieninstagram && (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={post.lieninstagram}
+                  >
+                    <i className="fa-brands fa-instagram"></i>
+                  </a>
+                )}
+                {post.lienyoutube && (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={post.lienyoutube}
+                  >
+                    <i className="fa-brands fa-youtube"></i>
+                  </a>
+                )}
+              </div>
+              <div>{post.mail && <p>{post.mail}</p>}</div>
             </div>
           )}
         </section>

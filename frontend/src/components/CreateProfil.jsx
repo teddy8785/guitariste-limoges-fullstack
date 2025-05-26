@@ -1,40 +1,91 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/createProfil.css";
+import "../styles/header.css";
 
 function CreateProfil({ onSubmit, initialData = {} }) {
   const [formData, setFormData] = useState({
-    nom: initialData.nom || "",
-    photo: initialData.photo || "",
-    photoDown: initialData.photoDown || "",
-    style: initialData.style ? initialData.style.join(", ") : "",
-    audio: initialData.audio || "",
-    histoire: initialData.histoire || "",
-    mail: initialData.mail || "",
-    lienx: initialData.lienx || "",
-    lieninstagram: initialData.lieninstagram || "",
-    lienyoutube: initialData.lienyoutube || "",
-    annonce: initialData.annonce || "",
+    nom: "",
+    photo: null, // ici photo est un File ou null
+    photoPreview: "", // string base64 pour preview
+    photoDown: "",
+    style: "",
+    audio: "",
+    histoire: "",
+    mail: "",
+    lienx: "",
+    lieninstagram: "",
+    lienyoutube: "",
+    annonce: "",
   });
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setFormData({
+      nom: initialData.nom || "",
+      photo: null,
+      photoPreview: initialData.photo || "",
+      photoDown: initialData.photoDown || "",
+      style: initialData.style ? initialData.style.join(", ") : "",
+      audio: initialData.audio || "",
+      histoire: initialData.histoire || "",
+      mail: initialData.mail || "",
+      lienx: initialData.lienx || "",
+      lieninstagram: initialData.lieninstagram || "",
+      lienyoutube: initialData.lienyoutube || "",
+      annonce: initialData.annonce || "",
+    });
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, photo: file }));
 
-    const payload = {
-      ...formData,
-      style: formData.style.split(",").map((s) => s.trim()),
-    };
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((prev) => ({ ...prev, photoPreview: reader.result }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    onSubmit(payload);
+  const payload = {
+    ...formData,
+    style: formData.style.split(",").map((s) => s.trim()),
+    // Si photo est null, on envoie la photoPreview (url existante) pour dire au backend de garder l'ancienne
+    photo: formData.photo ? formData.photo : formData.photoPreview,
   };
 
+  try {
+    await onSubmit(payload);
+    if (initialData._id) {
+      navigate(`/artiste/${initialData._id}`);
+    } else {
+      navigate("/index");
+    }
+  } catch (error) {
+    alert("Erreur lors de la mise à jour : " + error.message);
+  }
+};
+
   return (
-    <div>
+    <div className="header">
+      <button className="header__button" onClick={() => navigate("/index")}>
+        Retour
+      </button>
+
       <h2 className="form__title">Créer son profil</h2>
+
       <form className="form" onSubmit={handleSubmit}>
         <label className="form__label">Nom:</label>
         <input
@@ -46,14 +97,24 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           required
         />
 
-        <label className="form__label">Photo (URL):</label>
+        <label className="form__label">Photo (fichier local):</label>
         <input
           className="form__input"
-          type="text"
-          name="photo"
-          value={formData.photo}
-          onChange={handleChange}
+          type="file"
+          name="image"
+          accept="image/*"
+          onChange={handleFileChange}
         />
+
+        {formData.photoPreview && (
+          <div className="form__preview">
+            <img
+              src={formData.photoPreview}
+              alt="Aperçu"
+              style={{ maxWidth: "200px", marginTop: "10px" }}
+            />
+          </div>
+        )}
 
         <label className="form__label">Photo secondaire (URL):</label>
         <input

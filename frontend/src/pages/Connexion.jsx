@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/connexion.css";
 
 function Connexion() {
@@ -6,6 +7,8 @@ function Connexion() {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -35,6 +38,7 @@ function Connexion() {
 
         alert("Connexion réussie !");
         // Tu peux aussi rediriger ici si tu veux
+        navigate("/");
       })
       .catch((error) => {
         console.error("Erreur :", error);

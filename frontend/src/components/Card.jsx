@@ -8,19 +8,26 @@ export const gestionErreurPhoto = (e) => {
 };
 
 function Card({ id, nom, photo, photoDown, audio, annonce }) {
+  const backendUrl = "http://localhost:4000";
+
+  const photoSrc = photo
+    ? photo.startsWith("http") ? photo : `${backendUrl}/${photo}`
+    : defaultPhoto;
+
+  const photoDownSrc = photoDown
+    ? photoDown.startsWith("http") ? photoDown : `${backendUrl}/${photoDown}`
+    : null;
+
+  const photoDownWebpSrc = photoDownSrc ? photoDownSrc.replace(/\.(jpg|jpeg|png)$/i, ".webp") : null;
+
   const picturesSources = (
     <picture>
-      {photoDown ? (
-        <source
-          srcSet={`${process.env.PUBLIC_URL}/${photoDown}`}
-          media="(max-width: 768px)"
-        />
-      ) : (
-        <source srcSet={defaultPhoto} media="(max-width: 768px)" />
+      {photoDownWebpSrc && (
+        <source srcSet={photoDownWebpSrc} type="image/webp" media="(max-width: 768px)" />
       )}
       <img
         className="card__img"
-        src={photo ? `${process.env.PUBLIC_URL}/${photo}` : defaultPhoto}
+        src={photoSrc}
         alt={nom ? `${nom} - Photo de l'artiste` : "Photo de l'artiste non disponible"}
         onError={gestionErreurPhoto}
       />
@@ -38,7 +45,7 @@ function Card({ id, nom, photo, photoDown, audio, annonce }) {
             className="card__audio"
             aria-label={`extrait musical de l'artiste nommé ${nom}`}
           >
-            <source src={`${process.env.PUBLIC_URL}/${audio}`} />
+            <source src={audio.startsWith("http") ? audio : `${backendUrl}/${audio}`} />
           </audio>
         )}
       </NavLink>

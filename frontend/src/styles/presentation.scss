@@ -45,6 +45,7 @@
     display: flex;
     justify-content: center;
     gap: 20px;
+    min-width: 50%;
   }
 
   a {
@@ -70,6 +71,7 @@
     border: 1px solid black;
     border-radius: 30px;
     background-color: white;
+    min-width: 50%;
   }
 
   .fa-twitter {

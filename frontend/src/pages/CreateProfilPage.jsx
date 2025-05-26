@@ -1,38 +1,81 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CreateProfil from "../components/CreateProfil";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function CreateProfilPage() {
   const navigate = useNavigate();
+  const { id } = useParams(); // si tu veux gérer la modification avec /profil/:id
+  const [initialData, setInitialData] = useState(null);
+  const [loading, setLoading] = useState(!!id); // si on a un id, on charge
 
-  const handleProfilSubmit = async (formData) => {
-    try {
-      const response = await fetch("http://localhost:4000/api/guitaristes", {
-        method: "POST",
+  useEffect(() => {
+    if (id) {
+      // Chargement du profil existant pour modification
+      fetch(`http://localhost:4000/api/guitaristes/${id}`, {
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) throw new Error("Erreur lors de la création du profil");
-
-      const data = await response.json();
-      console.log("Profil créé avec succès :", data);
-
-      navigate("/mon-profil"); // redirige vers ta page profil
-
-    } catch (error) {
-      console.error("Erreur lors de l'envoi :", error);
-      alert("Erreur lors de la création du profil");
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Profil non trouvé");
+          return res.json();
+        })
+        .then((data) => {
+          setInitialData(data);
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error(error);
+          setInitialData({});
+          setLoading(false);
+        });
     }
-  };
+  }, [id]);
+
+ const handleProfilSubmit = async (formData) => {
+  try {
+    const url = id
+  ? `http://localhost:4000/api/guitaristes/me` // ✅ correspond bien à ta route
+  : "http://localhost:4000/api/guitaristes";
+    const method = id ? "PUT" : "POST";
+
+    const dataToSend = new FormData();
+
+    for (const key in formData) {
+      if (key === "style") {
+        dataToSend.append(key, formData.style); // string style
+      } else if (key === "photo" && formData.photo instanceof File) {
+       dataToSend.append("image", formData.photo); // pour multer côté serveur
+      } else {
+        dataToSend.append(key, formData[key]);
+      }
+    }
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body: dataToSend,
+    });
+
+    if (!response.ok) throw new Error("Erreur lors de l’envoi");
+
+    const data = await response.json();
+    console.log("Profil enregistré :", data);
+    navigate(`/artiste/${data._id}`);
+  } catch (error) {
+    console.error("Erreur :", error);
+    alert(error.message);
+  }
+};
+  if (loading) return <p>Chargement du profil...</p>;
 
   return (
     <div>
-      <CreateProfil onSubmit={handleProfilSubmit} />
+      <CreateProfil initialData={initialData || {}} onSubmit={handleProfilSubmit} />
     </div>
   );
 }
+
 export default CreateProfilPage;

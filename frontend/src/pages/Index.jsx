@@ -13,9 +13,11 @@ function Index() {
   const [isLogged, setIsLogged] = useState(false);
   const [guitaristes, setGuitaristes] = useState([]);
   const [hasProfile, setHasProfile] = useState(false);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     window.scrollTo(0, 0);
+
     const token = localStorage.getItem("token");
     setIsLogged(!!token);
 
@@ -29,7 +31,10 @@ function Index() {
           if (!res.ok) throw new Error("Aucun profil trouvé");
           return res.json();
         })
-        .then(() => setHasProfile(true))
+        .then((data) => {
+          setHasProfile(true);
+          setUserId(data._id);
+        })
         .catch(() => setHasProfile(false));
     } else {
       setHasProfile(false);
@@ -75,7 +80,11 @@ function Index() {
           <div className="header__user">
             {isLogged ? (
               <>
-                {!hasProfile && (
+                {hasProfile && userId ? (
+                  <NavLink className="header__link" to={`/artiste/${userId}`}>
+                    Mon profil
+                  </NavLink>
+                ) : (
                   <NavLink className="header__link" to={`/profil`}>
                     Créer son profil
                   </NavLink>
