@@ -30,7 +30,7 @@ function Card({ id, nom, photo, photoDown, audio, annonce }) {
   return (
     <article className="card">
       <p className="card__name">{nom}</p>
-      <NavLink className="card__link" to={`/Artiste/${id}`}>
+      <NavLink className="card__link" to={`/artiste/${id}`}>
         {picturesSources}
         {audio && audio.length > 0 && (
           <audio

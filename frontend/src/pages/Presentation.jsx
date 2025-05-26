@@ -1,23 +1,49 @@
-import { Navigate, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, Navigate, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Main from "../components/Main";
 import Footer from "../components/Footer";
-import data from "../artistes.json";
-import "../styles/presentation.css";
-import { useEffect } from "react";
 import { gestionErreurPhoto } from "../components/Card";
 
 function Presentation() {
   const { id } = useParams();
-  const post = data.find((artiste) => artiste.id === id);
+  const navigate = useNavigate();
+
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isLogged, setIsLogged] = useState(false);
+
+  // Supposons que l'ID utilisateur connecté est dans le localStorage
+  const userId = localStorage.getItem("userId");
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    const token = localStorage.getItem("token");
+    setIsLogged(!!token);
 
-  if (!post) {
-    return <Navigate to="/Error/" />;
-  }
+    fetch(`http://localhost:4000/api/guitaristes/${id}`)
+      .then((res) => {
+        if (!res.ok) throw new Error("Artiste non trouvé");
+        return res.json();
+      })
+      .then((data) => {
+        setPost(data);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [id]);
+
+  if (loading) return <p>Chargement...</p>;
+
+  if (error) return <Navigate to="/Error/" />;
+
+  if (!post) return null; // Sécurité
+
+  const isOwner = userId === post.userId; // adapte selon ton backend
 
   return (
     <div className="footer__bottom">
@@ -33,6 +59,15 @@ function Presentation() {
           >
             Retour
           </button>
+          {isLogged && isOwner && (
+            <button
+              className="header__button"
+              onClick={() => navigate(`/edit/${id}`)}
+              style={{ marginLeft: "1rem" }}
+            >
+              Modifier mon profil
+            </button>
+          )}
         </nav>
         <h1 className="header__title">{post.nom}</h1>
       </Header>

@@ -3,7 +3,6 @@ import Main from "../components/Main";
 import Card from "../components/Card";
 import Pagination from "../components/Pagination";
 import Footer from "../components/Footer";
-import data from "../artistes.json";
 import { useEffect, useState, useMemo } from "react";
 
 function Artistes() {
@@ -11,8 +10,25 @@ function Artistes() {
   const [selectedStyle, setSelectedStyle] = useState("");
   const [isResearchOpen, setIsResearchOpen] = useState(false);
   const [currentPage, setCurrentPages] = useState(1);
+  const [data, setData] = useState([]);
 
   const maxCards = 20;
+
+  useEffect(() => {
+    fetch("http://localhost:4000/api/guitaristes")
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur lors du chargement");
+        return res.json();
+      })
+      .then((json) => {
+        if (Array.isArray(json)) {
+          setData(json);
+        } else {
+          console.error("Données inattendues:", json);
+        }
+      })
+      .catch(console.error);
+  }, []);
 
   // Extraire les styles uniques
   const allStyles = useMemo(() => {
@@ -28,7 +44,7 @@ function Artistes() {
         artiste.nom.toLocaleLowerCase().startsWith(cleanQuery) &&
         (selectedStyle === "" || artiste.style.includes(selectedStyle))
     );
-  }, [cleanQuery, selectedStyle]);
+  }, [cleanQuery, selectedStyle, data]);
 
   const totalPages = Math.ceil(filteredData.length / maxCards);
 
@@ -80,34 +96,34 @@ function Artistes() {
               ></i>
             </button>
             <div className="header__nav--research">
-            <input
-              type="text"
-              placeholder="par Nom"
-              className={`header__input--research ${
-                isResearchOpen ? "" : "header__link--hidden"
-              }`}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            ></input>
-            <select
-              className={`header__input--research ${
-                isResearchOpen ? "" : "header__link--hidden"
-              }`}
-              value={selectedStyle}
-              onChange={(e) => setSelectedStyle(e.target.value)}
-            >
-              {selectedStyle === "" && (
-                <option value="" disabled hidden>
-                  Par style
-                </option>
-              )}
-              <option value="">Tous les styles</option>
-              {allStyles.map((style, index) => (
-                <option key={index} value={style}>
-                  {style}
-                </option>
-              ))}
-            </select>
+              <input
+                type="text"
+                placeholder="par Nom"
+                className={`header__input--research ${
+                  isResearchOpen ? "" : "header__link--hidden"
+                }`}
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              ></input>
+              <select
+                className={`header__input--research ${
+                  isResearchOpen ? "" : "header__link--hidden"
+                }`}
+                value={selectedStyle}
+                onChange={(e) => setSelectedStyle(e.target.value)}
+              >
+                {selectedStyle === "" && (
+                  <option value="" disabled hidden>
+                    Par style
+                  </option>
+                )}
+                <option value="">Tous les styles</option>
+                {allStyles.map((style, index) => (
+                  <option key={index} value={style}>
+                    {style}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
         </nav>
@@ -125,8 +141,8 @@ function Artistes() {
         <div className="main__gallery">
           {getCurrentPageData().map((post) => (
             <Card
-              key={post.id}
-              id={post.id}
+              key={post._id}
+              id={post._id}
               nom={post.nom}
               photo={post.photo}
               photoDown={post.photoDown}

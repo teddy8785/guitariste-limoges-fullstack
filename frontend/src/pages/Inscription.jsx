@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/connexion.css";
 
-function Connexion() {
+function Inscription() {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
@@ -15,7 +15,7 @@ function Connexion() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:4000/api/user/login", {
+    fetch("http://localhost:4000/api/user/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -24,27 +24,26 @@ function Connexion() {
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Erreur lors de la connexion");
+          throw new Error("Erreur lors de l'inscription");
         }
         return res.json();
       })
       .then((data) => {
-        // Stocker le token et userId
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.userId);
-
-        alert("Connexion réussie !");
-        // Tu peux aussi rediriger ici si tu veux
+        console.log("Inscription réussie :", data);
+        alert("Inscription réussie !");
+        // Ici tu peux stocker le token ou rediriger l'utilisateur
+        // localStorage.setItem("token", data.token);
+        // navigate("/dashboard");
       })
       .catch((error) => {
         console.error("Erreur :", error);
-        alert("Échec de la connexion. Vérifie tes identifiants.");
+        alert("Échec de l'inscription. Vérifie tes identifiants.");
       });
   };
 
   return (
     <div>
-      <h2 className="form__title">Connexion</h2>
+      <h2 className="form__title">Inscription</h2>
       <form className="form" onSubmit={handleSubmit}>
         <label className="form__label">Email :</label>
         <input
@@ -62,16 +61,14 @@ function Connexion() {
           name="password"
           value={credentials.password}
           onChange={handleChange}
-          className="form__input"
+           className="form__input"
           required
         />
 
-        <button className="form__button" type="submit">
-          Se connecter
-        </button>
+        <button className="form__button" type="submit">S'inscrire</button>
       </form>
     </div>
   );
 }
 
-export default Connexion;
+export default Inscription;

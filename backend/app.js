@@ -1,7 +1,9 @@
-const express = require ("express");
+const express = require("express");
 const mongoose = require('mongoose');
+const path = require('path');
 
 const guitaristeRoutes = require('./routes/guitaristes');
+const userRoutes = require('./routes/user');
 
 const app = express();
 
@@ -13,6 +15,7 @@ mongoose.connect('mongodb+srv://teddybarieraud:lXk1Ed5QaWv3CGCn@guitaristes-limo
 
 app.use(express.json());
 
+// Middleware CORS
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
@@ -20,8 +23,9 @@ app.use((req, res, next) => {
   next();
 });
 
+// Tes routes
 app.use('/api/guitaristes', guitaristeRoutes);
-// app.use('/api/auth', userRoutes);
-// app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/api/user', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;

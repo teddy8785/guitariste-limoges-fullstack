@@ -30,12 +30,13 @@
 }
 .contact__button {
   height: 50px;
-  background-color: black;
+  background-color: red;
   color: white;
   border: none;
   font-size: large;
   font-weight: 600;
   font-family: "Nova Square", sans-serif;
+  cursor: pointer;
 }
 @media (max-width: 768px) {
   .contact .contact {

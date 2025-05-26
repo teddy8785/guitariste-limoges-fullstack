@@ -4,23 +4,57 @@ import Main from "../components/Main";
 import Card from "../components/Card";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
-import data from "../artistes.json";
 import { NavLink } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import { useEffect, useState } from "react";
 
 function Index() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isLogged, setIsLogged] = useState(false);
+  const [guitaristes, setGuitaristes] = useState([]);
+  const [hasProfile, setHasProfile] = useState(false);
 
-  const maxCards = 4;
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    const token = localStorage.getItem("token");
+    setIsLogged(!!token);
+
+    if (token) {
+      fetch("http://localhost:4000/api/guitaristes/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+        .then((res) => {
+          if (!res.ok) throw new Error("Aucun profil trouvé");
+          return res.json();
+        })
+        .then(() => setHasProfile(true))
+        .catch(() => setHasProfile(false));
+    } else {
+      setHasProfile(false);
+    }
+
+    fetch("http://localhost:4000/api/guitaristes")
+      .then((res) => {
+        if (!res.ok)
+          throw new Error("Erreur lors du chargement des guitaristes");
+        return res.json();
+      })
+      .then((json) => setGuitaristes(json))
+      .catch(console.error);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLogged(false);
+  };
+
+  const maxCards = 4;
 
   return (
     <div>
@@ -33,24 +67,48 @@ function Index() {
           MENU
         </button>
         <nav
-          onMouseLeave={toggleMenu}
+          onClick={toggleMenu}
           className={`header__link--container ${
             isMenuOpen ? "" : "header__link--hidden"
           }`}
         >
+          <div className="header__user">
+            {isLogged ? (
+              <>
+                {!hasProfile && (
+                  <NavLink className="header__link" to={`/profil`}>
+                    Créer son profil
+                  </NavLink>
+                )}
+                <button className="header__link" onClick={handleLogout}>
+                  Déconnexion
+                </button>
+              </>
+            ) : (
+              <>
+                <NavLink
+                  className="header__link"
+                  to={`/inscription`}
+                  onClick={toggleMenu}
+                >
+                  S'inscrire
+                </NavLink>
+                <NavLink
+                  className="header__link"
+                  to={`/connexion`}
+                  onClick={toggleMenu}
+                >
+                  Se connecter
+                </NavLink>
+              </>
+            )}
+          </div>
           <NavLink
             className="header__link"
             to={`/Gallery`}
             onClick={toggleMenu}
           >
             Voir tous les guitaristes
-          </NavLink>
-          <NavLink
-            className="header__link"
-            to={`/connexion`}
-            onClick={toggleMenu}
-          >
-            Se connecter
           </NavLink>
           <div className="header__ancre--container">
             <HashLink
@@ -78,17 +136,20 @@ function Index() {
         <section id="new">
           <h2 className="main__title">NOUVEAUX</h2>
           <div className="main__gallery">
-            {data.slice(-maxCards).map((post) => (
-              <Card
-                key={post.id}
-                id={post.id}
-                nom={post.nom}
-                photo={post.photo}
-                photoDown={post.photoDown}
-                audio={post.audio}
-                annonce={post.annonce}
-              />
-            ))}
+            {guitaristes
+              .slice(-maxCards)
+              .reverse()
+              .map((post) => (
+                <Card
+                  key={post._id}
+                  id={post._id}
+                  nom={post.nom}
+                  photo={post.photo}
+                  photoDown={post.photoDown}
+                  audio={post.audio}
+                  annonce={post.annonce}
+                />
+              ))}
           </div>
         </section>
         <Contact />

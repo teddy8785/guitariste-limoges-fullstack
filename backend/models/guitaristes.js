@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 
 const guitaristeSchema = mongoose.Schema({
+  userId: { type: String, required: true },
   nom: { type: String, required: true },
   photo: { type: String },
   photoDown: { type: String },
