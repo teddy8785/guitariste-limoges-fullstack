@@ -34,7 +34,7 @@ function Artistes() {
   const allStyles = useMemo(() => {
     const styles = data.flatMap((artiste) => artiste.style);
     return [...new Set(styles)];
-  }, []);
+  }, [data]);
 
   // Filtrage combiné par nom et style
   const cleanQuery = searchQuery.trim().toLocaleLowerCase();

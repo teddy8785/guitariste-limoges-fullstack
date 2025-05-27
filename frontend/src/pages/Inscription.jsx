@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/connexion.css";
 
 function Inscription() {
@@ -6,6 +7,8 @@ function Inscription() {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -33,7 +36,7 @@ function Inscription() {
         alert("Inscription réussie !");
         // Ici tu peux stocker le token ou rediriger l'utilisateur
         // localStorage.setItem("token", data.token);
-        // navigate("/dashboard");
+        navigate("/connexion");
       })
       .catch((error) => {
         console.error("Erreur :", error);
@@ -61,11 +64,13 @@ function Inscription() {
           name="password"
           value={credentials.password}
           onChange={handleChange}
-           className="form__input"
+          className="form__input"
           required
         />
 
-        <button className="form__button" type="submit">S'inscrire</button>
+        <button className="form__button" type="submit">
+          S'inscrire
+        </button>
       </form>
     </div>
   );

@@ -28,5 +28,6 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api/guitaristes', guitaristeRoutes);
 app.use('/api/user', userRoutes);
 app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/audios', express.static(path.join(__dirname, 'audios')));
 
 module.exports = app;

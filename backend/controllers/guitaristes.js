@@ -8,9 +8,12 @@ exports.createGuitariste = async (req, res) => {
   try {
     let photoUrl = "";
     let photoDownUrl = "";
+    let audioUrl = "";
 
-    if (req.file) {
-      const originalName = req.file.originalname
+    // Gestion image
+    if (req.files && req.files["image"] && req.files["image"][0]) {
+      const imageFile = req.files["image"][0];
+      const originalName = imageFile.originalname
         .split(" ")
         .join("_")
         .split(".")[0];
@@ -18,13 +21,11 @@ exports.createGuitariste = async (req, res) => {
       const jpgFilename = `${originalName}_${timestamp}.jpg`;
       const webpFilename = `${originalName}_${timestamp}.webp`;
 
-      // Convertir et sauvegarder JPG
-      await sharp(req.file.buffer)
+      await sharp(imageFile.buffer)
         .jpeg({ quality: 90 })
         .toFile(path.join("images", jpgFilename));
 
-      // Convertir et sauvegarder WebP
-      await sharp(req.file.buffer)
+      await sharp(imageFile.buffer)
         .webp({ quality: 80 })
         .toFile(path.join("images", webpFilename));
 
@@ -34,10 +35,39 @@ exports.createGuitariste = async (req, res) => {
       )}/images/${webpFilename}`;
     }
 
+    // Gestion audio
+    if (req.files && req.files["audio"] && req.files["audio"][0]) {
+      const audioFile = req.files["audio"][0];
+      const originalName = audioFile.originalname
+        .split(" ")
+        .join("_")
+        .split(".")[0];
+      const timestamp = Date.now();
+      const audioFilename = `${originalName}_${timestamp}${path.extname(
+        audioFile.originalname
+      )}`;
+
+      await fsPromises.writeFile(
+        path.join("audios", audioFilename),
+        audioFile.buffer
+      );
+
+      audioUrl = `${req.protocol}://${req.get("host")}/audios/${audioFilename}`;
+    }
+
+    // Conversion des styles texte -> tableau
+    if (typeof req.body.style === "string") {
+      req.body.style = req.body.style
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
+
     const guitariste = new Guitariste({
       ...req.body,
       photo: photoUrl, // URL JPG
       photoDown: photoDownUrl, // URL WebP
+      audio: audioUrl, // URL audio
       userId: req.auth.userId,
     });
 
@@ -59,7 +89,9 @@ exports.getMyGuitariste = (req, res) => {
   Guitariste.findOne({ userId: req.auth.userId })
     .then((guitariste) => {
       if (!guitariste) {
-        return res.status(404).json({ message: "Profil non trouvé" });
+        if (!guitariste) {
+          return res.status(200).json(null); // ou {}
+        }
       }
       res.status(200).json(guitariste);
     })
@@ -99,12 +131,21 @@ exports.updateMyGuitariste = async (req, res) => {
 
     let updatedData = { ...req.body };
 
-    if (req.file) {
-      // Supprimer les anciennes images JPG et WebP
+    // Conversion des styles texte -> tableau
+    if (typeof req.body.style === "string") {
+      req.body.style = req.body.style
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
+
+    // Gestion image
+    if (req.files && req.files["image"] && req.files["image"][0]) {
       await deleteFileIfExists(guitariste.photo);
       await deleteFileIfExists(guitariste.photoDown);
 
-      const originalName = req.file.originalname
+      const imageFile = req.files["image"][0];
+      const originalName = imageFile.originalname
         .split(" ")
         .join("_")
         .split(".")[0];
@@ -112,13 +153,10 @@ exports.updateMyGuitariste = async (req, res) => {
       const jpgFilename = `${originalName}_${timestamp}.jpg`;
       const webpFilename = `${originalName}_${timestamp}.webp`;
 
-      // Convertir et sauvegarder JPG
-      await sharp(req.file.buffer)
+      await sharp(imageFile.buffer)
         .jpeg({ quality: 90 })
         .toFile(path.join("images", jpgFilename));
-
-      // Convertir et sauvegarder WebP
-      await sharp(req.file.buffer)
+      await sharp(imageFile.buffer)
         .webp({ quality: 80 })
         .toFile(path.join("images", webpFilename));
 
@@ -128,6 +166,31 @@ exports.updateMyGuitariste = async (req, res) => {
       updatedData.photoDown = `${req.protocol}://${req.get(
         "host"
       )}/images/${webpFilename}`;
+    }
+
+    // Gestion audio
+    if (req.files && req.files["audio"] && req.files["audio"][0]) {
+      // Supprimer ancien audio
+      await deleteFileIfExists(guitariste.audio);
+
+      const audioFile = req.files["audio"][0];
+      const audioOriginalName = audioFile.originalname
+        .split(" ")
+        .join("_")
+        .split(".")[0];
+      const timestampAudio = Date.now();
+      const audioFilename = `${audioOriginalName}_${timestampAudio}${path.extname(
+        audioFile.originalname
+      )}`;
+
+      await fsPromises.writeFile(
+        path.join("audios", audioFilename),
+        audioFile.buffer
+      );
+
+      updatedData.audio = `${req.protocol}://${req.get(
+        "host"
+      )}/audios/${audioFilename}`;
     }
 
     await Guitariste.updateOne(

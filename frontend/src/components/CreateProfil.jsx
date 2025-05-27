@@ -55,28 +55,37 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       reader.readAsDataURL(file);
     }
   };
-  
-const handleSubmit = async (e) => {
-  e.preventDefault();
 
-  const payload = {
-    ...formData,
-    style: formData.style.split(",").map((s) => s.trim()),
-    // Si photo est null, on envoie la photoPreview (url existante) pour dire au backend de garder l'ancienne
-    photo: formData.photo ? formData.photo : formData.photoPreview,
+  const handleAudioChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, audio: file }));
+      const audioUrl = URL.createObjectURL(file);
+      setFormData((prev) => ({ ...prev, audioPreview: audioUrl }));
+    }
   };
 
-  try {
-    await onSubmit(payload);
-    if (initialData._id) {
-      navigate(`/artiste/${initialData._id}`);
-    } else {
-      navigate("/index");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      ...formData,
+      style: formData.style.split(",").map((s) => s.trim()),
+      // Si photo est null, on envoie la photoPreview (url existante) pour dire au backend de garder l'ancienne
+      photo: formData.photo ? formData.photo : formData.photoPreview,
+    };
+
+    try {
+      await onSubmit(payload);
+      if (initialData._id) {
+        navigate(`/artiste/${initialData._id}`);
+      } else {
+        navigate("/index");
+      }
+    } catch (error) {
+      alert("Erreur lors de la mise à jour : " + error.message);
     }
-  } catch (error) {
-    alert("Erreur lors de la mise à jour : " + error.message);
-  }
-};
+  };
 
   return (
     <div className="header">
@@ -116,15 +125,6 @@ const handleSubmit = async (e) => {
           </div>
         )}
 
-        <label className="form__label">Photo secondaire (URL):</label>
-        <input
-          className="form__input"
-          type="text"
-          name="photoDown"
-          value={formData.photoDown}
-          onChange={handleChange}
-        />
-
         <label className="form__label">
           Style(s) (séparés par des virgules):
         </label>
@@ -136,14 +136,23 @@ const handleSubmit = async (e) => {
           onChange={handleChange}
         />
 
-        <label className="form__label">Audio (URL):</label>
+        <label className="form__label">Audio (fichier local):</label>
         <input
           className="form__input"
-          type="text"
+          type="file"
           name="audio"
-          value={formData.audio}
-          onChange={handleChange}
+          accept="audio/*"
+          onChange={handleAudioChange}
         />
+
+        {formData.audio && (
+          <div>
+            <audio controls src={formData.audioPreview}>
+              <source src={formData.audio} type="audio/mpeg" />
+              Votre navigateur ne supporte pas l’élément audio.
+            </audio>
+          </div>
+        )}
 
         <label className="form__label">Histoire:</label>
         <textarea

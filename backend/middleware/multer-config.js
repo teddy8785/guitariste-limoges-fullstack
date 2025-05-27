@@ -3,7 +3,15 @@ const multer = require('multer');
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+  // Autoriser image et audio (si tu veux gérer audios aussi)
+  const allowedMimeTypes = [
+    'image/jpeg',
+    'image/jpg',
+    'image/png',
+    'audio/mpeg',
+    'audio/wav',
+    'audio/mp3',
+  ];
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -11,4 +19,6 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-module.exports = multer({ storage, fileFilter }).single("image");
+const upload = multer({ storage, fileFilter });
+
+module.exports = upload;
