@@ -7,6 +7,7 @@ import Footer from "../components/Footer";
 import { NavLink } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import { useEffect, useState } from "react";
+import StatusIndicator from "../components/StatusIndicator";
 
 function Index() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -56,6 +57,7 @@ function Index() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    window.dispatchEvent(new Event("logout"));
     setIsLogged(false);
   };
 
@@ -71,6 +73,7 @@ function Index() {
         >
           MENU
         </button>
+         <StatusIndicator />
         <nav
           onClick={toggleMenu}
           className={`header__link--container ${
