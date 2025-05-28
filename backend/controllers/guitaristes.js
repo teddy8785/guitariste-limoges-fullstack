@@ -63,6 +63,14 @@ exports.createGuitariste = async (req, res) => {
         .filter((s) => s.length > 0);
     }
 
+    // Conversion des instruments texte -> tableau
+    if (typeof req.body.instrument === "string") {
+      req.body.instrument = req.body.instrument
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
+
     const guitariste = new Guitariste({
       ...req.body,
       photo: photoUrl, // URL JPG
@@ -134,6 +142,14 @@ exports.updateMyGuitariste = async (req, res) => {
     // Conversion des styles texte -> tableau
     if (typeof req.body.style === "string") {
       req.body.style = req.body.style
+        .split(",")
+        .map((s) => s.trim())
+        .filter((s) => s.length > 0);
+    }
+
+    // Conversion des instruments texte -> tableau
+    if (typeof req.body.instrument === "string") {
+      req.body.instrument = req.body.instrument
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);

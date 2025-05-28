@@ -36,9 +36,7 @@
 
   &__contactcontent {
     background-color: white;
-    height: 200px;
     border-radius: 30px;
-    width: 300px;
   }
 
   &__contact {
@@ -93,10 +91,18 @@
   }
 
   @media (max-width: 435px) {
-
     &__annonce {
       flex-direction: column;
       font-size: 25px;
+    }
+
+    &__contactcontent {
+      background-color: white;
+      border-radius: 30px;
+    }
+
+    p {
+      font-size: 20px;
     }
   }
 }

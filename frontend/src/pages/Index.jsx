@@ -120,7 +120,7 @@ function Index() {
             to={`/Gallery`}
             onClick={toggleMenu}
           >
-            Voir tous les guitaristes
+            Voir tous les musiciens
           </NavLink>
           <div className="header__ancre--container">
             <HashLink

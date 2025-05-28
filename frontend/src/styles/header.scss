@@ -15,6 +15,13 @@
     margin-bottom: 0;
   }
 
+  &__title--nom {
+color: white;
+font-family: $font-primary;
+text-align: center;
+margin: 0;
+  }
+
   &__status {
     width: 40px;
     height: 40px;

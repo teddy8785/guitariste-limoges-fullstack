@@ -33,9 +33,7 @@
 }
 .presentation__contactcontent {
   background-color: white;
-  height: 200px;
   border-radius: 30px;
-  width: 300px;
 }
 .presentation__contact {
   display: flex;
@@ -85,5 +83,12 @@
   .presentation__annonce {
     flex-direction: column;
     font-size: 25px;
+  }
+  .presentation__contactcontent {
+    background-color: white;
+    border-radius: 30px;
+  }
+  .presentation p {
+    font-size: 20px;
   }
 }/*# sourceMappingURL=presentation.css.map */

@@ -12,6 +12,12 @@
   font-style: normal;
   margin-bottom: 0;
 }
+.header__title--nom {
+  color: white;
+  font-family: "Eater", serif;
+  text-align: center;
+  margin: 0;
+}
 .header__status {
   width: 40px;
   height: 40px;

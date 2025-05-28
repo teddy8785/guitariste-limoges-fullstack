@@ -7,7 +7,9 @@ import { useEffect, useState, useMemo } from "react";
 
 function Artistes() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedVille, setSelectedVille] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("");
+  const [selectedInstrument, setSelectedInstrument] = useState("");
   const [isResearchOpen, setIsResearchOpen] = useState(false);
   const [currentPage, setCurrentPages] = useState(1);
   const [data, setData] = useState([]);
@@ -30,21 +32,34 @@ function Artistes() {
       .catch(console.error);
   }, []);
 
+  // Extraire les villes uniques
+  const allVilles = useMemo(() => {
+    const villes = data.flatMap((artiste) => artiste.ville);
+    return [...new Set(villes)].filter((v) => v && v.trim() !== "");
+  }, [data]);
+
   // Extraire les styles uniques
   const allStyles = useMemo(() => {
     const styles = data.flatMap((artiste) => artiste.style);
     return [...new Set(styles)];
   }, [data]);
 
+  // Extraire les instruments uniques
+  const allInstruments = useMemo(() => {
+    const instruments = data.flatMap((artiste) => artiste.instrument);
+    return [...new Set(instruments)].filter((i) => i && i.trim() !== "");
+  }, [data]);
+
   // Filtrage combiné par nom et style
   const cleanQuery = searchQuery.trim().toLocaleLowerCase();
   const filteredData = useMemo(() => {
-    return data.filter(
-      (artiste) =>
-        artiste.nom.toLocaleLowerCase().startsWith(cleanQuery) &&
-        (selectedStyle === "" || artiste.style.includes(selectedStyle))
-    );
-  }, [cleanQuery, selectedStyle, data]);
+  return data.filter((artiste) =>
+    artiste.nom.toLocaleLowerCase().startsWith(cleanQuery) &&
+    (selectedStyle === "" || artiste.style.includes(selectedStyle)) &&
+    (selectedVille === "" || artiste.ville === selectedVille) &&
+    (selectedInstrument === "" || artiste.instrument.includes(selectedInstrument))
+  );
+}, [cleanQuery, selectedStyle, selectedVille, selectedInstrument, data]);
 
   const totalPages = Math.ceil(filteredData.length / maxCards);
 
@@ -71,7 +86,7 @@ function Artistes() {
 
   useEffect(() => {
     setCurrentPages(1);
-  }, [searchQuery]);
+  }, [searchQuery, selectedStyle, selectedVille, selectedInstrument]);
 
   return (
     <div>
@@ -121,6 +136,44 @@ function Artistes() {
                 {allStyles.map((style, index) => (
                   <option key={index} value={style}>
                     {style}
+                  </option>
+                ))}
+              </select>
+              <select
+                className={`header__input--research ${
+                  isResearchOpen ? "" : "header__link--hidden"
+                }`}
+                value={selectedInstrument}
+                onChange={(e) => setSelectedInstrument(e.target.value)}
+              >
+                {selectedInstrument === "" && (
+                  <option value="" disabled hidden>
+                    Par instruments
+                  </option>
+                )}
+                <option value="">Tous les instruments</option>
+                {allInstruments.map((instrument, index) => (
+                  <option key={index} value={instrument}>
+                    {instrument}
+                  </option>
+                ))}
+              </select>
+              <select
+                className={`header__input--research ${
+                  isResearchOpen ? "" : "header__link--hidden"
+                }`}
+                value={selectedVille}
+                onChange={(e) => setSelectedVille(e.target.value)}
+              >
+                {selectedVille === "" && (
+                  <option value="" disabled hidden>
+                    Par ville
+                  </option>
+                )}
+                <option value="">Toutes les villes</option>
+                {allVilles.map((ville, index) => (
+                  <option key={index} value={ville}>
+                    {ville}
                   </option>
                 ))}
               </select>

@@ -16,6 +16,7 @@ function Presentation() {
   const [isLogged, setIsLogged] = useState(false);
 
   const userId = localStorage.getItem("userId");
+  const backendUrl = "http://localhost:4000";
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -66,7 +67,7 @@ function Presentation() {
             </button>
           )}
         </nav>
-        <h1 className="header__title">{post.nom}</h1>
+        <h1 className="header__title--nom">{post.nom}</h1>
       </Header>
       <Main>
         {post.annonce && (
@@ -99,6 +100,58 @@ function Presentation() {
                 />
               </picture>
             )}
+            {post.audio && (
+              <audio
+                controls
+                aria-label={`extrait musical de l'artiste nommé ${post.nom}`}
+              >
+                <source
+                  src={
+                    post.audio.startsWith("http")
+                      ? post.audio
+                      : `${backendUrl}/${post.audio}`
+                  }
+                />
+              </audio>
+            )}
+            {(post.lienx ||
+              post.lieninstagram ||
+              post.lienyoutube ||
+              post.mail) && (
+              <div className="presentation__contactcontent">
+                <h3>CONTACT</h3>
+                <div className="presentation__contact">
+                  {post.lienx && (
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={post.lienx}
+                    >
+                      <i className="fa-brands fa-twitter"></i>
+                    </a>
+                  )}
+                  {post.lieninstagram && (
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={post.lieninstagram}
+                    >
+                      <i className="fa-brands fa-instagram"></i>
+                    </a>
+                  )}
+                  {post.lienyoutube && (
+                    <a
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={post.lienyoutube}
+                    >
+                      <i className="fa-brands fa-youtube"></i>
+                    </a>
+                  )}
+                </div>
+                <div>{post.mail && <p>{post.mail}</p>}</div>
+              </div>
+            )}
             {post.histoire && (
               <div className="presentation__histoire">
                 <>
@@ -108,44 +161,6 @@ function Presentation() {
               </div>
             )}
           </>
-          {(post.lienx ||
-            post.lieninstagram ||
-            post.lienyoutube ||
-            post.mail) && (
-            <div className="presentation__contactcontent">
-              <h3>CONTACT</h3>
-              <div className="presentation__contact">
-                {post.lienx && (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={post.lienx}
-                  >
-                    <i className="fa-brands fa-twitter"></i>
-                  </a>
-                )}
-                {post.lieninstagram && (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={post.lieninstagram}
-                  >
-                    <i className="fa-brands fa-instagram"></i>
-                  </a>
-                )}
-                {post.lienyoutube && (
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={post.lienyoutube}
-                  >
-                    <i className="fa-brands fa-youtube"></i>
-                  </a>
-                )}
-              </div>
-              <div>{post.mail && <p>{post.mail}</p>}</div>
-            </div>
-          )}
         </section>
       </Main>
       <Footer />

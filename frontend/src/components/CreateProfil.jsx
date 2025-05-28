@@ -6,10 +6,12 @@ import "../styles/header.css";
 function CreateProfil({ onSubmit, initialData = {} }) {
   const [formData, setFormData] = useState({
     nom: "",
+    ville: "",
     photo: null, // ici photo est un File ou null
     photoPreview: "", // string base64 pour preview
     photoDown: "",
     style: "",
+    instrument: "",
     audio: "",
     histoire: "",
     mail: "",
@@ -24,10 +26,12 @@ function CreateProfil({ onSubmit, initialData = {} }) {
   useEffect(() => {
     setFormData({
       nom: initialData.nom || "",
+      ville: initialData.ville || "",
       photo: null,
       photoPreview: initialData.photo || "",
       photoDown: initialData.photoDown || "",
       style: initialData.style ? initialData.style.join(", ") : "",
+      instrument: initialData.instrument ? initialData.instrument.join(", ") : "",
       audio: initialData.audio || "",
       histoire: initialData.histoire || "",
       mail: initialData.mail || "",
@@ -71,6 +75,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     const payload = {
       ...formData,
       style: formData.style.split(",").map((s) => s.trim()),
+      instrument: formData.instrument.split(",").map((s) => s.trim()),
       // Si photo est null, on envoie la photoPreview (url existante) pour dire au backend de garder l'ancienne
       photo: formData.photo ? formData.photo : formData.photoPreview,
     };
@@ -106,6 +111,15 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           required
         />
 
+        <label className="form__label">Ville:</label>
+        <input
+          className="form__input"
+          type="text"
+          name="ville"
+          value={formData.ville}
+          onChange={handleChange}
+        />
+
         <label className="form__label">Photo (fichier local):</label>
         <input
           className="form__input"
@@ -133,6 +147,17 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           type="text"
           name="style"
           value={formData.style}
+          onChange={handleChange}
+        />
+
+        <label className="form__label">
+          Instrument(s) (séparés par des virgules):
+        </label>
+        <input
+          className="form__input"
+          type="text"
+          name="instrument"
+          value={formData.instrument}
           onChange={handleChange}
         />
 
