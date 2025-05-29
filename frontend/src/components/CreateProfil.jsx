@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { allInstruments } from "../assets/data";
+import { allStyles } from "../assets/data";
 import "../styles/createProfil.css";
 import "../styles/header.css";
 
@@ -10,8 +12,8 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     photo: null, // ici photo est un File ou null
     photoPreview: "", // string base64 pour preview
     photoDown: "",
-    style: "",
-    instrument: "",
+    style: [],
+    instrument: [],
     audio: "",
     histoire: "",
     mail: "",
@@ -24,14 +26,20 @@ function CreateProfil({ onSubmit, initialData = {} }) {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const sanitizeArray = (val) => {
+      if (Array.isArray(val)) return val;
+      if (typeof val === "string") return val.split(",").map((v) => v.trim());
+      return [];
+    };
+
     setFormData({
       nom: initialData.nom || "",
       ville: initialData.ville || "",
       photo: null,
       photoPreview: initialData.photo || "",
       photoDown: initialData.photoDown || "",
-      style: initialData.style ? initialData.style.join(", ") : "",
-      instrument: initialData.instrument ? initialData.instrument.join(", ") : "",
+      style: sanitizeArray(initialData.style),
+      instrument: sanitizeArray(initialData.instrument),
       audio: initialData.audio || "",
       histoire: initialData.histoire || "",
       mail: initialData.mail || "",
@@ -72,11 +80,19 @@ function CreateProfil({ onSubmit, initialData = {} }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    console.log("STYLE AVANT ENVOI :", formData.style);
+    console.log("INSTRUMENT AVANT ENVOI :", formData.instrument);
+
+    const sanitizeArray = (val) => {
+      if (Array.isArray(val)) return val;
+      if (typeof val === "string") return val.split(",").map((v) => v.trim());
+      return [];
+    };
+
     const payload = {
       ...formData,
-      style: formData.style.split(",").map((s) => s.trim()),
-      instrument: formData.instrument.split(",").map((s) => s.trim()),
-      // Si photo est null, on envoie la photoPreview (url existante) pour dire au backend de garder l'ancienne
+      style: sanitizeArray(formData.style),
+      instrument: sanitizeArray(formData.instrument),
       photo: formData.photo ? formData.photo : formData.photoPreview,
     };
 
@@ -100,7 +116,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
 
       <h2 className="form__title">Créer son profil</h2>
 
-      <form className="form" onSubmit={handleSubmit}>
+      <form className="form form__profil" onSubmit={handleSubmit}>
         <label className="form__label">Nom:</label>
         <input
           className="form__input"
@@ -138,29 +154,55 @@ function CreateProfil({ onSubmit, initialData = {} }) {
             />
           </div>
         )}
+        <div className="form__select">
+          <label className="form__label">Style(s) :</label>
+          <div className="form__input">
+            {allStyles.map((style) => (
+              <label key={style}>
+                <input
+                  type="checkbox"
+                  value={style}
+                  checked={formData.style.includes(style)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const isChecked = e.target.checked;
+                    setFormData((prev) => ({
+                      ...prev,
+                      style: isChecked
+                        ? [...prev.style, value]
+                        : prev.style.filter((s) => s !== value),
+                    }));
+                  }}
+                />
+                {style}
+              </label>
+            ))}
+          </div>
 
-        <label className="form__label">
-          Style(s) (séparés par des virgules):
-        </label>
-        <input
-          className="form__input"
-          type="text"
-          name="style"
-          value={formData.style}
-          onChange={handleChange}
-        />
-
-        <label className="form__label">
-          Instrument(s) (séparés par des virgules):
-        </label>
-        <input
-          className="form__input"
-          type="text"
-          name="instrument"
-          value={formData.instrument}
-          onChange={handleChange}
-        />
-
+          <label className="form__label">Instrument(s):</label>
+          <div className="form__input">
+            {allInstruments.map((instrument) => (
+              <label key={instrument}>
+                <input
+                  type="checkbox"
+                  value={instrument}
+                  checked={formData.instrument.includes(instrument)}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    const isChecked = e.target.checked;
+                    setFormData((prev) => ({
+                      ...prev,
+                      instrument: isChecked
+                        ? [...prev.instrument, value]
+                        : prev.instrument.filter((s) => s !== value),
+                    }));
+                  }}
+                />
+                {instrument}
+              </label>
+            ))}
+          </div>
+        </div>
         <label className="form__label">Audio (fichier local):</label>
         <input
           className="form__input"
@@ -229,7 +271,9 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           onChange={handleChange}
         />
 
-        <button type="submit">Valider</button>
+        <button className="form__button" type="submit">
+          Valider
+        </button>
       </form>
     </div>
   );

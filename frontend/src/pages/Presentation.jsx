@@ -46,6 +46,35 @@ function Presentation() {
 
   const isOwner = userId === post.userId;
 
+  const deleteMyGuitariste = async () => {
+    const confirmDelete = window.confirm("Supprimer ton profil ?");
+
+    if (!confirmDelete) return;
+
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Non connecté, token manquant.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:4000/api/guitaristes/me", {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Erreur suppression profil");
+
+      alert("Profil supprimé !");
+      window.location.href = "/";
+    } catch (err) {
+      console.error(err);
+      alert("Erreur : " + err.message);
+    }
+  };
+
   return (
     <div className="footer__bottom">
       <Header>
@@ -64,6 +93,11 @@ function Presentation() {
               onClick={() => navigate(`/profil/${id}`)}
             >
               Modifier mon profil
+            </button>
+          )}
+          {isLogged && isOwner && (
+            <button className="header__button" onClick={deleteMyGuitariste}>
+              Supprimer mon profil
             </button>
           )}
         </nav>

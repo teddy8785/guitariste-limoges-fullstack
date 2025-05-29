@@ -21,11 +21,18 @@ exports.createGuitariste = async (req, res) => {
       const jpgFilename = `${originalName}_${timestamp}.jpg`;
       const webpFilename = `${originalName}_${timestamp}.webp`;
 
-      await sharp(imageFile.buffer)
+      // Redimensionner automatiquement à 300x400
+      const resizedImage = sharp(imageFile.buffer).resize({
+        width: 300,
+        height: 400,
+        fit: "cover", // crop si nécessaire pour remplir complètement
+      });
+
+      await resizedImage
         .jpeg({ quality: 90 })
         .toFile(path.join("images", jpgFilename));
 
-      await sharp(imageFile.buffer)
+      await resizedImage
         .webp({ quality: 80 })
         .toFile(path.join("images", webpFilename));
 
@@ -61,6 +68,10 @@ exports.createGuitariste = async (req, res) => {
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
+    } else if (Array.isArray(req.body.style)) {
+      req.body.style = req.body.style.map((s) => s.trim());
+    } else {
+      req.body.style = [];
     }
 
     // Conversion des instruments texte -> tableau
@@ -69,6 +80,10 @@ exports.createGuitariste = async (req, res) => {
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
+    } else if (Array.isArray(req.body.instrument)) {
+      req.body.instrument = req.body.instrument.map((s) => s.trim());
+    } else {
+      req.body.instrument = [];
     }
 
     const guitariste = new Guitariste({
@@ -145,6 +160,10 @@ exports.updateMyGuitariste = async (req, res) => {
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
+    } else if (Array.isArray(req.body.style)) {
+      req.body.style = req.body.style.map((s) => s.trim());
+    } else {
+      req.body.style = [];
     }
 
     // Conversion des instruments texte -> tableau
@@ -153,6 +172,10 @@ exports.updateMyGuitariste = async (req, res) => {
         .split(",")
         .map((s) => s.trim())
         .filter((s) => s.length > 0);
+    } else if (Array.isArray(req.body.instrument)) {
+      req.body.instrument = req.body.instrument.map((s) => s.trim());
+    } else {
+      req.body.instrument = [];
     }
 
     // Gestion image
@@ -169,10 +192,18 @@ exports.updateMyGuitariste = async (req, res) => {
       const jpgFilename = `${originalName}_${timestamp}.jpg`;
       const webpFilename = `${originalName}_${timestamp}.webp`;
 
-      await sharp(imageFile.buffer)
+      // Redimensionner automatiquement à 300x400
+      const resizedImage = sharp(imageFile.buffer).resize({
+        width: 300,
+        height: 400,
+        fit: "cover", // crop si nécessaire pour remplir complètement
+      });
+
+      await resizedImage
         .jpeg({ quality: 90 })
         .toFile(path.join("images", jpgFilename));
-      await sharp(imageFile.buffer)
+
+      await resizedImage
         .webp({ quality: 80 })
         .toFile(path.join("images", webpFilename));
 
@@ -230,22 +261,32 @@ exports.deleteMyGuitariste = (req, res) => {
       // Supprimer l'image JPG
       if (guitariste.photo) {
         const filenameJpg = guitariste.photo.split("/images/")[1];
-        fs.unlink(`images/${filenameJpg}`, (err) => {
-          if (err) console.log("Erreur suppression image JPG:", err);
+        fs.unlink(path.join("images", filenameJpg), (err) => {
+          if (err) console.log("Erreur suppression image JPG:", err.message);
         });
       }
 
-      // Supprimer l'image WebP (photoDown)
+      // Supprimer l'image WebP
       if (guitariste.photoDown) {
         const filenameWebp = guitariste.photoDown.split("/images/")[1];
-        fs.unlink(`images/${filenameWebp}`, (err) => {
-          if (err) console.log("Erreur suppression image WebP:", err);
+        fs.unlink(path.join("images", filenameWebp), (err) => {
+          if (err) console.log("Erreur suppression image WebP:", err.message);
         });
       }
 
-      Guitariste.deleteOne({ userId: req.auth.userId })
-        .then(() => res.status(200).json({ message: "Profil supprimé !" }))
-        .catch((error) => res.status(400).json({ error }));
+      // Supprimer le fichier audio
+      if (guitariste.audio) {
+        const filenameAudio = guitariste.audio.split("/audios/")[1];
+        fs.unlink(path.join("audios", filenameAudio), (err) => {
+          if (err) console.log("Erreur suppression audio:", err.message);
+        });
+      }
+
+      return Guitariste.deleteOne({ userId: req.auth.userId });
     })
-    .catch((error) => res.status(500).json({ error }));
+    .then(() => res.status(200).json({ message: "Profil supprimé !" }))
+    .catch((error) => {
+      console.error("Erreur deleteMyGuitariste:", error);
+      res.status(500).json({ error });
+    });
 };

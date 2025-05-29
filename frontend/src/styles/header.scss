@@ -16,10 +16,10 @@
   }
 
   &__title--nom {
-color: white;
-font-family: $font-primary;
-text-align: center;
-margin: 0;
+    color: white;
+    font-family: $font-primary;
+    text-align: center;
+    margin: 0;
   }
 
   &__status {
@@ -29,7 +29,7 @@ margin: 0;
     display: flex;
     margin: 15px 0 0 25px;
     position: fixed;
-    color:transparent;
+    color: transparent;
     background-color: grey;
   }
 

@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 function CreateProfilPage() {
   const navigate = useNavigate();
-  const { id } = useParams(); // si tu veux gérer la modification avec /profil/:id
+  const { id } = useParams();
   const [initialData, setInitialData] = useState(null);
   const [loading, setLoading] = useState(!!id); // si on a un id, on charge
 
@@ -35,17 +35,21 @@ function CreateProfilPage() {
   const handleProfilSubmit = async (formData) => {
     try {
       const url = id
-        ? `http://localhost:4000/api/guitaristes/me` // ✅ correspond bien à ta route
+        ? `http://localhost:4000/api/guitaristes/me`
         : "http://localhost:4000/api/guitaristes";
       const method = id ? "PUT" : "POST";
 
       const dataToSend = new FormData();
 
       for (const key in formData) {
-        if (key === "style") {
-          dataToSend.append(key, formData.style); // string style
+        if (key === "style" && Array.isArray(formData.style)) {
+          formData.style.forEach((s) => dataToSend.append("style", s));
+        } else if (key === "instrument" && Array.isArray(formData.instrument)) {
+          formData.instrument.forEach((i) =>
+            dataToSend.append("instrument", i)
+          );
         } else if (key === "photo" && formData.photo instanceof File) {
-          dataToSend.append("image", formData.photo); // pour multer côté serveur
+          dataToSend.append("image", formData.photo);
         } else if (key === "audio" && formData.audio instanceof File) {
           dataToSend.append("audio", formData.audio);
         } else {

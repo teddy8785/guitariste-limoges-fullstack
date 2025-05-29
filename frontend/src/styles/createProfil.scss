@@ -1,13 +1,13 @@
 @import "variables/police";
 
 .form {
-  display: flex;
-  flex-direction: column;
-  max-width: 400px;
-  margin: 20px auto;
-  padding: 15px;
-  background-color: #222;
-  border-radius: 8px;
+  &__profil {
+    // max-width: none;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: #222;
+    border-radius: 8px;
+  }
 
   &__title {
     color: white;
@@ -20,6 +20,15 @@
     color: white;
     margin-bottom: 6px;
     font-weight: 600;
+  }
+
+  &__select {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__select label {
+display: flex;
   }
 
   &__button {
@@ -46,5 +55,17 @@
 
   &__input::placeholder {
     color: #bbb;
+  }
+
+   @media (max-width: 700px) {
+    &__title {
+      font-size: 35px;
+    }
+  }
+
+     @media (max-width: 400px) {
+    &__title {
+      font-size: 28px;
+    }
   }
 }
