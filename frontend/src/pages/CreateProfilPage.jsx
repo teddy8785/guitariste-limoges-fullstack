@@ -52,7 +52,9 @@ function CreateProfilPage() {
           dataToSend.append("image", formData.photo);
         } else if (key === "audio" && formData.audio instanceof File) {
           dataToSend.append("audio", formData.audio);
-        } else {
+        } else if (key === "photoDeleted" && formData.photoDeleted === true) {
+          dataToSend.append("photoDeleted", "true");
+        } else if (key !== "photoDeleted") {
           dataToSend.append(key, formData[key]);
         }
       }

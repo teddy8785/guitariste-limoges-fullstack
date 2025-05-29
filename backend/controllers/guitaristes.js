@@ -133,6 +133,22 @@ exports.getGuitaristeById = async (req, res) => {
   }
 };
 
+exports.getRecentGuitaristes = (req, res) => {
+  Guitariste.find()
+    .sort({ createdAt: -1 }) // trie par date création décroissante
+    .limit(4)                 // limite à 4 résultats
+    .then((guitaristes) => res.status(200).json(guitaristes))
+    .catch((error) => res.status(500).json({ message: "Erreur serveur", error }));
+};
+
+exports.getRecentAnnonces = (req, res) => {
+  Guitariste.find({ annonce: { $exists: true, $ne: "" } }) // filtre pour les profils qui ont une annonce non vide
+    .sort({ annonceDate: -1 }) // trie par date d'annonce décroissante (les plus récentes en premier)
+    .limit(4) // limite à 4 résultats
+    .then((guitaristes) => res.status(200).json(guitaristes))
+    .catch((error) => res.status(400).json({ error }));
+};
+
 async function deleteFileIfExists(fileUrl) {
   if (!fileUrl) return;
   const filename = fileUrl.split("/images/")[1];
@@ -164,6 +180,14 @@ exports.updateMyGuitariste = async (req, res) => {
       req.body.style = req.body.style.map((s) => s.trim());
     } else {
       req.body.style = [];
+    }
+
+    // Gestion suppression photo uniquement si photoDeleted === "true"
+    if (req.body.photoDeleted === "true") {
+      await deleteFileIfExists(guitariste.photo);
+      await deleteFileIfExists(guitariste.photoDown);
+      updatedData.photo = null;
+      updatedData.photoDown = null;
     }
 
     // Conversion des instruments texte -> tableau
@@ -238,6 +262,10 @@ exports.updateMyGuitariste = async (req, res) => {
       updatedData.audio = `${req.protocol}://${req.get(
         "host"
       )}/audios/${audioFilename}`;
+    }
+
+    if (req.body.annonce) {
+      updatedData.annonceDate = new Date(); // Date actuelle à chaque modif d'annonce
     }
 
     await Guitariste.updateOne(

@@ -10,6 +10,9 @@ function Artistes() {
   const [selectedVille, setSelectedVille] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("");
   const [selectedInstrument, setSelectedInstrument] = useState("");
+  const [onlyWithAnnonce, setOnlyWithAnnonce] = useState(false);
+  const [onlyWithAudio, setOnlyWithAudio] = useState(false);
+   const [onlyWithPhoto, setOnlyWithPhoto] = useState(false);
   const [isResearchOpen, setIsResearchOpen] = useState(false);
   const [currentPage, setCurrentPages] = useState(1);
   const [data, setData] = useState([]);
@@ -53,13 +56,27 @@ function Artistes() {
   // Filtrage combiné par nom et style
   const cleanQuery = searchQuery.trim().toLocaleLowerCase();
   const filteredData = useMemo(() => {
-  return data.filter((artiste) =>
-    artiste.nom.toLocaleLowerCase().startsWith(cleanQuery) &&
-    (selectedStyle === "" || artiste.style.includes(selectedStyle)) &&
-    (selectedVille === "" || artiste.ville === selectedVille) &&
-    (selectedInstrument === "" || artiste.instrument.includes(selectedInstrument))
-  );
-}, [cleanQuery, selectedStyle, selectedVille, selectedInstrument, data]);
+    return data.filter(
+      (artiste) =>
+        artiste.nom.toLocaleLowerCase().startsWith(cleanQuery) &&
+        (selectedStyle === "" || artiste.style.includes(selectedStyle)) &&
+        (selectedVille === "" || artiste.ville === selectedVille) &&
+        (selectedInstrument === "" ||
+          artiste.instrument.includes(selectedInstrument)) &&
+        (!onlyWithAnnonce || (artiste.annonce && artiste.annonce.trim() !== "")) && 
+        (!onlyWithAudio || (artiste.audio && artiste.audio.trim() !== "")) &&
+        (!onlyWithPhoto || (artiste.photo && artiste.photo.trim() !== ""))
+    );
+  }, [
+    cleanQuery,
+    selectedStyle,
+    selectedVille,
+    selectedInstrument,
+    onlyWithAnnonce,
+    onlyWithAudio,
+    onlyWithPhoto,
+    data,
+  ]);
 
   const totalPages = Math.ceil(filteredData.length / maxCards);
 
@@ -104,6 +121,30 @@ function Artistes() {
             Retour
           </button>
           <div className="header__research">
+            <label className="header__checkboxAnnonce">
+                <input
+                  type="checkbox"
+                  checked={onlyWithPhoto}
+                  onChange={(e) => setOnlyWithPhoto(e.target.checked)}
+                />
+                Afficher les profils avec photo
+              </label>
+             <label className="header__checkboxAnnonce">
+                <input
+                  type="checkbox"
+                  checked={onlyWithAudio}
+                  onChange={(e) => setOnlyWithAudio(e.target.checked)}
+                />
+                Afficher les profils avec audio
+              </label>
+            <label className="header__checkboxAnnonce">
+                <input
+                  type="checkbox"
+                  checked={onlyWithAnnonce}
+                  onChange={(e) => setOnlyWithAnnonce(e.target.checked)}
+                />
+                Afficher les profils avec une annonce
+              </label>
             <button className="header__button" onClick={toggleResearch}>
               <i
                 className="fa-solid fa-magnifying-glass"

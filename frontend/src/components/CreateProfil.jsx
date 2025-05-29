@@ -47,6 +47,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       lieninstagram: initialData.lieninstagram || "",
       lienyoutube: initialData.lienyoutube || "",
       annonce: initialData.annonce || "",
+      photoDeleted: false,
     });
   }, [initialData]);
 
@@ -79,9 +80,6 @@ function CreateProfil({ onSubmit, initialData = {} }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    console.log("STYLE AVANT ENVOI :", formData.style);
-    console.log("INSTRUMENT AVANT ENVOI :", formData.instrument);
 
     const sanitizeArray = (val) => {
       if (Array.isArray(val)) return val;
@@ -152,6 +150,21 @@ function CreateProfil({ onSubmit, initialData = {} }) {
               alt="Aperçu"
               style={{ maxWidth: "200px", marginTop: "10px" }}
             />
+            <button
+            className="form__button"
+              type="button"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  photoPreview: "", // on vide la photo preview
+                  photo: null, // on supprime aussi le fichier sélectionné
+                  photoDeleted: true, // on ajoute un flag pour signaler suppression
+                }))
+              }
+              style={{ marginTop: "10px" }}
+            >
+              Supprimer la photo
+            </button>
           </div>
         )}
         <div className="form__select">

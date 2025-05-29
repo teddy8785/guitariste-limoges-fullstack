@@ -96,6 +96,9 @@
   align-items: center;
   gap: 10px;
 }
+.header__checkboxAnnonce {
+  color: white;
+}
 @keyframes apparition {
   0% {
     max-height: 0;

@@ -14,7 +14,8 @@ const guitaristeSchema = mongoose.Schema({
   lienx: { type: String },
   lieninstagram: { type: String },
   lienyoutube: { type: String },
-  annonce: { type: String }
-});
+  annonce: { type: String },
+  annonceDate: { type: Date },
+}, { timestamps: true });
 
 module.exports = mongoose.model('Guitariste', guitaristeSchema);

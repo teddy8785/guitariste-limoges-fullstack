@@ -15,6 +15,7 @@ function Index() {
   const [guitaristes, setGuitaristes] = useState([]);
   const [hasProfile, setHasProfile] = useState(false);
   const [userId, setUserId] = useState(null);
+  const [annonces, setAnnonces] = useState([]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -41,13 +42,30 @@ function Index() {
       setHasProfile(false);
     }
 
-    fetch("http://localhost:4000/api/guitaristes")
+    // fetch("http://localhost:4000/api/guitaristes")
+    //   .then((res) => {
+    //     if (!res.ok)
+    //       throw new Error("Erreur lors du chargement des guitaristes");
+    //     return res.json();
+    //   })
+    //   .then((json) => setGuitaristes(json))
+    //   .catch(console.error);
+
+    fetch("http://localhost:4000/api/guitaristes/recents")
       .then((res) => {
         if (!res.ok)
           throw new Error("Erreur lors du chargement des guitaristes");
         return res.json();
       })
-      .then((json) => setGuitaristes(json))
+      .then((data) => setGuitaristes(data))
+      .catch(console.error);
+
+    fetch("http://localhost:4000/api/guitaristes/annonces/recentes")
+      .then((res) => {
+        if (!res.ok) throw new Error("Erreur lors du chargement des annonces");
+        return res.json();
+      })
+      .then((json) => setAnnonces(json))
       .catch(console.error);
   }, []);
 
@@ -61,8 +79,6 @@ function Index() {
     setIsLogged(false);
   };
 
-  const maxCards = 4;
-
   return (
     <div>
       <Header>
@@ -73,7 +89,7 @@ function Index() {
         >
           MENU
         </button>
-         <StatusIndicator />
+        <StatusIndicator />
         <nav
           onClick={toggleMenu}
           className={`header__link--container ${
@@ -133,6 +149,14 @@ function Index() {
             </HashLink>
             <HashLink
               smooth
+              to="#annonce"
+              className="header__ancre"
+              onClick={toggleMenu}
+            >
+              annonces
+            </HashLink>
+            <HashLink
+              smooth
               to="#contact"
               className="header__ancre"
               onClick={toggleMenu}
@@ -146,22 +170,35 @@ function Index() {
       <Heroheader />
       <Main>
         <section id="new">
-          <h2 className="main__title">NOUVEAUX</h2>
-          <div className="main__gallery">
-            {guitaristes
-              .slice(-maxCards)
-              .reverse()
-              .map((post) => (
-                <Card
-                  key={post._id}
-                  id={post._id}
-                  nom={post.nom}
-                  photo={post.photo}
-                  photoDown={post.photoDown}
-                  audio={post.audio}
-                  annonce={post.annonce}
-                />
-              ))}
+          <h2 className="main__title">NOUVEAUX MUSICIENS</h2>
+          <div className="main__new">
+            {guitaristes.map((post) => (
+              <Card
+                key={post._id}
+                id={post._id}
+                nom={post.nom}
+                photo={post.photo}
+                photoDown={post.photoDown}
+                audio={post.audio}
+                annonce={post.annonce}
+              />
+            ))}
+          </div>
+        </section>
+        <section id="annonce">
+          <h2 className="main__title">NOUVELLES ANNONCES</h2>
+          <div className="main__new">
+            {annonces.map((post) => (
+              <Card
+                key={post._id}
+                id={post._id}
+                nom={post.nom}
+                photo={post.photo}
+                photoDown={post.photoDown}
+                audio={post.audio}
+                annonce={post.annonce}
+              />
+            ))}
           </div>
         </section>
         <Contact />

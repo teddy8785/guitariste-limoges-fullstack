@@ -22,13 +22,18 @@
     font-weight: 600;
   }
 
+  &__preview {
+    display: flex;
+    justify-content: space-between;
+  }
+
   &__select {
     display: flex;
     flex-direction: column;
   }
 
   &__select label {
-display: flex;
+    display: flex;
   }
 
   &__button {
@@ -57,13 +62,13 @@ display: flex;
     color: #bbb;
   }
 
-   @media (max-width: 700px) {
+  @media (max-width: 700px) {
     &__title {
       font-size: 35px;
     }
   }
 
-     @media (max-width: 400px) {
+  @media (max-width: 400px) {
     &__title {
       font-size: 28px;
     }
