@@ -42,15 +42,6 @@ function Index() {
       setHasProfile(false);
     }
 
-    // fetch("http://localhost:4000/api/guitaristes")
-    //   .then((res) => {
-    //     if (!res.ok)
-    //       throw new Error("Erreur lors du chargement des guitaristes");
-    //     return res.json();
-    //   })
-    //   .then((json) => setGuitaristes(json))
-    //   .catch(console.error);
-
     fetch("http://localhost:4000/api/guitaristes/recents")
       .then((res) => {
         if (!res.ok)

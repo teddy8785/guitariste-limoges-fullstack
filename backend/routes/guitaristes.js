@@ -14,7 +14,7 @@ router.post('/', auth, multiUpload, guitaristeCtrl.createGuitariste);
 
 router.get('/', guitaristeCtrl.getAllGuitaristes);
 router.get('/me', auth, guitaristeCtrl.getMyGuitariste);
-router.get("/recents", guitaristeCtrl.getRecentAnnonces);
+router.get("/recents", guitaristeCtrl.getRecentGuitaristes);
 router.get('/:id', guitaristeCtrl.getGuitaristeById);
 router.get("/annonces/recentes", guitaristeCtrl.getRecentAnnonces);
 router.put('/me', auth, multiUpload, guitaristeCtrl.updateMyGuitariste);
