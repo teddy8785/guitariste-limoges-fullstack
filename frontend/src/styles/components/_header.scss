@@ -1,0 +1,183 @@
+@import "../variables/police";
+@import "../variables/color";
+
+.header {
+  padding: 10px;
+
+  &__title {
+    margin-top: 30px;
+    font-family: $font-primary;
+    color: $color-secondary;
+    letter-spacing: 5px;
+    font-size: 80px;
+    text-align: center;
+    font-weight: 400;
+    font-style: normal;
+    margin-bottom: 0;
+    color: $color-secondary;
+  }
+
+  &__title--nom {
+    color: $color-secondary;
+    font-family: $font-primary;
+    text-align: center;
+    margin: 0;
+  }
+
+  &__status {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    margin: 15px 0 0 25px;
+    position: fixed;
+    color: transparent;
+    background-color: $grey-offline;
+  }
+
+  &__status--connected {
+    background-color: $green-online;
+  }
+
+  &__user {
+    display: flex;
+    gap: 20px;
+    border-bottom: 2px solid $color-primary;
+  }
+
+  &__link--container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    gap: 10px;
+    position: fixed;
+    width: 85%;
+    background-color: $color-secondary;
+    z-index: 100;
+    padding: 20px;
+    border-radius: 5px;
+    animation: apparition 80ms ease-out;
+  }
+
+  &__link {
+    font-family: $font-secondary;
+    color: $color-primary;
+    border: none;
+    text-decoration: none;
+    font-size: 20px;
+    cursor: pointer;
+  }
+
+  &__link--logout {
+    background-color: $color-secondary;
+  }
+
+  &__link--hidden {
+    display: none;
+    transition: 2s ease-in-out;
+  }
+
+  &__button--fixed {
+    position: fixed;
+  }
+
+  &__ancre--container {
+    display: flex;
+    gap: 10px;
+  }
+
+  &__ancre {
+    color: $color-primary;
+    text-decoration: none;
+  }
+
+  &__button {
+    font-family: $font-secondary;
+    color: $color-secondary;
+    background-color: transparent;
+    border: none;
+    text-decoration: none;
+    font-size: 20px;
+    cursor: pointer;
+    z-index: 1000;
+  }
+
+  &__nav {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &__research {
+    display: flex;
+    align-items: end;
+    flex-direction: column-reverse;
+    gap: 10px;
+  }
+
+  &__research--flex {
+    display: flex;
+  }
+
+  &__checkboxAnnonce {
+    color: $color-secondary;
+  }
+
+  .fa-solid {
+    color: $color-primary;
+  }
+
+  @keyframes apparition {
+    0% {
+      max-height: 0;
+      opacity: 0;
+    }
+    100% {
+      max-height: 100px;
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 768px) {
+    &__title {
+      font-size: 3.4rem;
+    }
+  }
+
+  @media (max-width: 435px) {
+    &__title {
+      font-size: 2rem;
+    }
+
+    &__status {
+      width: 15px;
+      height: 15px;
+      margin: 30px 0 0 0;
+    }
+
+    &__nav--research {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .fa-bars {
+      position: fixed;
+      z-index: 1000;
+      color: $color-primary;
+      font-size: large;
+    }
+
+    .fa-solid {
+      color: $color-secondary;
+    }
+
+    &__button--fixed {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,51 @@
+@import "../variables/police";
+@import "../variables/color";
+
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 400px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: $color-primary;
+  border-radius: 8px;
+
+  &__title {
+    color: $color-secondary;
+    font-family: $font-primary;
+    text-align: center;
+    font-size: 50px;
+  }
+
+  &__label {
+    color: $color-secondary;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  &__button {
+    background-color: $color-third;
+    color: $color-white-fixed;
+    font-weight: 700;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  &__input {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid $color-secondary;
+    background-color: $color-secondary;
+    color: $color-primary;
+    font-size: 1rem;
+    resize: vertical;
+  }
+
+  &__input::placeholder {
+    color: $color-secondary;
+  }
+}

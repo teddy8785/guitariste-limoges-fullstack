@@ -1,5 +1,4 @@
 import { NavLink } from "react-router-dom";
-import "../styles/card.css";
 
 export const defaultPhoto = `${process.env.PUBLIC_URL}/photos/sansphoto.webP`;
 export const gestionErreurPhoto = (e) => {

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import "../styles/connexion.css";
 
 function Connexion() {
   const [credentials, setCredentials] = useState({

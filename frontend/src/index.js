@@ -6,7 +6,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import "./styles/index.css";
+import './styles/styles.scss';
 import Index from "./pages/Index";
 import Presentation from "./pages/Presentation.jsx";
 import Inscription from "./pages/Inscription.jsx";

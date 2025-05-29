@@ -1,9 +1,7 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { allInstruments } from "../assets/data";
 import { allStyles } from "../assets/data";
-import "../styles/createProfil.css";
-import "../styles/header.css";
 
 function CreateProfil({ onSubmit, initialData = {} }) {
   const [formData, setFormData] = useState({
@@ -146,12 +144,12 @@ function CreateProfil({ onSubmit, initialData = {} }) {
         {formData.photoPreview && (
           <div className="form__preview">
             <img
+              className="form__img"
               src={formData.photoPreview}
               alt="Aperçu"
-              style={{ maxWidth: "200px", marginTop: "10px" }}
             />
             <button
-            className="form__button"
+              className="form__button form__button--delete"
               type="button"
               onClick={() =>
                 setFormData((prev) => ({
@@ -161,12 +159,29 @@ function CreateProfil({ onSubmit, initialData = {} }) {
                   photoDeleted: true, // on ajoute un flag pour signaler suppression
                 }))
               }
-              style={{ marginTop: "10px" }}
             >
               Supprimer la photo
             </button>
           </div>
         )}
+
+        <label className="form__label">Audio (fichier local):</label>
+        <input
+          className="form__input"
+          type="file"
+          name="audio"
+          accept="audio/*"
+          onChange={handleAudioChange}
+        />
+        {formData.audio && (
+          <div>
+            <audio controls src={formData.audioPreview}>
+              <source src={formData.audio} type="audio/mpeg" />
+              Votre navigateur ne supporte pas l’élément audio.
+            </audio>
+          </div>
+        )}
+
         <div className="form__select">
           <label className="form__label">Style(s) :</label>
           <div className="form__input">
@@ -216,23 +231,6 @@ function CreateProfil({ onSubmit, initialData = {} }) {
             ))}
           </div>
         </div>
-        <label className="form__label">Audio (fichier local):</label>
-        <input
-          className="form__input"
-          type="file"
-          name="audio"
-          accept="audio/*"
-          onChange={handleAudioChange}
-        />
-
-        {formData.audio && (
-          <div>
-            <audio controls src={formData.audioPreview}>
-              <source src={formData.audio} type="audio/mpeg" />
-              Votre navigateur ne supporte pas l’élément audio.
-            </audio>
-          </div>
-        )}
 
         <label className="form__label">Histoire:</label>
         <textarea

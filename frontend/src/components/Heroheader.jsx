@@ -1,5 +1,3 @@
-import "../styles/heroheader.css";
-
 function Heroheader() {
   return (
     <section className="heroheader">

@@ -1,0 +1,88 @@
+@import "../variables/police";
+@import "../variables/color";
+
+.form {
+  &__profil {
+    // max-width: none;
+    margin: 20px auto;
+    padding: 15px;
+    background-color: $color-primary;
+    border-radius: 8px;
+  }
+
+  &__title {
+    color: $color-secondary;
+    font-family: $font-primary;
+    text-align: center;
+    font-size: 50px;
+  }
+
+  &__label {
+    color: $color-secondary;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  &__preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__img {
+    max-width: 200px;
+    margin-top: 10px;
+  }
+
+  &__select {
+    display: flex;
+    flex-direction: column;
+  }
+
+  &__select label {
+    display: flex;
+  }
+
+  &__button {
+    background-color: $color-third;
+    color: $color-secondary;
+    font-weight: 700;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  &__button--delete {
+    height: 100px;
+    background-color: $color-third;
+  }
+
+  &__input {
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    border: 1px solid $color-primary;
+    background-color: $color-secondary;
+    color: $color-primary;
+    font-size: 1rem;
+    resize: vertical;
+  }
+
+  &__input::placeholder {
+    color: $color-secondary;
+  }
+
+  @media (max-width: 700px) {
+    &__title {
+      font-size: 35px;
+    }
+  }
+
+  @media (max-width: 400px) {
+    &__title {
+      font-size: 28px;
+    }
+  }
+}

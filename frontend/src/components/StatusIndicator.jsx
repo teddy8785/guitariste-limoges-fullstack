@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from "react";
-import "../styles/header.css";
+import { useEffect, useState } from "react";
 
 function StatusIndicator() {
   const [isConnected, setIsConnected] = useState(false);

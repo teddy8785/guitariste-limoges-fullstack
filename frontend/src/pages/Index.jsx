@@ -99,7 +99,7 @@ function Index() {
                     Créer son profil
                   </NavLink>
                 )}
-                <button className="header__link" onClick={handleLogout}>
+                <button className="header__link header__link--logout" onClick={handleLogout}>
                   Déconnexion
                 </button>
               </>

@@ -4,7 +4,6 @@ import Header from "../components/Header";
 import Main from "../components/Main";
 import Footer from "../components/Footer";
 import { gestionErreurPhoto } from "../components/Card";
-import "../styles/presentation.css";
 
 function Presentation() {
   const { id } = useParams();

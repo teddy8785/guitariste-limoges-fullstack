@@ -121,7 +121,10 @@ function Artistes() {
             Retour
           </button>
           <div className="header__research">
-            <label className="header__checkboxAnnonce">
+            <div>
+           <label className={`header__input--research  ${
+                  isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
+                }`}>
                 <input
                   type="checkbox"
                   checked={onlyWithPhoto}
@@ -129,7 +132,9 @@ function Artistes() {
                 />
                 Afficher les profils avec photo
               </label>
-             <label className="header__checkboxAnnonce">
+             <label className={`header__input--research  ${
+                  isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
+                }`}>
                 <input
                   type="checkbox"
                   checked={onlyWithAudio}
@@ -137,7 +142,9 @@ function Artistes() {
                 />
                 Afficher les profils avec audio
               </label>
-            <label className="header__checkboxAnnonce">
+            <label className={`header__input--research  ${
+                  isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
+                }`}>
                 <input
                   type="checkbox"
                   checked={onlyWithAnnonce}
@@ -145,6 +152,8 @@ function Artistes() {
                 />
                 Afficher les profils avec une annonce
               </label>
+              </div>
+              <div className="header__research--flex">
             <button className="header__button" onClick={toggleResearch}>
               <i
                 className="fa-solid fa-magnifying-glass"
@@ -218,6 +227,7 @@ function Artistes() {
                   </option>
                 ))}
               </select>
+              </div>
             </div>
           </div>
         </nav>

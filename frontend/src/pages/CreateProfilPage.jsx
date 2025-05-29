@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import CreateProfil from "../components/CreateProfil";
 import { useNavigate, useParams } from "react-router-dom";
 

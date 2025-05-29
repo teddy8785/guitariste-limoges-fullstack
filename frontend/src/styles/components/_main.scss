@@ -1,0 +1,57 @@
+@import "../variables/police";
+@import "../variables/color";
+
+.main {
+  margin-top: 50px;
+  display: flex;
+  flex-direction: column;
+
+  &__title {
+    font-family: $font-secondary;
+    font-size: 40px;
+    color: $color-secondary;
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  &__gallery {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 50px;
+  }
+
+  &__new {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 50px;
+  }
+
+  #new {
+    scroll-margin-top: 40px;
+    margin-bottom: 370px;
+  }
+
+  #annonce {
+    margin-bottom: 200px;
+  }
+
+  &__pagination {
+    margin: 20px 0px;
+  }
+
+  &__pagination--button {
+    width: 50px;
+    font-size: 20px;
+    color: $color-primary;
+    border-radius: 2px;
+    border: 1px solid $color-primary;
+  }
+
+  @media (min-width: 768px) and (max-width: 1008px) {
+    &__link {
+      margin: 7%;
+    }
+  }
+}
