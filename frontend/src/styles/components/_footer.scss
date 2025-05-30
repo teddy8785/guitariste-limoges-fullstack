@@ -1,18 +1,37 @@
 @import "../variables/color";
 
 .footer {
-  margin: 0;
+  margin: 50px 0 0 0;
   height: 100px;
   width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  align-items: center;
+  flex-direction: column;
+  justify-content: end;
 
   &__copyright {
     color: $color-secondary;
     margin: 0;
+    text-align: center;
   }
 
+  &__mentions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &__links--content {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  &__link {
+    color: $color-secondary;
+    text-decoration: none;
+  }
+  
   &__bottom {
     display: flex;
     flex-direction: column;

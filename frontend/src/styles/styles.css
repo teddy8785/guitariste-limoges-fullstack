@@ -154,16 +154,32 @@
 }
 
 .footer {
-  margin: 0;
+  margin: 50px 0 0 0;
   height: 100px;
   width: 100%;
   display: flex;
-  justify-content: center;
-  align-items: flex-end;
+  align-items: center;
+  flex-direction: column;
+  justify-content: end;
 }
 .footer__copyright {
   color: white;
   margin: 0;
+  text-align: center;
+}
+.footer__mentions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.footer__links--content {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.footer__link {
+  color: white;
+  text-decoration: none;
 }
 .footer__bottom {
   display: flex;
