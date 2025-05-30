@@ -8,7 +8,17 @@ const userSchema = mongoose.Schema({
     unique: true,
     match: [/.+\@.+\..+/, "Email non valide"],
   },
-  password: { type: String, required: true, minlength: 6, maxlength: 1024 },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6,
+    maxlength: 1024,
+  },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
 });
 
 userSchema.plugin(uniqueValidator);

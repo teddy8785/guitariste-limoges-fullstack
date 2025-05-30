@@ -4,13 +4,14 @@ const path = require("path");
 const cors = require("cors");
 
 const guitaristeRoutes = require("./routes/guitaristes");
-const userRoutes = require("./routes/user");
+const userRoutes = require("./routes/auth");
+const adminRoutes = require("./routes/admin");
 
 const app = express();
 
 // Connexion MongoDB
 mongoose.connect(
-  "mongodb+srv://teddybarieraud:lXk1Ed5QaWv3CGCn@guitaristes-limoges.ssruxie.mongodb.net/guitaristes-limoges?retryWrites=true&w=majority&appName=guitaristes-limoges",
+  process.env.DB_URI,
   { useNewUrlParser: true, useUnifiedTopology: true }
 )
 .then(() => console.log("Connexion à MongoDB réussie !"))
@@ -43,6 +44,7 @@ app.use("/audios", express.static(path.join(__dirname, "audios")));
 
 // Routes API
 app.use("/api/guitaristes", guitaristeRoutes);
-app.use("/api/user", userRoutes);
+app.use("/api/auth", userRoutes);
+app.use("/admin", adminRoutes);
 
 module.exports = app;

@@ -17,7 +17,7 @@ function Inscription() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:4000/api/user/signup", {
+    fetch("http://localhost:4000/api/auth/signup", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
