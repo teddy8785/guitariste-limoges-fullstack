@@ -9,13 +9,15 @@ const adminRoutes = require("./routes/admin");
 
 const app = express();
 
+require('dotenv').config();
+
 // Connexion MongoDB
 mongoose.connect(
   process.env.DB_URI,
   { useNewUrlParser: true, useUnifiedTopology: true }
 )
 .then(() => console.log("Connexion à MongoDB réussie !"))
-.catch(() => console.log("Connexion à MongoDB échouée !"));
+.catch(err => console.log("Connexion à MongoDB échouée !", err));
 
 // Middleware CORS (dev + future prod)
 const allowedOrigins = [
