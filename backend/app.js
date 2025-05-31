@@ -47,6 +47,6 @@ app.use("/audios", express.static(path.join(__dirname, "audios")));
 // Routes API
 app.use("/api/guitaristes", guitaristeRoutes);
 app.use("/api/auth", userRoutes);
-app.use("/admin", adminRoutes);
+app.use("/api/admin", adminRoutes);
 
 module.exports = app;

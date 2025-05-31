@@ -7,6 +7,7 @@ import { gestionErreurPhoto } from "../components/Card";
 
 function Presentation() {
   const { id } = useParams();
+  console.log("id récupéré dans useParams:", id);
   const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
@@ -15,6 +16,8 @@ function Presentation() {
   const [isLogged, setIsLogged] = useState(false);
 
   const userId = localStorage.getItem("userId");
+  const userRole = localStorage.getItem("role");
+  const isAdmin = userRole === "admin";
   const backendUrl = "http://localhost:4000";
 
   useEffect(() => {
@@ -45,9 +48,8 @@ function Presentation() {
 
   const isOwner = userId === post.userId;
 
-  const deleteMyGuitariste = async () => {
-    const confirmDelete = window.confirm("Supprimer ton profil ?");
-
+  const deleteProfil = async () => {
+    const confirmDelete = window.confirm("Supprimer ce profil ?");
     if (!confirmDelete) return;
 
     const token = localStorage.getItem("token");
@@ -57,7 +59,16 @@ function Presentation() {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/api/guitaristes/me", {
+      let url;
+      console.log("Suppression du profil avec id:", id);
+
+      if (isAdmin && id) {
+        url = `http://localhost:4000/api/admin/guitaristes/${id}`; // admin supprime un profil donné
+      } else {
+        url = "http://localhost:4000/api/guitaristes/me"; // utilisateur supprime son propre profil
+      }
+
+      const response = await fetch(url, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -86,17 +97,18 @@ function Presentation() {
           >
             Retour
           </button>
-          {isLogged && isOwner && (
+          {isLogged && (isOwner || isAdmin) && (
             <button
               className="header__button"
               onClick={() => navigate(`/profil/${id}`)}
             >
-              Modifier mon profil
+              Modifier ce profil
             </button>
           )}
-          {isLogged && isOwner && (
-            <button className="header__button" onClick={deleteMyGuitariste}>
-              Supprimer mon profil
+
+          {isLogged && (isOwner || isAdmin) && (
+            <button className="header__button" onClick={deleteProfil}>
+              Supprimer ce profil
             </button>
           )}
         </nav>
@@ -196,7 +208,9 @@ function Presentation() {
           </>
         </section>
       </Main>
-      <Footer />
+      <Footer>
+        <p className="footer__copyright">&copy; 2024 - Guitaristes Limoges</p>
+      </Footer>
     </div>
   );
 }

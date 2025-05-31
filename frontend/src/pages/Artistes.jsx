@@ -263,7 +263,9 @@ function Artistes() {
           />
         )}
       </Main>
-      <Footer />
+      <Footer>
+        <p className="footer__copyright">&copy; 2024 - Guitaristes Limoges</p>
+      </Footer>
     </div>
   );
 }

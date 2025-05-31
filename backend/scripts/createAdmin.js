@@ -9,7 +9,7 @@ mongoose.connect(process.env.DB_URI, {
 });
 
 async function createAdmin() {
-  const hashedPassword = await bcrypt.hash(process.env.JTW_SECRET, 10);
+  const hashedPassword = await bcrypt.hash(process.env.JWT_SECRET, 10);
 
   const adminUser = new User({
     email: "admin@guitaristes.fr",

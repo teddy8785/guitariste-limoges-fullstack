@@ -31,9 +31,10 @@ function Connexion() {
         return res.json();
       })
       .then((data) => {
-        // Stocker le token et userId
+        // Stocker le token et userId et le role
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data.userId);
+        localStorage.setItem("role", data.role);
 
         alert("Connexion réussie !");
         // Tu peux aussi rediriger ici si tu veux
