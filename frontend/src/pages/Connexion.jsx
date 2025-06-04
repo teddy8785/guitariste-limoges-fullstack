@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import PasswordInput from "../components/PasswordInput";
 
 function Connexion() {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
+  //  const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
 
@@ -61,15 +63,14 @@ function Connexion() {
         />
 
         <label className="form__label">Mot de passe :</label>
-        <input
-          type="password"
-          name="password"
-          value={credentials.password}
-          onChange={handleChange}
-          className="form__input"
-          required
-        />
-
+        <div className="form__input--container">
+          <PasswordInput
+            value={credentials.password}
+            onChange={handleChange}
+            name="password"
+            placeholder="Votre mot de passe"
+          />
+        </div>
         <button className="form__button" type="submit">
           Se connecter
         </button>

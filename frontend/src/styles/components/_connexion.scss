@@ -35,8 +35,9 @@
   }
 
   &__input {
+    width: 90%;
     margin-bottom: 15px;
-    padding: 8px 12px;
+    padding: 8px 20px 8px 15px;
     border-radius: 4px;
     border: 1px solid $color-secondary;
     background-color: $color-secondary;
@@ -45,7 +46,30 @@
     resize: vertical;
   }
 
+  &__input--container {
+    position: relative;
+  }
+
+  &__toggle--password {
+    position: absolute;
+    top: 20px;
+    right: 5px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
   &__input::placeholder {
     color: $color-secondary;
+  }
+
+  @media (max-width: 420px) {
+    &__title {
+      font-size: 40px;
+    }
+
+    &__input {
+      width: 90%;
+      padding: 8px 20px 8px 0px;
+    }
   }
 }
