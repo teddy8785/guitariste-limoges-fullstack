@@ -672,6 +672,14 @@ code {
 .form__input::placeholder {
   color: white;
 }
+.form__error {
+  background-color: darkred;
+  color: yellow;
+  width: 100%;
+  margin-top: 10px;
+  text-align: center;
+  border-radius: 50px;
+}
 @media (max-width: 420px) {
   .form__title {
     font-size: 40px;

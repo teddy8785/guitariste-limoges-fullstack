@@ -1,19 +1,20 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../components/PasswordInput";
+import ErrorDisplay from "../components/ErrorDisplay";
 
 function Connexion() {
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
-  //  const [showPassword, setShowPassword] = useState(false);
-
+  const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({ ...credentials, [name]: value });
+    setErrorMessage(null);
   };
 
   const handleSubmit = (e) => {
@@ -37,14 +38,10 @@ function Connexion() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data.userId);
         localStorage.setItem("role", data.role);
-
-        alert("Connexion réussie !");
-        // Tu peux aussi rediriger ici si tu veux
         navigate("/");
       })
       .catch((error) => {
-        console.error("Erreur :", error);
-        alert("Échec de la connexion. Vérifie tes identifiants.");
+        setErrorMessage("Adresse mail ou Mot de passe erroné");
       });
   };
 
@@ -74,6 +71,7 @@ function Connexion() {
         <button className="form__button" type="submit">
           Se connecter
         </button>
+        {errorMessage && <ErrorDisplay message={errorMessage} />}
       </form>
     </div>
   );
