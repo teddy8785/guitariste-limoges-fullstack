@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import CreateProfil from "../components/CreateProfil";
 import { useNavigate, useParams } from "react-router-dom";
+import Footer from "../components/Footer";
 
 function CreateProfilPage() {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ function CreateProfilPage() {
   useEffect(() => {
     if (id) {
       // Chargement du profil existant pour modification
-      fetch(`http://localhost:4000/api/guitaristes/${id}`, {
+      fetch(`http://localhost:4000/api/guitaristes/id/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -41,7 +42,7 @@ const handleProfilSubmit = async (formData) => {
     if (id) {
       method = "PUT";
       if (userRole === "admin") {
-        url = `http://localhost:4000/api/admin/guitaristes/${id}`;
+        url = `http://localhost:4000/api/admin/guitaristes/id/${id}`;
       } else {
         url = `http://localhost:4000/api/guitaristes/me`;
       }
@@ -79,7 +80,6 @@ const handleProfilSubmit = async (formData) => {
     if (!response.ok) throw new Error("Erreur lors de l’envoi");
 
     const data = await response.json();
-    console.log("Profil enregistré :", data);
     navigate(`/artiste/${data._id}`);
   } catch (error) {
     console.error("Erreur :", error);
@@ -95,6 +95,7 @@ const handleProfilSubmit = async (formData) => {
         initialData={initialData || {}}
         onSubmit={handleProfilSubmit}
       />
+        <Footer />
     </div>
   );
 }

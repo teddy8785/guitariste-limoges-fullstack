@@ -1,8 +1,10 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const guitaristeSchema = mongoose.Schema({
   userId: { type: String, required: true },
   nom: { type: String, required: true },
+  slug: { type: String },
   ville: { type:String },
   photo: { type: String },
   photoDown: { type: String },
@@ -17,5 +19,22 @@ const guitaristeSchema = mongoose.Schema({
   annonce: { type: String },
   annonceDate: { type: Date },
 }, { timestamps: true });
+
+guitaristeSchema.pre('save', async function (next) {
+  if (!this.isModified('nom')) return next();
+
+  const baseSlug = slugify(this.nom, { lower: true, strict: true });
+  let slug = baseSlug;
+  let counter = 1;
+
+  // Recherche d’un slug unique via le modèle actuel
+  while (await this.constructor.findOne({ slug })) {
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  this.slug = slug;
+  next();
+});
 
 module.exports = mongoose.model('Guitariste', guitaristeSchema);

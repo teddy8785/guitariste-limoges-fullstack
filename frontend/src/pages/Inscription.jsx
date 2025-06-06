@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../components/PasswordInput";
+import Footer from "../components/Footer";
 
 function Inscription() {
   const [credentials, setCredentials] = useState({
@@ -67,10 +68,11 @@ function Inscription() {
             placeholder="Votre mot de passe"
           />
         </div>
-        <button className="form__button" type="submit">
+        <button className="form__button form__button--space" type="submit">
           S'inscrire
         </button>
       </form>
+        <Footer />
     </div>
   );
 }

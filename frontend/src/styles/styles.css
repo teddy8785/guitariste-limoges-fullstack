@@ -6,7 +6,7 @@
   font-family: "Eater", serif;
   color: white;
   letter-spacing: 5px;
-  font-size: 80px;
+  font-size: 70px;
   text-align: center;
   font-weight: 400;
   font-style: normal;
@@ -268,9 +268,28 @@
   border-radius: 2px;
   border: 1px solid black;
 }
+.main__empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  color: #9e9e9e;
+  font-size: 2rem;
+  height: 300px;
+}
 @media (min-width: 768px) and (max-width: 1008px) {
   .main__link {
     margin: 7%;
+  }
+  .main__empty {
+    font-size: 1.5rem;
+    height: 150px;
+  }
+}
+@media (max-width: 767px) {
+  .main__empty {
+    font-size: 1.5rem;
+    height: 230px;
   }
 }
 
@@ -644,6 +663,9 @@ code {
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
+}
+.form__button--space {
+  margin-bottom: 100%;
 }
 .form__input {
   width: 90%;

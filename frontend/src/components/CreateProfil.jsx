@@ -97,7 +97,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       if (initialData._id) {
         navigate(`/artiste/${initialData._id}`);
       } else {
-        navigate("/index");
+        navigate("/");
       }
     } catch (error) {
       alert("Erreur lors de la mise à jour : " + error.message);
@@ -106,7 +106,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
 
   return (
     <div className="header">
-      <button className="header__button" onClick={() => navigate("/index")}>
+      <button className="header__button" onClick={() => navigate("/")}>
         Retour
       </button>
 

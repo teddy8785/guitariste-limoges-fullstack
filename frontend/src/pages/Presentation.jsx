@@ -6,9 +6,9 @@ import Footer from "../components/Footer";
 import { gestionErreurPhoto } from "../components/Card";
 
 function Presentation() {
-  const { id } = useParams();
-  console.log("id récupéré dans useParams:", id);
+  const { slug } = useParams();
   const navigate = useNavigate();
+  const isSafeUrl = (url) => /^https?:\/\/[\w.-]+/i.test(url);
 
   const [post, setPost] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,11 +21,17 @@ function Presentation() {
   const backendUrl = "http://localhost:4000";
 
   useEffect(() => {
+    if (post) {
+      document.title = `${post.nom} | Guitaristes`;
+    }
+  }, [post]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
     const token = localStorage.getItem("token");
     setIsLogged(!!token);
 
-    fetch(`http://localhost:4000/api/guitaristes/${id}`)
+    fetch(`http://localhost:4000/api/guitaristes/slug/${slug}`)
       .then((res) => {
         if (!res.ok) throw new Error("Artiste non trouvé");
         return res.json();
@@ -38,7 +44,7 @@ function Presentation() {
         setError(err.message);
         setLoading(false);
       });
-  }, [id]);
+  }, [slug]);
 
   if (loading) return <p>Chargement...</p>;
 
@@ -60,12 +66,10 @@ function Presentation() {
 
     try {
       let url;
-      console.log("Suppression du profil avec id:", id);
-
-      if (isAdmin && id) {
-        url = `http://localhost:4000/api/admin/guitaristes/${id}`; // admin supprime un profil donné
+      if (isAdmin && post?._id) {
+        url = `http://localhost:4000/api/admin/guitaristes/${post._id}`;
       } else {
-        url = "http://localhost:4000/api/guitaristes/me"; // utilisateur supprime son propre profil
+        url = "http://localhost:4000/api/guitaristes/me";
       }
 
       const response = await fetch(url, {
@@ -92,7 +96,7 @@ function Presentation() {
           <button
             className="header__button"
             onClick={() => {
-              navigate("/index");
+              navigate("/");
             }}
           >
             Retour
@@ -100,7 +104,7 @@ function Presentation() {
           {isLogged && (isOwner || isAdmin) && (
             <button
               className="header__button"
-              onClick={() => navigate(`/profil/${id}`)}
+              onClick={() => navigate(`/profil/${post._id}`)}
             >
               Modifier ce profil
             </button>
@@ -166,7 +170,7 @@ function Presentation() {
               <div className="presentation__contactcontent">
                 <h3>CONTACT</h3>
                 <div className="presentation__contact">
-                  {post.lienx && (
+                  {post.lienx && isSafeUrl(post.lienx) && (
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
@@ -175,7 +179,7 @@ function Presentation() {
                       <i className="fa-brands fa-twitter"></i>
                     </a>
                   )}
-                  {post.lieninstagram && (
+                  {post.lieninstagram && isSafeUrl(post.lieninstagram) && (
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
@@ -184,7 +188,7 @@ function Presentation() {
                       <i className="fa-brands fa-instagram"></i>
                     </a>
                   )}
-                  {post.lienyoutube && (
+                  {post.lienyoutube && isSafeUrl(post.lienyoutube) && (
                     <a
                       target="_blank"
                       rel="noopener noreferrer"
@@ -208,9 +212,7 @@ function Presentation() {
           </>
         </section>
       </Main>
-      <Footer>
-        <p className="footer__copyright">&copy; 2024 - Guitaristes Limoges</p>
-      </Footer>
+      <Footer />
     </div>
   );
 }

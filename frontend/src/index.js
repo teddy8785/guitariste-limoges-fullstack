@@ -1,11 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import {
-  HashRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import "./styles/styles.scss";
 import Index from "./pages/Index";
 import Presentation from "./pages/Presentation.jsx";
@@ -21,12 +16,11 @@ const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <React.StrictMode>
-    <Router>
+     <BrowserRouter basename="/guitaristes-limoges">
       <Routes>
-        <Route path="/" element={<Navigate to="/index" />} />
-        <Route path="/index" element={<Index />} />
+        <Route path="/" element={<Index />} />
         <Route path="/gallery" element={<Artistes />} />
-        <Route path="/artiste/:id" element={<Presentation />} />
+        <Route path="/artiste/:slug" element={<Presentation />} />
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/connexion" element={<Connexion />} />
         <Route path="/profil" element={<CreateProfil />} />
@@ -36,6 +30,6 @@ root.render(
         <Route path="/erreur" element={<Erreur />} />
         <Route path="*" element={<Erreur />} />
       </Routes>
-    </Router>
+    </BrowserRouter>
   </React.StrictMode>
 );

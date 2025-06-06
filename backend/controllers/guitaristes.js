@@ -133,6 +133,18 @@ exports.getGuitaristeById = async (req, res) => {
   }
 };
 
+exports.getGuitaristeBySlug = async (req, res) => {
+  try {
+    const guitariste = await Guitariste.findOne({ slug: req.params.slug });
+    if (!guitariste) {
+      return res.status(404).json({ message: "Profil non trouvé" });
+    }
+    res.status(200).json(guitariste);
+  } catch (error) {
+    res.status(500).json({ message: "Erreur serveur" });
+  }
+};
+
 exports.getRecentGuitaristes = (req, res) => {
   Guitariste.find()
     .sort({ createdAt: -1 }) // trie par date création décroissante

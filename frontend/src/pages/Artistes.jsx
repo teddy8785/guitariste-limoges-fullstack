@@ -12,7 +12,7 @@ function Artistes() {
   const [selectedInstrument, setSelectedInstrument] = useState("");
   const [onlyWithAnnonce, setOnlyWithAnnonce] = useState(false);
   const [onlyWithAudio, setOnlyWithAudio] = useState(false);
-   const [onlyWithPhoto, setOnlyWithPhoto] = useState(false);
+  const [onlyWithPhoto, setOnlyWithPhoto] = useState(false);
   const [isResearchOpen, setIsResearchOpen] = useState(false);
   const [currentPage, setCurrentPages] = useState(1);
   const [data, setData] = useState([]);
@@ -63,7 +63,8 @@ function Artistes() {
         (selectedVille === "" || artiste.ville === selectedVille) &&
         (selectedInstrument === "" ||
           artiste.instrument.includes(selectedInstrument)) &&
-        (!onlyWithAnnonce || (artiste.annonce && artiste.annonce.trim() !== "")) && 
+        (!onlyWithAnnonce ||
+          (artiste.annonce && artiste.annonce.trim() !== "")) &&
         (!onlyWithAudio || (artiste.audio && artiste.audio.trim() !== "")) &&
         (!onlyWithPhoto || (artiste.photo && artiste.photo.trim() !== ""))
     );
@@ -122,9 +123,13 @@ function Artistes() {
           </button>
           <div className="header__research">
             <div>
-           <label className={`header__input--research  ${
-                  isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
-                }`}>
+              <label
+                className={`header__input--research  ${
+                  isResearchOpen
+                    ? "header__checkboxAnnonce"
+                    : "header__link--hidden"
+                }`}
+              >
                 <input
                   type="checkbox"
                   checked={onlyWithPhoto}
@@ -132,9 +137,13 @@ function Artistes() {
                 />
                 Afficher les profils avec photo
               </label>
-             <label className={`header__input--research  ${
-                  isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
-                }`}>
+              <label
+                className={`header__input--research  ${
+                  isResearchOpen
+                    ? "header__checkboxAnnonce"
+                    : "header__link--hidden"
+                }`}
+              >
                 <input
                   type="checkbox"
                   checked={onlyWithAudio}
@@ -142,9 +151,13 @@ function Artistes() {
                 />
                 Afficher les profils avec audio
               </label>
-            <label className={`header__input--research  ${
-                  isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
-                }`}>
+              <label
+                className={`header__input--research  ${
+                  isResearchOpen
+                    ? "header__checkboxAnnonce"
+                    : "header__link--hidden"
+                }`}
+              >
                 <input
                   type="checkbox"
                   checked={onlyWithAnnonce}
@@ -152,81 +165,81 @@ function Artistes() {
                 />
                 Afficher les profils avec une annonce
               </label>
-              </div>
-              <div className="header__research--flex">
-            <button className="header__button" onClick={toggleResearch}>
-              <i
-                className="fa-solid fa-magnifying-glass"
-                style={{ color: "white" }}
-              ></i>
-            </button>
-            <div className="header__nav--research">
-              <input
-                type="text"
-                placeholder="par Nom"
-                className={`header__input--research ${
-                  isResearchOpen ? "" : "header__link--hidden"
-                }`}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              ></input>
-              <select
-                className={`header__input--research ${
-                  isResearchOpen ? "" : "header__link--hidden"
-                }`}
-                value={selectedStyle}
-                onChange={(e) => setSelectedStyle(e.target.value)}
-              >
-                {selectedStyle === "" && (
-                  <option value="" disabled hidden>
-                    Par style
-                  </option>
-                )}
-                <option value="">Tous les styles</option>
-                {allStyles.map((style, index) => (
-                  <option key={index} value={style}>
-                    {style}
-                  </option>
-                ))}
-              </select>
-              <select
-                className={`header__input--research ${
-                  isResearchOpen ? "" : "header__link--hidden"
-                }`}
-                value={selectedInstrument}
-                onChange={(e) => setSelectedInstrument(e.target.value)}
-              >
-                {selectedInstrument === "" && (
-                  <option value="" disabled hidden>
-                    Par instruments
-                  </option>
-                )}
-                <option value="">Tous les instruments</option>
-                {allInstruments.map((instrument, index) => (
-                  <option key={index} value={instrument}>
-                    {instrument}
-                  </option>
-                ))}
-              </select>
-              <select
-                className={`header__input--research ${
-                  isResearchOpen ? "" : "header__link--hidden"
-                }`}
-                value={selectedVille}
-                onChange={(e) => setSelectedVille(e.target.value)}
-              >
-                {selectedVille === "" && (
-                  <option value="" disabled hidden>
-                    Par ville
-                  </option>
-                )}
-                <option value="">Toutes les villes</option>
-                {allVilles.map((ville, index) => (
-                  <option key={index} value={ville}>
-                    {ville}
-                  </option>
-                ))}
-              </select>
+            </div>
+            <div className="header__research--flex">
+              <button className="header__button" onClick={toggleResearch}>
+                <i
+                  className="fa-solid fa-magnifying-glass"
+                  style={{ color: "white" }}
+                ></i>
+              </button>
+              <div className="header__nav--research">
+                <input
+                  type="text"
+                  placeholder="par Nom"
+                  className={`header__input--research ${
+                    isResearchOpen ? "" : "header__link--hidden"
+                  }`}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                ></input>
+                <select
+                  className={`header__input--research ${
+                    isResearchOpen ? "" : "header__link--hidden"
+                  }`}
+                  value={selectedStyle}
+                  onChange={(e) => setSelectedStyle(e.target.value)}
+                >
+                  {selectedStyle === "" && (
+                    <option value="" disabled hidden>
+                      Par style
+                    </option>
+                  )}
+                  <option value="">Tous les styles</option>
+                  {allStyles.map((style, index) => (
+                    <option key={index} value={style}>
+                      {style}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className={`header__input--research ${
+                    isResearchOpen ? "" : "header__link--hidden"
+                  }`}
+                  value={selectedInstrument}
+                  onChange={(e) => setSelectedInstrument(e.target.value)}
+                >
+                  {selectedInstrument === "" && (
+                    <option value="" disabled hidden>
+                      Par instruments
+                    </option>
+                  )}
+                  <option value="">Tous les instruments</option>
+                  {allInstruments.map((instrument, index) => (
+                    <option key={index} value={instrument}>
+                      {instrument}
+                    </option>
+                  ))}
+                </select>
+                <select
+                  className={`header__input--research ${
+                    isResearchOpen ? "" : "header__link--hidden"
+                  }`}
+                  value={selectedVille}
+                  onChange={(e) => setSelectedVille(e.target.value)}
+                >
+                  {selectedVille === "" && (
+                    <option value="" disabled hidden>
+                      Par ville
+                    </option>
+                  )}
+                  <option value="">Toutes les villes</option>
+                  {allVilles.map((ville, index) => (
+                    <option key={index} value={ville}>
+                      {ville}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           </div>
@@ -235,37 +248,37 @@ function Artistes() {
       </Header>
       <Main>
         <h2 className="main__title">TOUS LES GUITARISTES</h2>
-        {filteredData.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={changePage}
-          />
-        )}
-        <div className="main__gallery">
-          {getCurrentPageData().map((post) => (
-            <Card
-              key={post._id}
-              id={post._id}
-              nom={post.nom}
-              photo={post.photo}
-              photoDown={post.photoDown}
-              audio={post.audio}
-              annonce={post.annonce}
+        {filteredData.length > 0 ? (
+          <>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={changePage}
             />
-          ))}
-        </div>
-        {filteredData.length > 0 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={changePage}
-          />
+            <div className="main__gallery">
+              {getCurrentPageData().map((post) => (
+                <Card
+                  key={post._id}
+                  slug={post.slug}
+                  nom={post.nom}
+                  photo={post.photo}
+                  photoDown={post.photoDown}
+                  audio={post.audio}
+                  annonce={post.annonce}
+                />
+              ))}
+            </div>
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={changePage}
+            />
+          </>
+        ) : (
+          <div className="main__empty">Aucun musicien trouvé</div>
         )}
       </Main>
-      <Footer>
-        <p className="footer__copyright">&copy; 2024 - Guitaristes Limoges</p>
-      </Footer>
+      <Footer />
     </div>
   );
 }

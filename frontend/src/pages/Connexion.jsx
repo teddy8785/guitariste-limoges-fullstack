@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../components/PasswordInput";
 import ErrorDisplay from "../components/ErrorDisplay";
+import Footer from "../components/Footer";
 
 function Connexion() {
   const [credentials, setCredentials] = useState({
@@ -68,11 +69,12 @@ function Connexion() {
             placeholder="Votre mot de passe"
           />
         </div>
-        <button className="form__button" type="submit">
+        <button className="form__button form__button--space" type="submit">
           Se connecter
         </button>
         {errorMessage && <ErrorDisplay message={errorMessage} />}
       </form>
+        <Footer />
     </div>
   );
 }

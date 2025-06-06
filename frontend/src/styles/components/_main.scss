@@ -49,9 +49,31 @@
     border: 1px solid $color-primary;
   }
 
+  &__empty {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    color: $grey-offline;
+    font-size: 2rem;
+    height: 300px;
+  }
+
   @media (min-width: 768px) and (max-width: 1008px) {
     &__link {
       margin: 7%;
+    }
+
+    &__empty {
+      font-size: 1.5rem;
+      height: 150px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    &__empty {
+      font-size: 1.5rem;
+      height: 230px;
     }
   }
 }

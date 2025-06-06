@@ -14,7 +14,7 @@ function Index() {
   const [isLogged, setIsLogged] = useState(false);
   const [guitaristes, setGuitaristes] = useState([]);
   const [hasProfile, setHasProfile] = useState(false);
-  const [userId, setUserId] = useState(null);
+  const [userSlug, setUserSlug] = useState(null);
   const [annonces, setAnnonces] = useState([]);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ function Index() {
         })
         .then((data) => {
           setHasProfile(true);
-          setUserId(data._id);
+          setUserSlug(data.slug);
         })
         .catch(() => setHasProfile(false));
     } else {
@@ -90,8 +90,8 @@ function Index() {
           <div className="header__user">
             {isLogged ? (
               <>
-                {hasProfile && userId ? (
-                  <NavLink className="header__link" to={`/artiste/${userId}`}>
+                {hasProfile && userSlug ? (
+                  <NavLink className="header__link" to={`/artiste/${userSlug}`}>
                     Mon profil
                   </NavLink>
                 ) : (
@@ -99,7 +99,10 @@ function Index() {
                     Créer son profil
                   </NavLink>
                 )}
-                <button className="header__link header__link--logout" onClick={handleLogout}>
+                <button
+                  className="header__link header__link--logout"
+                  onClick={handleLogout}
+                >
                   Déconnexion
                 </button>
               </>
@@ -166,7 +169,7 @@ function Index() {
             {guitaristes.map((post) => (
               <Card
                 key={post._id}
-                id={post._id}
+                slug={post.slug}
                 nom={post.nom}
                 photo={post.photo}
                 photoDown={post.photoDown}
@@ -182,7 +185,7 @@ function Index() {
             {annonces.map((post) => (
               <Card
                 key={post._id}
-                id={post._id}
+                slug={post.slug}
                 nom={post.nom}
                 photo={post.photo}
                 photoDown={post.photoDown}
@@ -194,19 +197,7 @@ function Index() {
         </section>
         <Contact />
       </Main>
-      <Footer>
-        <div className="footer__mentions">
-        <div className="footer__links--content">
-          <NavLink to={`/mentions-legales`} className="footer__link">
-            Mentions légales
-          </NavLink>
-          <NavLink to={`/confidentialite`} className="footer__link">
-            Politique de confidentialité
-          </NavLink>
-        </div>
-      </div>
-      <p className="footer__copyright">&copy; 2024 - Guitaristes Limoges</p>
-      </Footer>
+      <Footer />
     </div>
   );
 }
