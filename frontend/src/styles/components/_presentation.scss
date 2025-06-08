@@ -7,6 +7,10 @@
   flex-direction: column;
   gap: 2px;
 
+  &__heart::before {
+    font-size: 50px;
+  }
+
   &__annonce {
     display: flex;
     gap: 30px;
@@ -19,6 +23,10 @@
     font-size: 30px;
     padding: 10px;
     margin: 0px 10px 20px 10px;
+  }
+
+  &__bell--color::before {
+    color: $color-third;
   }
 
   h3 {

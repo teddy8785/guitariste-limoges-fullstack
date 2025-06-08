@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import Heart from "./Heart";
 
 export const defaultPhoto = `${process.env.PUBLIC_URL}/photos/sansphoto.webP`;
 export const gestionErreurPhoto = (e) => {
@@ -8,7 +9,7 @@ export const gestionErreurPhoto = (e) => {
 
 function Card({ slug, nom, photo, photoDown, audio, annonce }) {
   const backendUrl = "http://localhost:4000";
-  
+
   const photoSrc = photo
     ? photo.startsWith("http")
       ? photo
@@ -50,6 +51,7 @@ function Card({ slug, nom, photo, photoDown, audio, annonce }) {
   return (
     <article className="card">
       <p className="card__name">{nom}</p>
+      <Heart className="card__heart" color="black" />
       <NavLink className="card__link" to={`/artiste/${slug}`}>
         {picturesSources}
         {audio && audio.length > 0 && (

@@ -3,6 +3,7 @@ import { useParams, Navigate, useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Main from "../components/Main";
 import Footer from "../components/Footer";
+import Heart from "../components/Heart";
 import { gestionErreurPhoto } from "../components/Card";
 
 function Presentation() {
@@ -121,10 +122,11 @@ function Presentation() {
       <Main>
         {post.annonce && (
           <div className="presentation__annonce">
-            <i className="fa-solid fa-bell" style={{ color: "red" }}></i>
+            <i className="fa-solid fa-bell presentation__bell--color"></i>
             {post.annonce}
           </div>
         )}
+        <Heart className="card__heart presentation__heart" color="white" />
         <section className="presentation">
           <>
             {post.photo && (
