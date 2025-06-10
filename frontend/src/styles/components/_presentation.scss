@@ -11,6 +11,11 @@
     font-size: 50px;
   }
 
+  &__count {
+    color: $color-secondary;
+    font-size: 40px;
+  }
+
   &__annonce {
     display: flex;
     gap: 30px;

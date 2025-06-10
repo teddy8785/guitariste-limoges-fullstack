@@ -145,12 +145,16 @@ exports.getGuitaristeBySlug = async (req, res) => {
   }
 };
 
-exports.getRecentGuitaristes = (req, res) => {
-  Guitariste.find()
-    .sort({ createdAt: -1 }) // trie par date création décroissante
-    .limit(4)                 // limite à 4 résultats
-    .then((guitaristes) => res.status(200).json(guitaristes))
-    .catch((error) => res.status(500).json({ message: "Erreur serveur", error }));
+exports.getRecentGuitaristes = async (req, res) => {
+  try {
+    const guitaristes = await Guitariste.find()
+      .sort({ createdAt: -1 })
+      .limit(4);
+    res.status(200).json(guitaristes);
+  } catch (error) {
+    console.error("Erreur getRecentGuitaristes:", error);
+    res.status(500).json({ message: "Erreur serveur", error: error.message });
+  }
 };
 
 exports.getRecentAnnonces = (req, res) => {
@@ -185,10 +189,12 @@ exports.updateMyGuitariste = async (req, res) => {
     let guitariste;
     if (isAdmin && guitaristeId) {
       guitariste = await Guitariste.findById(guitaristeId);
-      if (!guitariste) return res.status(404).json({ error: "Profil non trouvé" });
+      if (!guitariste)
+        return res.status(404).json({ error: "Profil non trouvé" });
     } else {
       guitariste = await Guitariste.findOne({ userId });
-      if (!guitariste) return res.status(404).json({ error: "Profil non trouvé" });
+      if (!guitariste)
+        return res.status(404).json({ error: "Profil non trouvé" });
     }
 
     let updatedData = { ...req.body };
@@ -231,7 +237,10 @@ exports.updateMyGuitariste = async (req, res) => {
       await deleteFileIfExists(guitariste.photoDown);
 
       const imageFile = req.files["image"][0];
-      const originalName = imageFile.originalname.split(" ").join("_").split(".")[0];
+      const originalName = imageFile.originalname
+        .split(" ")
+        .join("_")
+        .split(".")[0];
       const timestamp = Date.now();
       const jpgFilename = `${originalName}_${timestamp}.jpg`;
       const webpFilename = `${originalName}_${timestamp}.webp`;
@@ -242,11 +251,19 @@ exports.updateMyGuitariste = async (req, res) => {
         fit: "cover",
       });
 
-      await resizedImage.jpeg({ quality: 90 }).toFile(path.join("images", jpgFilename));
-      await resizedImage.webp({ quality: 80 }).toFile(path.join("images", webpFilename));
+      await resizedImage
+        .jpeg({ quality: 90 })
+        .toFile(path.join("images", jpgFilename));
+      await resizedImage
+        .webp({ quality: 80 })
+        .toFile(path.join("images", webpFilename));
 
-      updatedData.photo = `${req.protocol}://${req.get("host")}/images/${jpgFilename}`;
-      updatedData.photoDown = `${req.protocol}://${req.get("host")}/images/${webpFilename}`;
+      updatedData.photo = `${req.protocol}://${req.get(
+        "host"
+      )}/images/${jpgFilename}`;
+      updatedData.photoDown = `${req.protocol}://${req.get(
+        "host"
+      )}/images/${webpFilename}`;
     }
 
     // Gestion audio
@@ -254,13 +271,23 @@ exports.updateMyGuitariste = async (req, res) => {
       await deleteFileIfExists(guitariste.audio);
 
       const audioFile = req.files["audio"][0];
-      const audioOriginalName = audioFile.originalname.split(" ").join("_").split(".")[0];
+      const audioOriginalName = audioFile.originalname
+        .split(" ")
+        .join("_")
+        .split(".")[0];
       const timestampAudio = Date.now();
-      const audioFilename = `${audioOriginalName}_${timestampAudio}${path.extname(audioFile.originalname)}`;
+      const audioFilename = `${audioOriginalName}_${timestampAudio}${path.extname(
+        audioFile.originalname
+      )}`;
 
-      await fsPromises.writeFile(path.join("audios", audioFilename), audioFile.buffer);
+      await fsPromises.writeFile(
+        path.join("audios", audioFilename),
+        audioFile.buffer
+      );
 
-      updatedData.audio = `${req.protocol}://${req.get("host")}/audios/${audioFilename}`;
+      updatedData.audio = `${req.protocol}://${req.get(
+        "host"
+      )}/audios/${audioFilename}`;
     }
 
     // Mise à jour date annonce si modif annonce
@@ -270,10 +297,15 @@ exports.updateMyGuitariste = async (req, res) => {
 
     // On interdit la modification du userId
     delete updatedData.userId;
+    const updatedGuitariste = await Guitariste.findByIdAndUpdate(
+      guitariste._id,
+      updatedData,
+      { new: true }
+    );
 
-    await Guitariste.updateOne({ _id: guitariste._id }, updatedData);
-
-    res.status(200).json({ message: "Profil mis à jour !" });
+    res
+      .status(200)
+      .json({ message: "Profil mis à jour !", slug: updatedGuitariste.slug });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
@@ -285,7 +317,7 @@ exports.deleteMyGuitariste = async (req, res) => {
     const userId = req.auth.userId;
     const isAdmin = req.auth.isAdmin; // suppose que tu as ce booléen dans auth
 
-    // L'id du profil à supprimer : 
+    // L'id du profil à supprimer :
     // - admin peut passer un id dans params
     // - user normal supprime son propre profil (userId)
     const guitaristeId = isAdmin ? req.params.id : null;
@@ -293,10 +325,12 @@ exports.deleteMyGuitariste = async (req, res) => {
     let guitariste;
     if (isAdmin && guitaristeId) {
       guitariste = await Guitariste.findById(guitaristeId);
-      if (!guitariste) return res.status(404).json({ error: "Profil non trouvé" });
+      if (!guitariste)
+        return res.status(404).json({ error: "Profil non trouvé" });
     } else {
       guitariste = await Guitariste.findOne({ userId });
-      if (!guitariste) return res.status(404).json({ error: "Profil non trouvé" });
+      if (!guitariste)
+        return res.status(404).json({ error: "Profil non trouvé" });
     }
 
     // Supprimer les fichiers
@@ -306,11 +340,15 @@ exports.deleteMyGuitariste = async (req, res) => {
     }
     if (guitariste.photoDown) {
       const filenameWebp = guitariste.photoDown.split("/images/")[1];
-      await fsPromises.unlink(path.join("images", filenameWebp)).catch(() => {});
+      await fsPromises
+        .unlink(path.join("images", filenameWebp))
+        .catch(() => {});
     }
     if (guitariste.audio) {
       const filenameAudio = guitariste.audio.split("/audios/")[1];
-      await fsPromises.unlink(path.join("audios", filenameAudio)).catch(() => {});
+      await fsPromises
+        .unlink(path.join("audios", filenameAudio))
+        .catch(() => {});
     }
 
     // Supprimer la fiche dans la DB

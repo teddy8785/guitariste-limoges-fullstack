@@ -33,59 +33,68 @@ function CreateProfilPage() {
     }
   }, [id]);
 
-const handleProfilSubmit = async (formData) => {
-  try {
-    const userRole = localStorage.getItem("role");
-    let url;
-    let method;
+  const handleProfilSubmit = async (formData) => {
+    try {
+      const userRole = localStorage.getItem("role");
+      let url;
+      let method;
 
-    if (id) {
-      method = "PUT";
-      if (userRole === "admin") {
-        url = `http://localhost:4000/api/admin/guitaristes/id/${id}`;
+      if (id) {
+        method = "PUT";
+        if (userRole === "admin") {
+          url = `http://localhost:4000/api/admin/guitaristes/id/${id}`;
+        } else {
+          url = `http://localhost:4000/api/guitaristes/me`;
+        }
       } else {
-        url = `http://localhost:4000/api/guitaristes/me`;
+        method = "POST";
+        url = "http://localhost:4000/api/guitaristes";
       }
-    } else {
-      method = "POST";
-      url = "http://localhost:4000/api/guitaristes";
-    }
 
-    const dataToSend = new FormData();
+      const dataToSend = new FormData();
 
-    for (const key in formData) {
-      if (key === "style" && Array.isArray(formData.style)) {
-        formData.style.forEach((s) => dataToSend.append("style", s));
-      } else if (key === "instrument" && Array.isArray(formData.instrument)) {
-        formData.instrument.forEach((i) => dataToSend.append("instrument", i));
-      } else if (key === "photo" && formData.photo instanceof File) {
-        dataToSend.append("image", formData.photo);
-      } else if (key === "audio" && formData.audio instanceof File) {
-        dataToSend.append("audio", formData.audio);
-      } else if (key === "photoDeleted" && formData.photoDeleted === true) {
-        dataToSend.append("photoDeleted", "true");
-      } else if (key !== "photoDeleted") {
-        dataToSend.append(key, formData[key]);
+      for (const key in formData) {
+        if (key === "style" && Array.isArray(formData.style)) {
+          formData.style.forEach((s) => dataToSend.append("style", s));
+        } else if (key === "instrument" && Array.isArray(formData.instrument)) {
+          formData.instrument.forEach((i) =>
+            dataToSend.append("instrument", i)
+          );
+        } else if (key === "photo" && formData.photo instanceof File) {
+          dataToSend.append("image", formData.photo);
+        } else if (key === "audio" && formData.audio instanceof File) {
+          dataToSend.append("audio", formData.audio);
+        } else if (key === "photoDeleted" && formData.photoDeleted === true) {
+          dataToSend.append("photoDeleted", "true");
+        } else if (key !== "photoDeleted") {
+          dataToSend.append(key, formData[key]);
+        }
       }
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: dataToSend,
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de l’envoi");
+
+      const data = await response.json();
+      // Essaie d'utiliser data.slug, sinon initialData.slug, sinon redirige vers la home
+      const profileSlug = data.slug || initialData?.slug;
+
+      if (profileSlug) {
+        navigate(`/artiste/${profileSlug}`);
+      } else {
+        navigate("/"); // ou une autre page de fallback
+      }
+    } catch (error) {
+      console.error("Erreur :", error);
+      alert(error.message);
     }
-
-    const response = await fetch(url, {
-      method,
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-      body: dataToSend,
-    });
-
-    if (!response.ok) throw new Error("Erreur lors de l’envoi");
-
-    const data = await response.json();
-    navigate(`/artiste/${data._id}`);
-  } catch (error) {
-    console.error("Erreur :", error);
-    alert(error.message);
-  }
-};
+  };
 
   if (loading) return <p>Chargement du profil...</p>;
 
@@ -95,7 +104,7 @@ const handleProfilSubmit = async (formData) => {
         initialData={initialData || {}}
         onSubmit={handleProfilSubmit}
       />
-        <Footer />
+      <Footer />
     </div>
   );
 }

@@ -169,6 +169,7 @@ function Index() {
             {guitaristes.map((post) => (
               <Card
                 key={post._id}
+                itemId={post._id}
                 slug={post.slug}
                 nom={post.nom}
                 photo={post.photo}
@@ -185,6 +186,7 @@ function Index() {
             {annonces.map((post) => (
               <Card
                 key={post._id}
+                itemId={post._id}
                 slug={post.slug}
                 nom={post.nom}
                 photo={post.photo}

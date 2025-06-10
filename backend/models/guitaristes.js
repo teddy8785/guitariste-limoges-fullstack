@@ -18,6 +18,10 @@ const guitaristeSchema = mongoose.Schema({
   lienyoutube: { type: String },
   annonce: { type: String },
   annonceDate: { type: Date },
+  likes: {
+    type: Number,
+    default: 0,
+  },
 }, { timestamps: true });
 
 guitaristeSchema.pre('save', async function (next) {

@@ -15,8 +15,13 @@
     margin-top: 15px;
   }
 
+  &__heart--content {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+  }
+
   &__heart {
-    text-align: center;
     margin-top: 3px;
     margin-bottom: 10px;
     pointer-events: none;

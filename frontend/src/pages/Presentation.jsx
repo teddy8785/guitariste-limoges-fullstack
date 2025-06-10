@@ -6,7 +6,7 @@ import Footer from "../components/Footer";
 import Heart from "../components/Heart";
 import { gestionErreurPhoto } from "../components/Card";
 
-function Presentation() {
+function Presentation({ type }) {
   const { slug } = useParams();
   const navigate = useNavigate();
   const isSafeUrl = (url) => /^https?:\/\/[\w.-]+/i.test(url);
@@ -126,7 +126,15 @@ function Presentation() {
             {post.annonce}
           </div>
         )}
-        <Heart className="card__heart presentation__heart" color="white" />
+        {post._id && (
+          <Heart
+            className="card__heart presentation__heart"
+            color="white"
+            itemId={post._id}
+            itemType={type}
+            variant="presentation"
+          />
+        )}
         <section className="presentation">
           <>
             {post.photo && (

@@ -95,7 +95,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     try {
       await onSubmit(payload);
       if (initialData._id) {
-        navigate(`/artiste/${initialData._id}`);
+        navigate(`/artiste/${initialData.slug}`);
       } else {
         navigate("/");
       }
