@@ -19,6 +19,12 @@ const userSchema = mongoose.Schema({
     enum: ["user", "admin"],
     default: "user",
   },
+  likedProfiles: [
+    {
+      profileId: { type: mongoose.Schema.Types.ObjectId, required: true },
+      likedAt: { type: Date, default: Date.now },
+    },
+  ],
 });
 
 userSchema.plugin(uniqueValidator);

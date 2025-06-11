@@ -176,7 +176,7 @@ async function deleteFileIfExists(fileUrl) {
   } catch (err) {
     console.log(`Erreur suppression fichier ${filename}:`, err.message);
   }
-}
+};
 
 exports.updateMyGuitariste = async (req, res) => {
   try {

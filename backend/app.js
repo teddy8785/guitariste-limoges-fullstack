@@ -7,6 +7,7 @@ const cors = require("cors");
 const guitaristeRoutes = require("./routes/guitaristes");
 const userRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
+const likesRoutes = require('./routes/likes');
 
 const app = express();
 
@@ -58,6 +59,7 @@ app.use((req, res, next) => {
 app.use("/api/guitaristes", guitaristeRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/admin", adminRoutes);
+app.use('/api/likes', likesRoutes);
 
 // Servir frontend React
 app.use(express.static(frontendBuildPath));

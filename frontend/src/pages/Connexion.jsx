@@ -1,8 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import PasswordInput from "../components/PasswordInput";
 import ErrorDisplay from "../components/ErrorDisplay";
 import Footer from "../components/Footer";
+
+// Import actions
+import { login } from "../Store/authSlice";
+import { fetchUserLikes } from "../Store/likesSlice";
+// import { resetLikes } from "../Store/likesSlice";
 
 function Connexion() {
   const [credentials, setCredentials] = useState({
@@ -11,6 +17,7 @@ function Connexion() {
   });
   const [errorMessage, setErrorMessage] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -18,32 +25,66 @@ function Connexion() {
     setErrorMessage(null);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    fetch("http://localhost:4000/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(credentials),
-    })
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Erreur lors de la connexion");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        // Stocker le token et userId et le role
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.userId);
-        localStorage.setItem("role", data.role);
-        navigate("/");
-      })
-      .catch((error) => {
-        setErrorMessage("Adresse mail ou Mot de passe erroné");
+    try {
+      const res = await fetch("http://localhost:4000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(credentials),
       });
+
+      const text = await res.text(); // toujours lire la réponse brute
+      let data;
+
+      try {
+        data = JSON.parse(text); // tente de parser en JSON
+      } catch (err) {
+        throw new Error("Réponse invalide du serveur : " + text);
+      }
+
+      if (!res.ok) {
+        throw new Error(data?.message || "Erreur lors de la connexion");
+      }
+
+      // si ici tout va bien :
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
+      localStorage.setItem("role", data.role);
+
+      const visitorKey = localStorage.getItem("visitor_key");
+
+      if (visitorKey) {
+        const transferRes = await fetch(
+          "http://localhost:4000/api/likes/transfer",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${data.token}`,
+            },
+            body: JSON.stringify({ visitorKey }),
+          }
+        );
+
+        if (!transferRes.ok) {
+          const errorText = await transferRes.text();
+          console.error("Erreur transfert likes :", errorText);
+        } else {
+          console.log("Likes transférés avec succès");
+        }
+      }
+
+      dispatch(
+        login({ token: data.token, userId: data.userId, role: data.role })
+      );
+      await dispatch(fetchUserLikes(data.userId, data.token));
+      navigate("/");
+    } catch (error) {
+      console.error("Erreur dans handleSubmit :", error);
+      setErrorMessage(error.message);
+    }
   };
 
   return (
@@ -74,7 +115,7 @@ function Connexion() {
         </button>
         {errorMessage && <ErrorDisplay message={errorMessage} />}
       </form>
-        <Footer />
+      <Footer />
     </div>
   );
 }

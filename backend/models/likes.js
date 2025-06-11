@@ -11,7 +11,7 @@ const likeSchema = mongoose.Schema(
       type: String,
       required: false,
     },
-    guitaristeId: {
+    profileId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Guitariste",
       required: true,

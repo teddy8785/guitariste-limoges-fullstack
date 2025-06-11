@@ -1,7 +1,8 @@
+const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-
 const User = require("../models/user");
+const Guitariste = require("../models/guitaristes");
 
 exports.signup = (req, res, next) => {
   bcrypt
@@ -51,4 +52,31 @@ exports.login = (req, res, next) => {
       console.error("Erreur login:", error);
       res.status(500).json({ error });
     });
+};
+
+exports.getLikedProfiles = async (req, res) => {
+  try {
+    const userId = req.params.userId;
+
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "ID utilisateur invalide" });
+    }
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: "Utilisateur non trouvé" });
+    }
+
+    // Extraire les profileIds likés
+    const likedProfileIds = user.likedProfiles.map((p) => p.profileId);
+
+    // Rechercher les guitaristes avec ces IDs
+    const likedProfiles = await Guitariste.find({ _id: { $in: likedProfileIds } });
+
+    res.json({ likedProfiles });
+  } catch (error) {
+    console.error("Erreur getLikedProfiles:", error);
+    res.status(500).json({ error: "Erreur serveur" });
+  }
 };
