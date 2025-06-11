@@ -12,10 +12,15 @@ import Artistes from "./pages/Artistes.jsx";
 import MentionsLegales from "./pages/MentionsLegales.jsx";
 import Confidentialite from "./pages/Confidentialite.jsx";
 
+// Redux
+import { Provider } from "react-redux";
+import store from './Store/index.js';
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
   <React.StrictMode>
+    <Provider store={store}>
      <BrowserRouter basename="/guitaristes-limoges">
       <Routes>
         <Route path="/" element={<Index />} />
@@ -31,5 +36,6 @@ root.render(
         <Route path="*" element={<Erreur />} />
       </Routes>
     </BrowserRouter>
+    </Provider>
   </React.StrictMode>
 );
