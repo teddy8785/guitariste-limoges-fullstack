@@ -306,8 +306,12 @@
   margin-bottom: 0;
   margin-top: 15px;
 }
+.card__heart--content {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
 .card__heart {
-  text-align: center;
   margin-top: 3px;
   margin-bottom: 10px;
   pointer-events: none;
@@ -323,6 +327,34 @@
 }
 .card__heart--liked {
   color: darkred;
+}
+.card__report {
+  position: absolute;
+  top: 30px;
+  right: 20px;
+  cursor: pointer;
+  color: darkred;
+  font-size: 20px;
+}
+.card__report--tooltip {
+  visibility: hidden;
+  opacity: 0;
+  background-color: #333;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 4px;
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 20px;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+.card__report:hover .card__report--tooltip {
+  visibility: visible;
+  opacity: 1;
 }
 @media (max-width: 1008px) {
   .card {
@@ -364,6 +396,9 @@
 @media (max-width: 435px) {
   .card {
     width: 80%;
+  }
+  .card__report {
+    top: 10px;
   }
 }
 
@@ -467,6 +502,10 @@
 }
 .presentation__heart::before {
   font-size: 50px;
+}
+.presentation__count {
+  color: white;
+  font-size: 40px;
 }
 .presentation__annonce {
   display: flex;

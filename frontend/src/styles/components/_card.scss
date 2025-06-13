@@ -42,6 +42,37 @@
     color: $color-third;
   }
 
+  &__report {
+    position: absolute;
+    top: 30px;
+    right: 20px;
+    cursor: pointer;
+    color: $color-third;
+    font-size: 20px;
+  }
+
+  &__report--tooltip {
+    visibility: hidden;
+    opacity: 0;
+    background-color: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 20px;
+    transition: opacity 0.3s ease;
+    z-index: 10;
+  }
+
+  &__report:hover &__report--tooltip {
+    visibility: visible;
+    opacity: 1;
+  }
+
   @media (max-width: 1008px) {
     width: 40%;
   }
@@ -83,6 +114,10 @@
   @media (max-width: 435px) {
     & {
       width: 80%;
+    }
+
+    &__report {
+      top: 10px;
     }
   }
 }
