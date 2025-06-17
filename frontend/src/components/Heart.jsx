@@ -9,7 +9,7 @@ function Heart({
   color,
   initialCount = 0,
   itemId,
-  itemType = "guitariste",
+  itemType = "like",
   variant = "",
 }) {
   const dispatch = useDispatch();
@@ -74,6 +74,7 @@ function Heart({
     const visitorKey = !token ? localStorage.getItem("visitor_key") : null;
 
     try {
+      // Envoi du like
       const res = await fetch(`${backendUrl}/api/${itemType}s/${itemId}/like`, {
         method: "POST",
         headers: {
@@ -83,12 +84,36 @@ function Heart({
         body: JSON.stringify({ ...(visitorKey && { visitorKey }) }),
       });
 
-      const data = await res.json();
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Erreur HTTP ${res.status} : ${text}`);
+      }
+
+      // Après le POST, on refait un GET pour récupérer l’état à jour
+      const statusUrl = token
+        ? `${backendUrl}/api/likes/${itemId}/like-status`
+        : `${backendUrl}/api/likes/${itemId}/like-status?visitorKey=${visitorKey}`;
+
+      const statusRes = await fetch(statusUrl, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+
+      if (!statusRes.ok) {
+        const text = await statusRes.text();
+        throw new Error(`Erreur HTTP ${statusRes.status} : ${text}`);
+      }
+
+      const statusData = await statusRes.json();
+
       dispatch(
-        setLikeStatus({ itemId, liked: data.liked, count: data.newCount })
+        setLikeStatus({
+          itemId,
+          liked: statusData.liked,
+          count: statusData.count,
+        })
       );
     } catch (err) {
-      console.error("Erreur enregistrement like :", err);
+      console.error("Erreur enregistrement ou récupération like :", err);
     }
   };
 
