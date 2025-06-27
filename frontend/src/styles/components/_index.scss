@@ -1,4 +1,4 @@
-@import "../variables/color";
+@use "../variables/color" as color;
 
 html, body {
   height: 100%;
@@ -8,7 +8,7 @@ html, body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: $color-primary;
+  background-color: color.$color-primary;
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
@@ -22,7 +22,7 @@ code {
 
 @media (max-width: 768px) {
  body {
-  background-color: $color-primary;
+  background-color: color.$color-primary;
   background-image: none;
  }
 }

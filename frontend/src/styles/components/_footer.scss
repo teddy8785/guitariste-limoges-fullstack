@@ -1,4 +1,4 @@
-@import "../variables/color";
+@use "../variables/color" as color;
 
 .footer {
   margin: 50px 0 0 0;
@@ -10,7 +10,7 @@
   justify-content: end;
 
   &__copyright {
-    color: $color-secondary;
+    color: color.$color-secondary;
     margin: 0;
     text-align: center;
   }
@@ -28,7 +28,7 @@
   }
 
   &__link {
-    color: $color-secondary;
+    color: color.$color-secondary;
     text-decoration: none;
   }
   

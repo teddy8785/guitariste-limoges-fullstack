@@ -1,25 +1,25 @@
-@import "../variables/police";
-@import "../variables/color";
+@use "../variables/police" as police;
+@use "../variables/color" as color;
 
 .header {
   padding: 10px;
 
   &__title {
     margin-top: 30px;
-    font-family: $font-primary;
-    color: $color-secondary;
+    font-family: police.$font-primary;
+    color: color.$color-secondary;
     letter-spacing: 5px;
     font-size: 70px;
     text-align: center;
     font-weight: 400;
     font-style: normal;
     margin-bottom: 0;
-    color: $color-secondary;
+    color: color.$color-secondary;
   }
 
   &__title--nom {
-    color: $color-secondary;
-    font-family: $font-primary;
+    color: color.$color-secondary;
+    font-family: police.$font-primary;
     text-align: center;
     margin: 0;
   }
@@ -32,17 +32,17 @@
     margin: 15px 0 0 25px;
     position: fixed;
     color: transparent;
-    background-color: $grey-offline;
+    background-color: color.$grey-offline;
   }
 
   &__status--connected {
-    background-color: $green-online;
+    background-color: color.$green-online;
   }
 
   &__user {
     display: flex;
     gap: 20px;
-    border-bottom: 2px solid $color-primary;
+    border-bottom: 2px solid color.$color-primary;
   }
 
   &__link--container {
@@ -56,7 +56,7 @@
     gap: 10px;
     position: fixed;
     width: 85%;
-    background-color: $color-secondary;
+    background-color: color.$color-secondary;
     z-index: 100;
     padding: 20px;
     border-radius: 5px;
@@ -64,8 +64,8 @@
   }
 
   &__link {
-    font-family: $font-secondary;
-    color: $color-primary;
+    font-family: police.$font-secondary;
+    color: color.$color-primary;
     border: none;
     text-decoration: none;
     font-size: 20px;
@@ -73,7 +73,7 @@
   }
 
   &__link--logout {
-    background-color: $color-secondary;
+    background-color: color.$color-secondary;
   }
 
   &__link--hidden {
@@ -91,13 +91,13 @@
   }
 
   &__ancre {
-    color: $color-primary;
+    color: color.$color-primary;
     text-decoration: none;
   }
 
   &__button {
-    font-family: $font-secondary;
-    color: $color-secondary;
+    font-family: police.$font-secondary;
+    color: color.$color-secondary;
     background-color: transparent;
     border: none;
     text-decoration: none;
@@ -123,11 +123,11 @@
   }
 
   &__checkboxAnnonce {
-    color: $color-secondary;
+    color: color.$color-secondary;
   }
 
   .fa-solid {
-    color: $color-primary;
+    color: color.$color-primary;
   }
 
   @keyframes apparition {
@@ -168,12 +168,12 @@
     .fa-bars {
       position: fixed;
       z-index: 1000;
-      color: $color-primary;
+      color: color.$color-primary;
       font-size: large;
     }
 
     .fa-solid {
-      color: $color-secondary;
+      color: color.$color-secondary;
     }
 
     &__button--fixed {

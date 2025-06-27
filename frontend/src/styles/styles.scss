@@ -1,14 +1,13 @@
-@import "./variables/color";
-@import "./variables/police";
+@use "./variables/police" as *;
+@use "./variables/color" as *;
 
-@import "./components/header";
-@import "./components/footer";
-@import "./components/heroheader";
-@import "./components/main";
-@import "./components/card";
-@import "./components/contact";
-@import "./components/heroheader";
-@import "./components/presentation";
-@import "./components/index";
-@import "./components/createProfil";
-@import "./components/connexion";
+@use "./components/header" as *;
+@use "./components/footer" as *;
+@use "./components/heroheader" as *;
+@use "./components/main" as *;
+@use "./components/card" as *;
+@use "./components/contact" as *;
+@use "./components/presentation" as *;
+@use "./components/index" as *;
+@use "./components/createProfil" as *;
+@use "./components/connexion" as *;

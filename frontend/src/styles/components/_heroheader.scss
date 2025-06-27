@@ -1,20 +1,20 @@
-@import "../variables/police";
-@import "../variables/color";
+@use "../variables/police" as police;
+@use "../variables/color" as color;
 
 .heroheader {
   margin: 168px 0px 350px 0px;
 
   &__title {
-    font-family: $font-secondary;
-    color: $color-secondary;
+    font-family: police.$font-secondary;
+    color: color.$color-secondary;
     text-align: center;
     font-size: 80px;
   }
 
   &__welcome {
     font-size: 35px;
-    color: $color-secondary;
-    font-family: $font-secondary;
+    color: color.$color-secondary;
+    font-family: police.$font-secondary;
     margin: 0px 30px;
     text-align: center;
   }

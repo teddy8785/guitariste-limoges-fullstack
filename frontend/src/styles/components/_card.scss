@@ -1,10 +1,10 @@
-@import "../variables/police";
-@import "../variables/color";
+@use "../variables/police" as police;
+@use "../variables/color" as color;
 
 .card {
-  border: solid $color-primary 1px;
+  border: solid color.$color-primary 1px;
   border-radius: 30px 30px 0px 0px;
-  background-color: $color-secondary;
+  background-color: color.$color-secondary;
   width: 17%;
   display: flex;
   flex-direction: column;
@@ -39,7 +39,7 @@
   }
 
   &__heart--liked {
-    color: $color-third;
+    color: color.$color-third;
   }
 
   &__report {
@@ -47,7 +47,7 @@
     top: 30px;
     right: 20px;
     cursor: pointer;
-    color: $color-third;
+    color: color.$color-third;
     font-size: 20px;
   }
 
@@ -78,10 +78,10 @@
   }
 
   &__name {
-    color: $color-primary;
+    color: color.$color-primary;
     text-align: center;
     font-size: 25px;
-    font-family: $font-secondary;
+    font-family: police.$font-secondary;
   }
 
   &__img {
@@ -99,8 +99,8 @@
   }
 
   &__annonce {
-    background-color: $color-third;
-    color: $color-secondary;
+    background-color: color.$color-third;
+    color: color.$color-secondary;
     width: 100px;
     text-align: center;
     position: absolute;
@@ -108,7 +108,7 @@
     right: 0;
     font-size: 18px;
     font-weight: 600;
-    font-family: $font-secondary;
+    font-family: police.$font-secondary;
   }
 
   @media (max-width: 435px) {
