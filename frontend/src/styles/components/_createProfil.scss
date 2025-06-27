@@ -1,9 +1,16 @@
 @use "../variables/police" as police;
 @use "../variables/color" as color;
 
-.form {
+.form-profil {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: color.$color-primary;
+  border-radius: 8px;
+
   &__profil {
-    // max-width: none;
     margin: 20px auto;
     padding: 15px;
     background-color: color.$color-primary;

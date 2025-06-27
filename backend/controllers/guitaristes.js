@@ -176,7 +176,20 @@ async function deleteFileIfExists(fileUrl) {
   } catch (err) {
     console.log(`Erreur suppression fichier ${filename}:`, err.message);
   }
-};
+}
+
+async function deleteAudioFileIfExists(audioUrl) {
+  if (!audioUrl) return;
+  const filename = audioUrl.split("/audios/")[1];
+  if (!filename) return;
+  const filepath = path.join("audios", filename);
+
+  try {
+    await fsPromises.unlink(filepath);
+  } catch (err) {
+    console.log(`Erreur suppression fichier audio ${filename}:`, err.message);
+  }
+}
 
 exports.updateMyGuitariste = async (req, res) => {
   try {
@@ -229,6 +242,12 @@ exports.updateMyGuitariste = async (req, res) => {
       await deleteFileIfExists(guitariste.photoDown);
       updatedData.photo = null;
       updatedData.photoDown = null;
+    }
+
+    // Suppression audio si demandé
+    if (req.body.audioDeleted === "true") {
+      await deleteAudioFileIfExists(guitariste.audio);
+      updatedData.audio = null;
     }
 
     // Gestion image (upload et redimension)

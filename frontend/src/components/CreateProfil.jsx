@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { allInstruments } from "../assets/data";
-import { allStyles } from "../assets/data";
+import { allInstruments, allStyles } from "../assets/data";
 
 function CreateProfil({ onSubmit, initialData = {} }) {
   const [formData, setFormData] = useState({
@@ -13,6 +12,8 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     style: [],
     instrument: [],
     audio: "",
+    audioPreview: "",
+    audioDeleted: false,
     histoire: "",
     mail: "",
     lienx: "",
@@ -39,6 +40,8 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       style: sanitizeArray(initialData.style),
       instrument: sanitizeArray(initialData.instrument),
       audio: initialData.audio || "",
+      audioPreview: initialData.audio || "",
+      audioDeleted: false,
       histoire: initialData.histoire || "",
       mail: initialData.mail || "",
       lienx: initialData.lienx || "",
@@ -70,9 +73,13 @@ function CreateProfil({ onSubmit, initialData = {} }) {
   const handleAudioChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setFormData((prev) => ({ ...prev, audio: file }));
       const audioUrl = URL.createObjectURL(file);
-      setFormData((prev) => ({ ...prev, audioPreview: audioUrl }));
+      setFormData((prev) => ({
+        ...prev,
+        audio: file,
+        audioPreview: audioUrl,
+        audioDeleted: false,
+      }));
     }
   };
 
@@ -85,12 +92,23 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       return [];
     };
 
+    // Préparer payload
     const payload = {
       ...formData,
       style: sanitizeArray(formData.style),
       instrument: sanitizeArray(formData.instrument),
       photo: formData.photo ? formData.photo : formData.photoPreview,
     };
+
+    // Si suppression audio, et audio existant (chaine => nom fichier), ajouter clé audioToDelete
+    if (
+      formData.audioDeleted &&
+      typeof formData.audio === "string" &&
+      formData.audio !== ""
+    ) {
+      payload.audioToDelete = formData.audio; // le nom du fichier à supprimer côté serveur
+      payload.audio = null; // pour bien indiquer qu'il n'y a plus d'audio
+    }
 
     try {
       await onSubmit(payload);
@@ -112,10 +130,10 @@ function CreateProfil({ onSubmit, initialData = {} }) {
 
       <h2 className="form__title">Créer son profil</h2>
 
-      <form className="form form__profil" onSubmit={handleSubmit}>
-        <label className="form__label">Nom:</label>
+      <form className="form-profil form-profil__profil" onSubmit={handleSubmit}>
+        <label className="form-profil__label">Nom:</label>
         <input
-          className="form__input"
+          className="form-profil__input"
           type="text"
           name="nom"
           value={formData.nom}
@@ -123,18 +141,18 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           required
         />
 
-        <label className="form__label">Ville:</label>
+        <label className="form-profil__label">Ville:</label>
         <input
-          className="form__input"
+          className="form-profil__input"
           type="text"
           name="ville"
           value={formData.ville}
           onChange={handleChange}
         />
 
-        <label className="form__label">Photo (fichier local):</label>
+        <label className="form-profil__label">Photo (fichier local):</label>
         <input
-          className="form__input"
+          className="form-profil__input"
           type="file"
           name="image"
           accept="image/*"
@@ -142,14 +160,14 @@ function CreateProfil({ onSubmit, initialData = {} }) {
         />
 
         {formData.photoPreview && (
-          <div className="form__preview">
+          <div className="form-profil__preview">
             <img
-              className="form__img"
+              className="form-profil__img"
               src={formData.photoPreview}
               alt="Aperçu"
             />
             <button
-              className="form__button form__button--delete"
+              className="form-profil__button form-profil__button--delete"
               type="button"
               onClick={() =>
                 setFormData((prev) => ({
@@ -165,26 +183,40 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           </div>
         )}
 
-        <label className="form__label">Audio (fichier local):</label>
+        <label className="form-profil__label">Audio (fichier local):</label>
         <input
-          className="form__input"
+          className="form-profil__input"
           type="file"
           name="audio"
           accept="audio/*"
           onChange={handleAudioChange}
         />
-        {formData.audio && (
-          <div>
+
+        {(formData.audioPreview || formData.audio) && (
+          <div className="form-profil__preview">
             <audio controls src={formData.audioPreview}>
-              <source src={formData.audio} type="audio/mpeg" />
               Votre navigateur ne supporte pas l’élément audio.
             </audio>
+            <button
+              type="button"
+              className="form-profil__button form-profil__button--delete"
+              onClick={() =>
+                setFormData((prev) => ({
+                  ...prev,
+                  audio: "",
+                  audioPreview: "",
+                  audioDeleted: true,
+                }))
+              }
+            >
+              Supprimer l'audio
+            </button>
           </div>
         )}
 
-        <div className="form__select">
-          <label className="form__label">Style(s) :</label>
-          <div className="form__input">
+        <div className="form-profil__select">
+          <label className="form-profil__label">Style(s) :</label>
+          <div className="form-profil__input">
             {allStyles.map((style) => (
               <label key={style}>
                 <input
@@ -207,8 +239,8 @@ function CreateProfil({ onSubmit, initialData = {} }) {
             ))}
           </div>
 
-          <label className="form__label">Instrument(s):</label>
-          <div className="form__input">
+          <label className="form-profil__label">Instrument(s):</label>
+          <div className="form-profil__input">
             {allInstruments.map((instrument) => (
               <label key={instrument}>
                 <input
@@ -232,23 +264,23 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           </div>
         </div>
 
-        <label className="form__label">Histoire:</label>
+        <label className="form-profil__label">Histoire:</label>
         <textarea
           name="histoire"
           value={formData.histoire}
           onChange={handleChange}
         />
 
-        <label className="form__label">Email:</label>
+        <label className="form-profil__label">Email:</label>
         <input
-          className="form__input"
+          className="form-profil__input"
           type="email"
           name="mail"
           value={formData.mail}
           onChange={handleChange}
         />
 
-        <label className="form__label">Lien X (ex-Twitter):</label>
+        <label className="form-profil__label">Lien X (ex-Twitter):</label>
         <input
           className="form__input"
           type="text"
@@ -257,32 +289,32 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           onChange={handleChange}
         />
 
-        <label className="form__label">Instagram:</label>
+        <label className="form-profil__label">Instagram:</label>
         <input
-          className="form__input"
+          className="form-profil__input"
           type="text"
           name="lieninstagram"
           value={formData.lieninstagram}
           onChange={handleChange}
         />
 
-        <label className="form__label">YouTube:</label>
+        <label className="form-profil__label">YouTube:</label>
         <input
-          className="form__input"
+          className="form-profil__input"
           type="text"
           name="lienyoutube"
           value={formData.lienyoutube}
           onChange={handleChange}
         />
 
-        <label className="form__label">Annonce:</label>
+        <label className="form-profil__label">Annonce:</label>
         <textarea
           name="annonce"
           value={formData.annonce}
           onChange={handleChange}
         />
 
-        <button className="form__button" type="submit">
+        <button className="form-profil__button" type="submit">
           Valider
         </button>
       </form>

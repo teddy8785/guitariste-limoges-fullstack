@@ -2,6 +2,7 @@
 @use "../variables/color" as color;
 
 .form {
+  position: relative;
   display: flex;
   flex-direction: column;
   max-width: 400px;
@@ -67,10 +68,12 @@
   }
 
   &__error {
+    position: absolute;
+    top: 220px;
+    left: 0;
+    right: 0;
     background-color: color.$color-third;
     color: color.$color-annonce;
-    width: 100%;
-    margin-top: 10px;
     text-align: center;
     border-radius: 50px;
   }
