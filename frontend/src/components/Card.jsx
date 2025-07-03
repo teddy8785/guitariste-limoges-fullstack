@@ -8,8 +8,17 @@ export const gestionErreurPhoto = (e) => {
   e.target.src = defaultPhoto;
 };
 
-function Card({ itemId, slug, nom, photo, photoDown, audio, annonce, type }) {
-
+function Card({
+  itemId,
+  slug,
+  nom,
+  photo,
+  photoDown,
+  audio,
+  annonce,
+  type,
+  profileId,
+}) {
   const backendUrl = "http://localhost:4000";
 
   const photoSrc = photo
@@ -53,8 +62,13 @@ function Card({ itemId, slug, nom, photo, photoDown, audio, annonce, type }) {
   return (
     <article className="card">
       <p className="card__name">{nom}</p>
-      <Heart className="card__heart" color="black" itemId={itemId} itemType={type} />
-      <Report />
+      <Heart
+        className="card__heart"
+        color="black"
+        itemId={itemId}
+        itemType={type}
+      />
+      <Report profileId={profileId} />
       <NavLink className="card__link" to={`/artiste/${slug}`}>
         {picturesSources}
         {audio && audio.length > 0 && (

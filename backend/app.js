@@ -8,6 +8,7 @@ const guitaristeRoutes = require("./routes/guitaristes");
 const userRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const likesRoutes = require('./routes/likes');
+const reportRoutes = require("./routes/reports");
 
 const app = express();
 
@@ -60,6 +61,7 @@ app.use("/api/guitaristes", guitaristeRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/likes', likesRoutes);
+app.use("/api", reportRoutes);
 
 // Servir frontend React
 app.use(express.static(frontendBuildPath));

@@ -176,6 +176,7 @@ function Index() {
                 photoDown={post.photoDown}
                 audio={post.audio}
                 annonce={post.annonce}
+                profileId={post._id}
               />
             ))}
           </div>
@@ -193,6 +194,7 @@ function Index() {
                 photoDown={post.photoDown}
                 audio={post.audio}
                 annonce={post.annonce}
+                profileId={post._id}
               />
             ))}
           </div>

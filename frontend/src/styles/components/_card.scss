@@ -73,6 +73,20 @@
     opacity: 1;
   }
 
+  &__report-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 0.5rem;
+  }
+
+  &__report--message {
+    margin-top: 20px;
+    font-size: 1rem;
+    color:color.$color-third;
+    text-align: center;
+  }
+
   @media (max-width: 1008px) {
     width: 40%;
   }
