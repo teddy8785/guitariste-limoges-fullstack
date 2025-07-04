@@ -19,6 +19,7 @@ const guitaristeSchema = mongoose.Schema(
     lienyoutube: { type: String },
     annonce: { type: String },
     annonceDate: { type: Date },
+    copyrightAccepted: { type: Boolean, required: true, default: false },
     likes: {
       type: Number,
       default: 0,

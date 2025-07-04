@@ -45,7 +45,9 @@ function Connexion() {
       }
 
       if (!res.ok) {
-        throw new Error(data?.message || "Erreur lors de la connexion");
+        throw new Error(
+          data?.message || data?.error || "Erreur lors de la connexion"
+        );
       }
 
       // si ici tout va bien :

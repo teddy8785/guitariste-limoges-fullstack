@@ -28,13 +28,15 @@ exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
     .then((user) => {
       if (!user) {
-        return res.status(401).json({ error: "Utilisateur non trouvé !" });
+        return res.status(401).json({ message: "Identifiants incorrects." });
       }
       bcrypt
         .compare(req.body.password, user.password)
         .then((valid) => {
           if (!valid) {
-            return res.status(401).json({ error: "Mot de passe incorrect !" });
+            return res
+              .status(401)
+              .json({ message: "Identifiants incorrects." });
           }
           res.status(200).json({
             userId: user._id,
@@ -46,11 +48,11 @@ exports.login = (req, res, next) => {
             ),
           });
         })
-        .catch((error) => res.status(500).json({ error }));
+        .catch((error) => res.status(500).json({ message: "Erreur serveur" }));
     })
     .catch((error) => {
       console.error("Erreur login:", error);
-      res.status(500).json({ error });
+      res.status(500).json({ message: "Erreur serveur" });
     });
 };
 
@@ -72,7 +74,9 @@ exports.getLikedProfiles = async (req, res) => {
     const likedProfileIds = user.likedProfiles.map((p) => p.profileId);
 
     // Rechercher les guitaristes avec ces IDs
-    const likedProfiles = await Guitariste.find({ _id: { $in: likedProfileIds } });
+    const likedProfiles = await Guitariste.find({
+      _id: { $in: likedProfileIds },
+    });
 
     res.json({ likedProfiles });
   } catch (error) {

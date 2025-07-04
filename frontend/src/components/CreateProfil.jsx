@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { allInstruments, allStyles } from "../assets/data";
+import ErrorDisplay from "./ErrorDisplay";
 
 function CreateProfil({ onSubmit, initialData = {} }) {
+  const [error, setError] = useState(null);
   const [formData, setFormData] = useState({
     nom: "",
     ville: "",
@@ -20,8 +22,20 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     lieninstagram: "",
     lienyoutube: "",
     annonce: "",
+    copyrightAccepted: false,
   });
 
+  const hasMedia = () => {
+    // On considère qu'on a une photo valide si on a un fichier ou une preview non vide
+    const photoExists =
+      formData.photo instanceof File ||
+      (formData.photoPreview && formData.photoPreview !== "");
+    // On considère qu'on a un audio valide si on a un fichier ou une preview non vide
+    const audioExists =
+      formData.audio instanceof File ||
+      (formData.audioPreview && formData.audioPreview !== "");
+    return photoExists || audioExists;
+  };
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,8 +63,47 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       lienyoutube: initialData.lienyoutube || "",
       annonce: initialData.annonce || "",
       photoDeleted: false,
+      copyrightAccepted: initialData.copyrightAccepted || false,
     });
   }, [initialData]);
+
+  useEffect(() => {
+    const photoExists =
+      formData.photo instanceof File ||
+      (formData.photoPreview && formData.photoPreview !== "");
+    const audioExists =
+      formData.audio instanceof File ||
+      (formData.audioPreview && formData.audioPreview !== "");
+
+    const mediaExists = photoExists || audioExists;
+
+    if (!mediaExists) {
+      // Si la case est cochée, on la décoche
+      if (formData.copyrightAccepted) {
+        setFormData((prev) => ({
+          ...prev,
+          copyrightAccepted: false,
+        }));
+      }
+      // Si un message d'erreur est affiché, on le supprime
+      if (error) {
+        setError(null);
+      }
+    }
+  }, [
+    formData.photo,
+    formData.photoPreview,
+    formData.audio,
+    formData.audioPreview,
+    formData.copyrightAccepted,
+    error,
+  ]);
+
+  useEffect(() => {
+    if (formData.copyrightAccepted && error) {
+      setError(null);
+    }
+  }, [formData.copyrightAccepted, error]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -85,6 +138,14 @@ function CreateProfil({ onSubmit, initialData = {} }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(null);
+
+    if (hasMedia() && !formData.copyrightAccepted) {
+      setError(
+        "Vous devez certifier que les droits d'auteur sont respectés pour la photo ou l'audio."
+      );
+      return;
+    }
 
     const sanitizeArray = (val) => {
       if (Array.isArray(val)) return val;
@@ -175,6 +236,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
                   photoPreview: "", // on vide la photo preview
                   photo: null, // on supprime aussi le fichier sélectionné
                   photoDeleted: true, // on ajoute un flag pour signaler suppression
+                  copyrightAccepted: false,
                 }))
               }
             >
@@ -206,6 +268,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
                   audio: "",
                   audioPreview: "",
                   audioDeleted: true,
+                  copyrightAccepted: false,
                 }))
               }
             >
@@ -314,6 +377,24 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           onChange={handleChange}
         />
 
+        {hasMedia() && (
+          <label className="form-profil__label">
+            <input
+              type="checkbox"
+              name="copyrightAccepted"
+              checked={formData.copyrightAccepted || false}
+              onChange={(e) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  copyrightAccepted: e.target.checked,
+                }))
+              }
+            />
+            Je certifie que les droits d'auteur des contenus publiés sont
+            respectés
+          </label>
+        )}
+        {error && <ErrorDisplay message={error} />}
         <button className="form-profil__button" type="submit">
           Valider
         </button>

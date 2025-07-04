@@ -50,6 +50,12 @@
     display: flex;
   }
 
+  & .form__error {
+  position: static !important;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
   &__button {
     background-color: color.$color-third;
     color: color.$color-secondary;
