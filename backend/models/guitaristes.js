@@ -41,6 +41,13 @@ const guitaristeSchema = mongoose.Schema(
       type: [String],
       default: [],
     },
+    reports: [
+      {
+        reason: { type: String, required: true },
+        date: { type: Date, default: Date.now },
+        from: { type: String }, // userId ou visitorId
+      },
+    ],
   },
   { timestamps: true }
 );

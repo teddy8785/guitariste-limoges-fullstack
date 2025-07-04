@@ -61,7 +61,7 @@ app.use("/api/guitaristes", guitaristeRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use('/api/likes', likesRoutes);
-app.use("/api", reportRoutes);
+app.use("/api/report", reportRoutes);
 
 // Servir frontend React
 app.use(express.static(frontendBuildPath));

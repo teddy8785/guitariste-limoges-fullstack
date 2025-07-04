@@ -4,6 +4,8 @@ import Card from "../components/Card";
 import Pagination from "../components/Pagination";
 import Footer from "../components/Footer";
 import { useEffect, useState, useMemo } from "react";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
 
 function Artistes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -14,9 +16,13 @@ function Artistes() {
   const [onlyWithAudio, setOnlyWithAudio] = useState(false);
   const [onlyWithPhoto, setOnlyWithPhoto] = useState(false);
   const [isResearchOpen, setIsResearchOpen] = useState(false);
-  const [currentPage, setCurrentPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
   const [data, setData] = useState([]);
+  const [onlyReported, setOnlyReported] = useState(false);
+  const [reportedProfilesIds, setReportedProfilesIds] = useState(new Set());
 
+  const role = useSelector((state) => state.auth.role);
+  const token = useSelector((state) => state.auth.token);
   const maxCards = 20;
 
   useEffect(() => {
@@ -33,6 +39,31 @@ function Artistes() {
         }
       })
       .catch(console.error);
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setReportedProfilesIds(new Set());
+      return;
+    }
+
+    fetch("http://localhost:4000/api/report/admin/reported-profiles", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then((res) => {
+        if (res.status === 401) {
+          throw new Error("Non autorisé");
+        }
+        return res.json();
+      })
+      .then((reportedProfiles) => {
+        const ids = new Set(reportedProfiles.map((p) => p._id));
+        setReportedProfilesIds(ids);
+      })
+      .catch(() => setReportedProfilesIds(new Set()));
   }, []);
 
   // Extraire les villes uniques
@@ -56,18 +87,22 @@ function Artistes() {
   // Filtrage combiné par nom et style
   const cleanQuery = searchQuery.trim().toLocaleLowerCase();
   const filteredData = useMemo(() => {
-    return data.filter(
-      (artiste) =>
-        artiste.nom.toLocaleLowerCase().startsWith(cleanQuery) &&
-        (selectedStyle === "" || artiste.style.includes(selectedStyle)) &&
-        (selectedVille === "" || artiste.ville === selectedVille) &&
-        (selectedInstrument === "" ||
-          artiste.instrument.includes(selectedInstrument)) &&
-        (!onlyWithAnnonce ||
-          (artiste.annonce && artiste.annonce.trim() !== "")) &&
-        (!onlyWithAudio || (artiste.audio && artiste.audio.trim() !== "")) &&
-        (!onlyWithPhoto || (artiste.photo && artiste.photo.trim() !== ""))
-    );
+    return data
+      .filter(
+        (artiste) =>
+          artiste.nom.toLocaleLowerCase().startsWith(cleanQuery) &&
+          (selectedStyle === "" || artiste.style.includes(selectedStyle)) &&
+          (selectedVille === "" || artiste.ville === selectedVille) &&
+          (selectedInstrument === "" ||
+            artiste.instrument.includes(selectedInstrument)) &&
+          (!onlyWithAnnonce ||
+            (artiste.annonce && artiste.annonce.trim() !== "")) &&
+          (!onlyWithAudio || (artiste.audio && artiste.audio.trim() !== "")) &&
+          (!onlyWithPhoto || (artiste.photo && artiste.photo.trim() !== ""))
+      )
+      .filter((artiste) =>
+        onlyReported ? reportedProfilesIds.has(artiste._id) : true
+      );
   }, [
     cleanQuery,
     selectedStyle,
@@ -76,6 +111,8 @@ function Artistes() {
     onlyWithAnnonce,
     onlyWithAudio,
     onlyWithPhoto,
+    onlyReported,
+    reportedProfilesIds,
     data,
   ]);
 
@@ -89,7 +126,7 @@ function Artistes() {
 
   const changePage = (page) => {
     if (page > 0 && page <= totalPages) {
-      setCurrentPages(page);
+      setCurrentPage(page);
       window.scrollTo(0, 0);
     }
   };
@@ -103,8 +140,18 @@ function Artistes() {
   }, []);
 
   useEffect(() => {
-    setCurrentPages(1);
+    setCurrentPage(1);
   }, [searchQuery, selectedStyle, selectedVille, selectedInstrument]);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const onlyReportedFromQuery = params.get("onlyReported") === "true";
+    if (onlyReportedFromQuery) {
+      setOnlyReported(true);
+    }
+  }, [location.search]);
 
   return (
     <div>
@@ -123,6 +170,22 @@ function Artistes() {
           </button>
           <div className="header__research">
             <div>
+              {token && role === "admin" && (
+                <label
+                  className={`header__input--research  ${
+                    isResearchOpen
+                      ? "header__checkboxAnnonce"
+                      : "header__link--hidden"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={onlyReported}
+                    onChange={(e) => setOnlyReported(e.target.checked)}
+                  />
+                  Afficher uniquement les profils signalés
+                </label>
+              )}
               <label
                 className={`header__input--research  ${
                   isResearchOpen

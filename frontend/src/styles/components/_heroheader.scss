@@ -19,6 +19,12 @@
     text-align: center;
   }
 
+  &__link {
+    display: flex;
+    justify-content: center;
+    color: color.$color-secondary;
+  }
+
   @media (max-width: 957px) {
     & {
       margin: 150px 0px 250px 0px;

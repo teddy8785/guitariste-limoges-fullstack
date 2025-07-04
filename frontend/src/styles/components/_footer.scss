@@ -31,10 +31,16 @@
     color: color.$color-secondary;
     text-decoration: none;
   }
-  
+
   &__bottom {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+  }
+
+  @media (max-width: 346px) {
+    &__mentions {
+      padding-left: 55px;
+    }
   }
 }

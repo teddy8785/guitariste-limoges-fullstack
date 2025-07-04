@@ -12,6 +12,8 @@ const Report = ({ profileId, userId }) => {
   const [reported, setReported] = useState(false);
   const [error, setError] = useState(null);
   const [visitorId, setVisitorId] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedReason, setSelectedReason] = useState("");
 
   // Création/chargement visitorId si non connecté
   useEffect(() => {
@@ -64,11 +66,25 @@ const Report = ({ profileId, userId }) => {
     checkStatus();
   }, [profileId, userId, visitorId]);
 
-  const handleReport = async () => {
+  const openReportModal = () => {
     if (reported) return;
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setSelectedReason("");
+    setError(null);
+  };
+
+  const handleReport = async () => {
+    if (!selectedReason) {
+      setError("Veuillez sélectionner un motif.");
+      return;
+    }
 
     try {
-      const bodyData = { profileId };
+      const bodyData = { profileId, reason: selectedReason };
       const headers = { "Content-Type": "application/json" };
 
       const token = localStorage.getItem("token");
@@ -80,7 +96,7 @@ const Report = ({ profileId, userId }) => {
         setError("Impossible de signaler : identifiant manquant.");
         return;
       }
-console.log("Headers envoyés:", headers);
+
       const res = await fetch("http://localhost:4000/api/report", {
         method: "POST",
         headers,
@@ -97,6 +113,7 @@ console.log("Headers envoyés:", headers);
       } else {
         setReported(true);
         setError(null);
+        setShowModal(false); // Ferme la modale
       }
     } catch (err) {
       console.error("Erreur catch:", err);
@@ -106,20 +123,47 @@ console.log("Headers envoyés:", headers);
 
   return (
     <div className="card__report--container">
+      {showModal && (
+        <div className="card__modal">
+          <div className="card__modal--choise">
+            <select
+              value={selectedReason}
+              onChange={(e) => {
+                setSelectedReason(e.target.value);
+                if (error === "Veuillez sélectionner un motif.") {
+                  setError(null);
+                }
+              }}
+            >
+              <option value="">-- Choisir un motif --</option>
+              <option value="contenu inapproprié">Contenu inapproprié</option>
+              <option value="Violation des droits d'auteur">Violation des droits d'auteur</option>
+              <option value="faux profil">Faux profil</option>
+              <option value="spam">Spam</option>
+              <option value="autre">Autre</option>
+            </select>
+            {error === "Veuillez sélectionner un motif." && <p className="card__modal--msgError">{error}</p>}
+          </div>
+          <div className="card__modal--validate">
+            <button onClick={handleReport}>Confirmer</button>
+            <button onClick={closeModal}>Annuler</button>
+          </div>
+        </div>
+      )}
       <div
         className={`card__report ${reported ? "reported" : ""}`}
         onClick={handleReport}
         style={{ cursor: reported ? "default" : "pointer" }}
       >
-        <i className="fa-solid fa-flag"></i>
+        <i
+          className="fa-solid fa-flag"
+          onClick={openReportModal}
+          disabled={reported}
+        ></i>
         <span className="card__report--tooltip">
           {reported ? "Déjà signalé" : "Signaler"}
         </span>
       </div>
-
-      {error && !reported && (
-        <div className="card__report--message">{error}</div>
-      )}
     </div>
   );
 };
