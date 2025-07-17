@@ -2,6 +2,7 @@ const fs = require("fs");
 const fsPromises = fs.promises;
 const path = require("path");
 const sharp = require("sharp");
+const slugify = require("slugify");
 const Guitariste = require("../models/guitaristes");
 
 exports.createGuitariste = async (req, res) => {
@@ -313,7 +314,27 @@ exports.updateMyGuitariste = async (req, res) => {
     if (req.body.annonce) {
       updatedData.annonceDate = new Date();
     }
+    console.log("Pseudo actuel :", guitariste.nom);
+    console.log("Pseudo reçu dans req.body :", updatedData.nom);
+    console.log("updatedData.nom:", updatedData.nom);
+    // Recalcul du slug si nom modifié
+    if (updatedData.nom && updatedData.nom !== guitariste.nom) {
+      const baseSlug = slugify(updatedData.nom, { lower: true, strict: true });
 
+      let uniqueSlug = baseSlug;
+      let counter = 1;
+
+      while (
+        await Guitariste.findOne({
+          slug: uniqueSlug,
+          _id: { $ne: guitariste._id },
+        })
+      ) {
+        uniqueSlug = `${baseSlug}-${counter++}`;
+      }
+
+      updatedData.slug = uniqueSlug;
+    }
     // On interdit la modification du userId
     delete updatedData.userId;
     const updatedGuitariste = await Guitariste.findByIdAndUpdate(

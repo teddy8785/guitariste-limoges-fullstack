@@ -37,6 +37,15 @@ exports.reportProfile = async (req, res) => {
         .json({ message: "Vous avez déjà signalé ce profil." });
     }
 
+    let fromSlug = null;
+
+    if (userId) {
+      const reportingProfile = await Profile.findOne({ userId });
+      if (reportingProfile) {
+        fromSlug = reportingProfile.slug || null;
+      }
+    }
+
     // Mise à jour des données
     if (userId) profile.reportedBy.push(userId);
     if (visitorId) profile.reportedByVisitors.push(visitorId);
@@ -45,6 +54,7 @@ exports.reportProfile = async (req, res) => {
       reason,
       date: new Date(),
       from: userId || visitorId || "inconnu",
+      fromSlug, // 👈 ajouté ici
     });
 
     profile.isReported = true;

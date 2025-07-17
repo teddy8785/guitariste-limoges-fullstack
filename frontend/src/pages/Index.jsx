@@ -6,22 +6,30 @@ import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import { NavLink } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import StatusIndicator from "../components/StatusIndicator";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../Store/authSlice"; // adapte le chemin si besoin
 
 function Index() {
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const isLogged = !!token;
+
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isLogged, setIsLogged] = useState(false);
   const [guitaristes, setGuitaristes] = useState([]);
   const [hasProfile, setHasProfile] = useState(false);
   const [userSlug, setUserSlug] = useState(null);
   const [annonces, setAnnonces] = useState([]);
 
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("token");
+    dispatch(logout()); // Mise à jour du store Redux
+    window.dispatchEvent(new Event("logout"));
+  }, [dispatch]);
+  
   useEffect(() => {
     window.scrollTo(0, 0);
-
-    const token = localStorage.getItem("token");
-    setIsLogged(!!token);
 
     if (token) {
       fetch("http://localhost:4000/api/guitaristes/me", {
@@ -30,6 +38,10 @@ function Index() {
         },
       })
         .then((res) => {
+          if (res.status === 401) {
+            handleLogout();
+            throw new Error("Token invalide");
+          }
           if (!res.ok) throw new Error("Aucun profil trouvé");
           return res.json();
         })
@@ -58,16 +70,18 @@ function Index() {
       })
       .then((json) => setAnnonces(json))
       .catch(console.error);
+  }, [token, handleLogout]); // Attention ici on dépend du token !
+
+  useEffect(() => {
+    const handleGlobalLogout = () => {
+      // Plus besoin de setIsLogged ici, redux gère ça
+    };
+    window.addEventListener("logout", handleGlobalLogout);
+    return () => window.removeEventListener("logout", handleGlobalLogout);
   }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    window.dispatchEvent(new Event("logout"));
-    setIsLogged(false);
   };
 
   return (
@@ -166,7 +180,7 @@ function Index() {
         <section id="new">
           <h2 className="main__title">NOUVEAUX MUSICIENS</h2>
           <div className="main__new">
-            {guitaristes.map((post) => (
+            {guitaristes.slice(0, 4).map((post) => (
               <Card
                 key={post._id}
                 itemId={post._id}
@@ -184,7 +198,7 @@ function Index() {
         <section id="annonce">
           <h2 className="main__title">NOUVELLES ANNONCES</h2>
           <div className="main__new">
-            {annonces.map((post) => (
+            {annonces.slice(0, 4).map((post) => (
               <Card
                 key={post._id}
                 itemId={post._id}

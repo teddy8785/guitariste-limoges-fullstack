@@ -42,6 +42,11 @@ function Artistes() {
   }, []);
 
   useEffect(() => {
+    if (role !== "admin") {
+      setReportedProfilesIds(new Set());
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (!token) {
       setReportedProfilesIds(new Set());
@@ -54,7 +59,7 @@ function Artistes() {
       },
     })
       .then((res) => {
-        if (res.status === 401) {
+        if (!res.ok) {
           throw new Error("Non autorisé");
         }
         return res.json();
@@ -64,8 +69,7 @@ function Artistes() {
         setReportedProfilesIds(ids);
       })
       .catch(() => setReportedProfilesIds(new Set()));
-  }, []);
-
+  }, [role]);
   // Extraire les villes uniques
   const allVilles = useMemo(() => {
     const villes = data.flatMap((artiste) => artiste.ville);

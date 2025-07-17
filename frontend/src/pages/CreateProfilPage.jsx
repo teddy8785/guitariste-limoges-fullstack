@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import CreateProfil from "../components/CreateProfil";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import Footer from "../components/Footer";
 
 function CreateProfilPage() {
-  const navigate = useNavigate();
   const { id } = useParams();
   const [initialData, setInitialData] = useState(null);
   const [loading, setLoading] = useState(!!id); // si on a un id, on charge
@@ -82,17 +81,13 @@ function CreateProfilPage() {
       if (!response.ok) throw new Error("Erreur lors de l’envoi");
 
       const data = await response.json();
-      // Essaie d'utiliser data.slug, sinon initialData.slug, sinon redirige vers la home
-      const profileSlug = data.slug || initialData?.slug;
+      console.log("Réponse API update :", data);
 
-      if (profileSlug) {
-        navigate(`/artiste/${profileSlug}`);
-      } else {
-        navigate("/"); // ou une autre page de fallback
-      }
+      // On retourne le slug pour la navigation côté CreateProfil
+      return data.slug || initialData?.slug || null;
     } catch (error) {
       console.error("Erreur :", error);
-      alert(error.message);
+      throw error;
     }
   };
 

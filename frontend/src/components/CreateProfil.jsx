@@ -153,7 +153,6 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       return [];
     };
 
-    // Préparer payload
     const payload = {
       ...formData,
       style: sanitizeArray(formData.style),
@@ -161,25 +160,33 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       photo: formData.photo ? formData.photo : formData.photoPreview,
     };
 
-    // Si suppression audio, et audio existant (chaine => nom fichier), ajouter clé audioToDelete
     if (
       formData.audioDeleted &&
       typeof formData.audio === "string" &&
       formData.audio !== ""
     ) {
-      payload.audioToDelete = formData.audio; // le nom du fichier à supprimer côté serveur
-      payload.audio = null; // pour bien indiquer qu'il n'y a plus d'audio
+      payload.audioToDelete = formData.audio;
+      payload.audio = null;
     }
 
     try {
-      await onSubmit(payload);
-      if (initialData._id) {
+      // ATTENTION ici on récupère le slug retourné par onSubmit
+      const newSlug = await onSubmit(payload);
+
+      if (newSlug) {
+        navigate(`/artiste/${newSlug}`);
+      } else if (initialData._id && initialData.slug) {
+        // fallback si pas de nouveau slug
         navigate(`/artiste/${initialData.slug}`);
       } else {
         navigate("/");
       }
     } catch (error) {
-      alert("Erreur lors de la mise à jour : " + error.message);
+      console.error("Erreur submit profil:", error);
+      alert(
+        "Erreur lors de la mise à jour : " +
+          (error.message || JSON.stringify(error))
+      );
     }
   };
 

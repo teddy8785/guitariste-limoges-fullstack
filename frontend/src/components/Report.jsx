@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 function generateUUID() {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
@@ -8,14 +9,20 @@ function generateUUID() {
   });
 }
 
-const Report = ({ profileId, userId }) => {
+const Report = ({ profileId, slug }) => {
   const [reported, setReported] = useState(false);
   const [error, setError] = useState(null);
   const [visitorId, setVisitorId] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedReason, setSelectedReason] = useState("");
+  const [reports, setReports] = useState(null);
 
-  // Création/chargement visitorId si non connecté
+  // Redux selectors
+  const userId = useSelector((state) => state.auth.userId);
+  const token = useSelector((state) => state.auth.token);
+  const isAdmin = useSelector((state) => state.auth.role === "admin");
+
+  // Gestion du visitorId
   useEffect(() => {
     if (!userId) {
       const storedId = localStorage.getItem("visitorId");
@@ -27,12 +34,11 @@ const Report = ({ profileId, userId }) => {
         setVisitorId(newId);
       }
     } else {
-      // Si connecté, ne plus utiliser visitorId
       setVisitorId(null);
     }
   }, [userId]);
 
-  // Vérification si le profil a déjà été signalé
+  // Vérification du statut signalement
   useEffect(() => {
     if (!profileId) return;
 
@@ -41,19 +47,20 @@ const Report = ({ profileId, userId }) => {
         let queryParams = new URLSearchParams({ profileId });
         const headers = { "Content-Type": "application/json" };
 
-        if (userId) {
-          const token = localStorage.getItem("token");
-          if (token) headers["Authorization"] = `Bearer ${token}`;
-          // Pas besoin d’ajouter userId dans les query params
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`;
         } else if (visitorId) {
           queryParams.append("visitorId", visitorId);
         } else {
-          return; // Rien à faire si ni user ni visitor
+          return;
         }
 
         const res = await fetch(
           `http://localhost:4000/api/report/status?${queryParams}`,
-          { method: "GET", headers }
+          {
+            method: "GET",
+            headers,
+          }
         );
 
         const data = await res.json();
@@ -64,8 +71,36 @@ const Report = ({ profileId, userId }) => {
     };
 
     checkStatus();
-  }, [profileId, userId, visitorId]);
+  }, [profileId, token, visitorId]);
 
+  useEffect(() => {
+    const fetchReportsDetails = async () => {
+      if (!isAdmin || !profileId) return;
+
+      try {
+        const token = localStorage.getItem("token");
+        const res = await fetch(
+          `http://localhost:4000/api/admin/guitaristes/${profileId}/reports`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        const data = await res.json();
+        if (res.ok) {
+          setReports(data.reports);
+        }
+      } catch (error) {
+        console.error("Erreur récupération reports:", error);
+      }
+    };
+
+    fetchReportsDetails();
+  }, [isAdmin, profileId]);
+
+  // Ouvrir / Fermer modale
   const openReportModal = () => {
     if (reported) return;
     setShowModal(true);
@@ -77,6 +112,7 @@ const Report = ({ profileId, userId }) => {
     setError(null);
   };
 
+  // Envoi du signalement
   const handleReport = async () => {
     if (!selectedReason) {
       setError("Veuillez sélectionner un motif.");
@@ -87,7 +123,6 @@ const Report = ({ profileId, userId }) => {
       const bodyData = { profileId, reason: selectedReason };
       const headers = { "Content-Type": "application/json" };
 
-      const token = localStorage.getItem("token");
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
       } else if (visitorId) {
@@ -113,7 +148,7 @@ const Report = ({ profileId, userId }) => {
       } else {
         setReported(true);
         setError(null);
-        setShowModal(false); // Ferme la modale
+        setShowModal(false);
       }
     } catch (err) {
       console.error("Erreur catch:", err);
@@ -137,12 +172,16 @@ const Report = ({ profileId, userId }) => {
             >
               <option value="">-- Choisir un motif --</option>
               <option value="contenu inapproprié">Contenu inapproprié</option>
-              <option value="Violation des droits d'auteur">Violation des droits d'auteur</option>
+              <option value="Violation des droits d'auteur">
+                Violation des droits d'auteur
+              </option>
               <option value="faux profil">Faux profil</option>
               <option value="spam">Spam</option>
               <option value="autre">Autre</option>
             </select>
-            {error === "Veuillez sélectionner un motif." && <p className="card__modal--msgError">{error}</p>}
+            {error === "Veuillez sélectionner un motif." && (
+              <p className="card__modal--msgError">{error}</p>
+            )}
           </div>
           <div className="card__modal--validate">
             <button onClick={handleReport}>Confirmer</button>
@@ -150,20 +189,38 @@ const Report = ({ profileId, userId }) => {
           </div>
         </div>
       )}
+
       <div
         className={`card__report ${reported ? "reported" : ""}`}
         onClick={handleReport}
         style={{ cursor: reported ? "default" : "pointer" }}
       >
-        <i
-          className="fa-solid fa-flag"
-          onClick={openReportModal}
-          disabled={reported}
-        ></i>
+        <i className="fa-solid fa-flag" onClick={openReportModal}></i>
         <span className="card__report--tooltip">
           {reported ? "Déjà signalé" : "Signaler"}
         </span>
       </div>
+
+      {isAdmin && reports && reports.length > 0 && (
+        <div className="card__report--adminReason">
+          <strong>Signalements :</strong>
+          <ul>
+            {reports.map(({ reason, from, fromSlug, date }, index) => (
+              <li key={index}>
+                {reason} - signalé par{" "}
+                {fromSlug && from ? (
+                  <>
+                    {fromSlug} ({from})
+                  </>
+                ) : (
+                  fromSlug || from
+                )}{" "}
+                le {new Date(date).toLocaleDateString()}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 };

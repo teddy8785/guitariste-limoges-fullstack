@@ -53,11 +53,10 @@ function Heroheader() {
           Profils signalés ({reportedProfiles.length})
         </h2>
 
-        {/* Lien vers la page artistes avec filtre "signalés" */}
         <Link
           to={{
             pathname: "/gallery",
-            search: "?onlyReported=true", // passe le filtre via query string
+            search: "?onlyReported=true",
           }}
           className="heroheader__link"
           aria-label="Voir tous les profils signalés"
@@ -65,23 +64,27 @@ function Heroheader() {
           Voir tous les profils signalés
         </Link>
 
-        <ul>
-          {reportedProfiles.slice(0, 5).map((profile) => (
-            // Par exemple on montre un aperçu limité à 5 profils
-            <li key={profile._id}>
-              <Card
-                itemId={profile._id}
-                slug={profile.slug}
-                nom={profile.nom}
-                photo={profile.photo}
-                photoDown={profile.photoDown}
-                audio={profile.audio}
-                profileId={profile._id}
-                type="profile"
-              />
-            </li>
-          ))}
-        </ul>
+        <div className="main__new">
+          {reportedProfiles.length === 0 ? (
+            <p className="main__empty">Aucun profil signalé actuellement.</p>
+          ) : (
+            reportedProfiles
+              .slice(0, 5)
+              .map((profile) => (
+                <Card
+                  key={profile._id}
+                  itemId={profile._id}
+                  slug={profile.slug}
+                  nom={profile.nom}
+                  photo={profile.photo}
+                  photoDown={profile.photoDown}
+                  audio={profile.audio}
+                  profileId={profile._id}
+                  type="profile"
+                />
+              ))
+          )}
+        </div>
       </section>
     );
   }

@@ -47,6 +47,7 @@ const guitaristeSchema = mongoose.Schema(
         reason: { type: String, required: true },
         date: { type: Date, default: Date.now },
         from: { type: String }, // userId ou visitorId
+        fromSlug: { type: String },
       },
     ],
   },
