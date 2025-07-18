@@ -6,6 +6,7 @@ import Footer from "../components/Footer";
 import { useEffect, useState, useMemo } from "react";
 import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
+import SearchBar from "../components/SearchBar";
 
 function Artistes() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -71,24 +72,6 @@ function Artistes() {
       .catch(() => setReportedProfilesIds(new Set()));
   }, [role]);
 
-  // Extraire les villes uniques
-  const allVilles = useMemo(() => {
-    const villes = data.flatMap((artiste) => artiste.ville);
-    return [...new Set(villes)].filter((v) => v && v.trim() !== "");
-  }, [data]);
-
-  // Extraire les styles uniques
-  const allStyles = useMemo(() => {
-    const styles = data.flatMap((artiste) => artiste.style);
-    return [...new Set(styles)];
-  }, [data]);
-
-  // Extraire les instruments uniques
-  const allInstruments = useMemo(() => {
-    const instruments = data.flatMap((artiste) => artiste.instrument);
-    return [...new Set(instruments)].filter((i) => i && i.trim() !== "");
-  }, [data]);
-
   // Filtrage combiné par nom et style
   const cleanQuery = searchQuery.trim().toLocaleLowerCase();
   const filteredData = useMemo(() => {
@@ -136,10 +119,6 @@ function Artistes() {
     }
   };
 
-  const toggleResearch = () => {
-    setIsResearchOpen(!isResearchOpen);
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -173,144 +152,29 @@ function Artistes() {
           >
             Retour
           </button>
-          <div className="header__research">
-            <div>
-              {token && role === "admin" && (
-                <label
-                  className={`header__input--research  ${
-                    isResearchOpen
-                      ? "header__checkboxAnnonce"
-                      : "header__link--hidden"
-                  }`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={onlyReported}
-                    onChange={(e) => setOnlyReported(e.target.checked)}
-                  />
-                  Afficher uniquement les profils signalés
-                </label>
-              )}
-              <label
-                className={`header__input--research  ${
-                  isResearchOpen
-                    ? "header__checkboxAnnonce"
-                    : "header__link--hidden"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={onlyWithPhoto}
-                  onChange={(e) => setOnlyWithPhoto(e.target.checked)}
-                />
-                Afficher les profils avec photo
-              </label>
-              <label
-                className={`header__input--research  ${
-                  isResearchOpen
-                    ? "header__checkboxAnnonce"
-                    : "header__link--hidden"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={onlyWithAudio}
-                  onChange={(e) => setOnlyWithAudio(e.target.checked)}
-                />
-                Afficher les profils avec audio
-              </label>
-              <label
-                className={`header__input--research  ${
-                  isResearchOpen
-                    ? "header__checkboxAnnonce"
-                    : "header__link--hidden"
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  checked={onlyWithAnnonce}
-                  onChange={(e) => setOnlyWithAnnonce(e.target.checked)}
-                />
-                Afficher les profils avec une annonce
-              </label>
-            </div>
-            <div className="header__research--flex">
-              <button className="header__button" onClick={toggleResearch}>
-                <i
-                  className="fa-solid fa-magnifying-glass"
-                  style={{ color: "white" }}
-                ></i>
-              </button>
-              <div className="header__nav--research">
-                <input
-                  type="text"
-                  placeholder="par Nom"
-                  className={`header__input--research ${
-                    isResearchOpen ? "" : "header__link--hidden"
-                  }`}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                ></input>
-                <select
-                  className={`header__input--research ${
-                    isResearchOpen ? "" : "header__link--hidden"
-                  }`}
-                  value={selectedStyle}
-                  onChange={(e) => setSelectedStyle(e.target.value)}
-                >
-                  {selectedStyle === "" && (
-                    <option value="" disabled hidden>
-                      Par style
-                    </option>
-                  )}
-                  <option value="">Tous les styles</option>
-                  {allStyles.map((style, index) => (
-                    <option key={index} value={style}>
-                      {style}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className={`header__input--research ${
-                    isResearchOpen ? "" : "header__link--hidden"
-                  }`}
-                  value={selectedInstrument}
-                  onChange={(e) => setSelectedInstrument(e.target.value)}
-                >
-                  {selectedInstrument === "" && (
-                    <option value="" disabled hidden>
-                      Par instruments
-                    </option>
-                  )}
-                  <option value="">Tous les instruments</option>
-                  {allInstruments.map((instrument, index) => (
-                    <option key={index} value={instrument}>
-                      {instrument}
-                    </option>
-                  ))}
-                </select>
-                <select
-                  className={`header__input--research ${
-                    isResearchOpen ? "" : "header__link--hidden"
-                  }`}
-                  value={selectedVille}
-                  onChange={(e) => setSelectedVille(e.target.value)}
-                >
-                  {selectedVille === "" && (
-                    <option value="" disabled hidden>
-                      Par ville
-                    </option>
-                  )}
-                  <option value="">Toutes les villes</option>
-                  {allVilles.map((ville, index) => (
-                    <option key={index} value={ville}>
-                      {ville}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
+          <SearchBar
+            data={data}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            selectedVille={selectedVille}
+            setSelectedVille={setSelectedVille}
+            selectedStyle={selectedStyle}
+            setSelectedStyle={setSelectedStyle}
+            selectedInstrument={selectedInstrument}
+            setSelectedInstrument={setSelectedInstrument}
+            onlyWithAnnonce={onlyWithAnnonce}
+            setOnlyWithAnnonce={setOnlyWithAnnonce}
+            onlyWithAudio={onlyWithAudio}
+            setOnlyWithAudio={setOnlyWithAudio}
+            onlyWithPhoto={onlyWithPhoto}
+            setOnlyWithPhoto={setOnlyWithPhoto}
+            isResearchOpen={isResearchOpen}
+            setIsResearchOpen={setIsResearchOpen}
+            onlyReported={onlyReported}
+            setOnlyReported={setOnlyReported}
+            role={role}
+            token={token}
+          />
         </nav>
         <h1 className="header__title">GUITARISTES LIMOGES</h1>
       </Header>
