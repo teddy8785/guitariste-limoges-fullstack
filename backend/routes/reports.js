@@ -7,7 +7,7 @@ const reportController = require("../controllers/report");
 
 // Middleware de debug pour voir quand une route du routeur /api/report est appelée
 router.use((req, res, next) => {
-  console.log(`Route /api${req.path} appelée avec méthode ${req.method}`);
+  // console.log(`Route /api${req.path} appelée avec méthode ${req.method}`);
   next();
 });
 

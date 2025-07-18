@@ -1,33 +1,11 @@
-import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
 function StatusIndicator() {
-  const [isConnected, setIsConnected] = useState(false);
-
-  const checkToken = () => {
-    const token = localStorage.getItem("token");
-    setIsConnected(!!token);
-  };
-
-  useEffect(() => {
-    checkToken();
-
-    const onLogout = () => {
-      setIsConnected(false);
-    };
-
-    window.addEventListener("logout", onLogout);
-
-    // Nettoyage de l’event listener au démontage
-    return () => {
-      window.removeEventListener("logout", onLogout);
-    };
-  }, []);
+  const token = useSelector((state) => state.auth.token);
 
   return (
     <span
-      className={` header__status ${
-        isConnected ? "header__status--connected" : ""
-      }`}
+      className={` header__status ${token ? "header__status--connected" : ""}`}
     ></span>
   );
 }

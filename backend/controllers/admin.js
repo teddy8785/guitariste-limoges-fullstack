@@ -66,8 +66,6 @@ exports.deleteGuitaristeByAdmin = async (req, res) => {
 
 exports.updateGuitaristeByAdmin = async (req, res) => {
   try {
-    console.log("ID reçu pour suppression:", req.params.id);
-
     const guitariste = await Guitariste.findById(req.params.id);
     if (!guitariste) {
       return res.status(404).json({ error: "Guitariste non trouvé" });

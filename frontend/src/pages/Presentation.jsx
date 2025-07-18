@@ -83,7 +83,7 @@ function Presentation({ type }) {
       if (!response.ok) throw new Error("Erreur suppression profil");
 
       alert("Profil supprimé !");
-      window.location.href = "/";
+      navigate("/");
     } catch (err) {
       console.error(err);
       alert("Erreur : " + err.message);

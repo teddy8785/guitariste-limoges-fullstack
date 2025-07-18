@@ -175,7 +175,7 @@ async function deleteFileIfExists(fileUrl) {
   try {
     await fsPromises.unlink(filepath);
   } catch (err) {
-    console.log(`Erreur suppression fichier ${filename}:`, err.message);
+     console.error(`Erreur suppression fichier ${filename}:`, err.message);
   }
 }
 
@@ -188,7 +188,7 @@ async function deleteAudioFileIfExists(audioUrl) {
   try {
     await fsPromises.unlink(filepath);
   } catch (err) {
-    console.log(`Erreur suppression fichier audio ${filename}:`, err.message);
+    console.error(`Erreur suppression fichier audio ${filename}:`, err.message);
   }
 }
 
@@ -314,9 +314,7 @@ exports.updateMyGuitariste = async (req, res) => {
     if (req.body.annonce) {
       updatedData.annonceDate = new Date();
     }
-    console.log("Pseudo actuel :", guitariste.nom);
-    console.log("Pseudo reçu dans req.body :", updatedData.nom);
-    console.log("updatedData.nom:", updatedData.nom);
+
     // Recalcul du slug si nom modifié
     if (updatedData.nom && updatedData.nom !== guitariste.nom) {
       const baseSlug = slugify(updatedData.nom, { lower: true, strict: true });

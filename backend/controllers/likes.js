@@ -44,19 +44,9 @@ async function toggleLike({ userId, visitorKey, profileId }) {
 
 async function getLikeStatus(req, res) {
   try {
-    console.log("req.user:", req.user);
     const userId = req.auth ? req.auth.userId : null;
     const profileId = req.params.id;
     const visitorKey = req.query.visitorKey || null;
-
-    console.log(
-      "Checking likes for userId:",
-      userId,
-      "profileId:",
-      profileId,
-      "visitorKey:",
-      visitorKey
-    );
 
     let existingLike = null;
 
@@ -65,8 +55,6 @@ async function getLikeStatus(req, res) {
     } else if (visitorKey) {
       existingLike = await Like.findOne({ visitorKey, profileId });
     }
-
-    console.log("existingLike:", existingLike);
 
     const count = await Like.countDocuments({ profileId });
 

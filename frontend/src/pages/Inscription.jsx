@@ -36,7 +36,6 @@ function Inscription() {
         return res.json();
       })
       .then((data) => {
-        console.log("Inscription réussie :", data);
         alert("Inscription réussie !");
         // Ici tu peux stocker le token ou rediriger l'utilisateur
         localStorage.setItem("token", data.token);

@@ -70,6 +70,7 @@ function Artistes() {
       })
       .catch(() => setReportedProfilesIds(new Set()));
   }, [role]);
+
   // Extraire les villes uniques
   const allVilles = useMemo(() => {
     const villes = data.flatMap((artiste) => artiste.ville);

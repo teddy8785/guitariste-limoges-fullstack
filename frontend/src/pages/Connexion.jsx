@@ -73,8 +73,6 @@ function Connexion() {
         if (!transferRes.ok) {
           const errorText = await transferRes.text();
           console.error("Erreur transfert likes :", errorText);
-        } else {
-          console.log("Likes transférés avec succès");
         }
       }
 

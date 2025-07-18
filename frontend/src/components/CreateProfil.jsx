@@ -170,7 +170,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     }
 
     try {
-      // ATTENTION ici on récupère le slug retourné par onSubmit
+      // on récupère le slug retourné par onSubmit
       const newSlug = await onSubmit(payload);
 
       if (newSlug) {

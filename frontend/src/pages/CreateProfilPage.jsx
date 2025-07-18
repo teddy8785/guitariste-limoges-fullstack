@@ -81,7 +81,6 @@ function CreateProfilPage() {
       if (!response.ok) throw new Error("Erreur lors de l’envoi");
 
       const data = await response.json();
-      console.log("Réponse API update :", data);
 
       // On retourne le slug pour la navigation côté CreateProfil
       return data.slug || initialData?.slug || null;

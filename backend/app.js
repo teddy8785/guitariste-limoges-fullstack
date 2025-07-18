@@ -52,7 +52,7 @@ app.use("/audios", express.static(path.join(__dirname, "audios")));
 
 // Middleware qui log toutes les requêtes (juste pour debug)
 app.use((req, res, next) => {
-  console.log(`REQ: ${req.method} ${req.url}`);
+  // console.log(`REQ: ${req.method} ${req.url}`);
   next();
 });
 

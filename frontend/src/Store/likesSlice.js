@@ -47,7 +47,6 @@ export const fetchUserLikes = (userId, token) => async (dispatch) => {
     }
 
     const data = await res.json();
-    console.log("Réponse JSON fetchUserLikes:", data);
 
     const likesObj = {};
     data.likedProfiles.forEach((profile) => {

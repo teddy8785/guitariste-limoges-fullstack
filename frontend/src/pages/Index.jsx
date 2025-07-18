@@ -46,7 +46,6 @@ function Index() {
           return res.json();
         })
         .then((data) => {
-            console.log("Données reçues:", data);
           if (data && data.slug) {
             setHasProfile(true);
             setUserSlug(data.slug);
