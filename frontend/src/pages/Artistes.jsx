@@ -21,6 +21,7 @@ function Artistes() {
   const [data, setData] = useState([]);
   const [onlyReported, setOnlyReported] = useState(false);
   const [reportedProfilesIds, setReportedProfilesIds] = useState(new Set());
+  const [sortOrder, setSortOrder] = useState("");
 
   const role = useSelector((state) => state.auth.role);
   const token = useSelector((state) => state.auth.token);
@@ -109,9 +110,8 @@ function Artistes() {
   const getCurrentPageData = () => {
     const startIndex = (currentPage - 1) * maxCards;
     const endIndex = startIndex + maxCards;
-    return filteredData.slice(startIndex, endIndex);
+    return sortedData.slice(startIndex, endIndex);
   };
-
   const changePage = (page) => {
     if (page > 0 && page <= totalPages) {
       setCurrentPage(page);
@@ -136,6 +136,37 @@ function Artistes() {
       setOnlyReported(true);
     }
   }, [location.search]);
+
+  const sortedData = useMemo(() => {
+    let sorted = [...filteredData];
+
+    if (sortOrder === "likesDesc") {
+      sorted.sort((a, b) => b.likes - a.likes);
+    } else if (sortOrder === "likesAsc") {
+      sorted.sort((a, b) => a.likes - b.likes);
+    } else if (sortOrder === "dateDesc") {
+      sorted.sort(
+        (a, b) =>
+          new Date(b.updatedAt || b.createdAt) -
+          new Date(a.updatedAt || a.createdAt)
+      );
+    } else if (sortOrder === "dateAsc") {
+      sorted.sort(
+        (a, b) =>
+          new Date(a.updatedAt || a.createdAt) -
+          new Date(b.updatedAt || b.createdAt)
+      );
+    } else if (sortOrder === "alphaAsc") {
+      sorted.sort((a, b) =>
+        a.nom.localeCompare(b.nom, "fr", { sensitivity: "base" })
+      );
+    } else if (sortOrder === "alphaDesc") {
+      sorted.sort((a, b) =>
+        b.nom.localeCompare(a.nom, "fr", { sensitivity: "base" })
+      );
+    }
+    return sorted;
+  }, [filteredData, sortOrder]);
 
   return (
     <div>
@@ -174,6 +205,8 @@ function Artistes() {
             setOnlyReported={setOnlyReported}
             role={role}
             token={token}
+            sortOrder={sortOrder}
+            setSortOrder={setSortOrder}
           />
         </nav>
         <h1 className="header__title">GUITARISTES LIMOGES</h1>

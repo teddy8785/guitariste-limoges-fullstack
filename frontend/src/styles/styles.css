@@ -186,6 +186,11 @@
   flex-direction: column;
   min-height: 100vh;
 }
+@media (max-width: 346px) {
+  .footer__mentions {
+    padding-left: 55px;
+  }
+}
 
 .heroheader {
   margin: 168px 0px 350px 0px;
@@ -202,6 +207,11 @@
   font-family: "Nova Square", sans-serif;
   margin: 0px 30px;
   text-align: center;
+}
+.heroheader__link {
+  display: flex;
+  justify-content: center;
+  color: white;
 }
 @media (max-width: 957px) {
   .heroheader {
@@ -356,6 +366,47 @@
   visibility: visible;
   opacity: 1;
 }
+.card__report-container {
+  position: relative;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  margin-top: 0.5rem;
+}
+.card__report--message {
+  margin-top: 20px;
+  font-size: 1rem;
+  color: darkred;
+  text-align: center;
+}
+.card__modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+}
+.card__modal--choise {
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  align-items: center;
+  margin-top: 25px;
+}
+.card__modal--msgError {
+  color: white;
+}
+.card__modal--validate {
+  display: flex;
+  gap: 5px;
+}
 @media (max-width: 1008px) {
   .card {
     width: 40%;
@@ -450,46 +501,6 @@
 @media (max-width: 435px) {
   .contact .contact {
     scroll-margin-top: 150px;
-  }
-}
-
-.heroheader {
-  margin: 168px 0px 350px 0px;
-}
-.heroheader__title {
-  font-family: "Nova Square", sans-serif;
-  color: white;
-  text-align: center;
-  font-size: 80px;
-}
-.heroheader__welcome {
-  font-size: 35px;
-  color: white;
-  font-family: "Nova Square", sans-serif;
-  margin: 0px 30px;
-  text-align: center;
-}
-@media (max-width: 957px) {
-  .heroheader {
-    margin: 150px 0px 250px 0px;
-  }
-}
-@media (max-width: 768px) {
-  .heroheader {
-    margin: 120px 0px 225px 0px;
-  }
-  .heroheader__title {
-    font-size: 60px;
-    margin-bottom: 100px;
-  }
-}
-@media (max-width: 435px) {
-  .heroheader__title {
-    font-size: 50px;
-    margin-bottom: 80px;
-  }
-  .heroheader__welcome {
-    font-size: 30px;
   }
 }
 
@@ -605,7 +616,6 @@
 }
 
 html, body {
-  height: 100%;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -627,40 +637,54 @@ code {
     background-image: none;
   }
 }
-.form__profil {
+.form-profil {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
   margin: 20px auto;
   padding: 15px;
   background-color: black;
   border-radius: 8px;
 }
-.form__title {
+.form-profil__profil {
+  margin: 20px auto;
+  padding: 15px;
+  background-color: black;
+  border-radius: 8px;
+}
+.form-profil__title {
   color: white;
   font-family: "Eater", serif;
   text-align: center;
   font-size: 50px;
 }
-.form__label {
+.form-profil__label {
   color: white;
   margin-bottom: 6px;
   font-weight: 600;
 }
-.form__preview {
+.form-profil__preview {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.form__img {
+.form-profil__img {
   max-width: 200px;
   margin-top: 10px;
 }
-.form__select {
+.form-profil__select {
   display: flex;
   flex-direction: column;
 }
-.form__select label {
+.form-profil__select label {
   display: flex;
 }
-.form__button {
+.form-profil .form__error {
+  position: static !important;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+.form-profil__button {
   background-color: darkred;
   color: white;
   font-weight: 700;
@@ -670,11 +694,11 @@ code {
   cursor: pointer;
   transition: background-color 0.3s ease;
 }
-.form__button--delete {
+.form-profil__button--delete {
   height: 100px;
   background-color: darkred;
 }
-.form__input {
+.form-profil__input {
   margin-bottom: 15px;
   padding: 8px 12px;
   border-radius: 4px;
@@ -684,24 +708,25 @@ code {
   font-size: 1rem;
   resize: vertical;
 }
-.form__input::-moz-placeholder {
+.form-profil__input::-moz-placeholder {
   color: white;
 }
-.form__input::placeholder {
+.form-profil__input::placeholder {
   color: white;
 }
 @media (max-width: 700px) {
-  .form__title {
+  .form-profil__title {
     font-size: 35px;
   }
 }
 @media (max-width: 400px) {
-  .form__title {
+  .form-profil__title {
     font-size: 28px;
   }
 }
 
 .form {
+  position: relative;
   display: flex;
   flex-direction: column;
   max-width: 400px;
@@ -762,10 +787,12 @@ code {
   color: white;
 }
 .form__error {
+  position: absolute;
+  top: 220px;
+  left: 0;
+  right: 0;
   background-color: darkred;
   color: yellow;
-  width: 100%;
-  margin-top: 10px;
   text-align: center;
   border-radius: 50px;
 }

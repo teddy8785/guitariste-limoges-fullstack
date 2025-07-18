@@ -22,6 +22,8 @@ function SearchBar({
   setIsResearchOpen,
   role,
   token,
+  sortOrder,
+  setSortOrder,
 }) {
   const toggleResearch = () => setIsResearchOpen(!isResearchOpen);
 
@@ -45,6 +47,52 @@ function SearchBar({
 
   return (
     <div className="header__research">
+      <div
+        className={`header__input--research ${
+          isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
+        }`}
+      >
+        <label>
+          <input
+            type="checkbox"
+            name="sort"
+            value="dateDesc"
+            checked={sortOrder === "dateDesc"}
+            onChange={(e) => setSortOrder(e.target.value)}
+          />
+          les plus récents
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="sort"
+            value="likesDesc"
+            checked={sortOrder === "likesDesc"}
+            onChange={(e) => setSortOrder(e.target.value)}
+          />
+          les plus likés
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="sort"
+            value="alphaAsc"
+            checked={sortOrder === "alphaAsc"}
+            onChange={(e) => setSortOrder(e.target.value)}
+          />
+          ordre alphabétique (A → Z)
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            name="sort"
+            value="alphaDesc"
+            checked={sortOrder === "alphaDesc"}
+            onChange={(e) => setSortOrder(e.target.value)}
+          />
+          ordre alphabétique (Z → A)
+        </label>
+      </div>
       <div>
         {token && role === "admin" && (
           <label
@@ -62,7 +110,6 @@ function SearchBar({
             Afficher uniquement les profils signalés
           </label>
         )}
-        {/* Les autres checkbox */}
         <label
           className={`header__input--research  ${
             isResearchOpen ? "header__checkboxAnnonce" : "header__link--hidden"
@@ -100,7 +147,6 @@ function SearchBar({
           Afficher les profils avec une annonce
         </label>
       </div>
-
       <div className="header__research--flex">
         <button className="header__button" onClick={toggleResearch}>
           <i
