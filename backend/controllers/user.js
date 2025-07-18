@@ -15,11 +15,28 @@ exports.signup = (req, res, next) => {
       });
       user
         .save()
-        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-        .catch((error) => res.status(400).json({ error }));
+        .then((savedUser) => {
+          // Crée un token comme dans login
+          const token = jwt.sign(
+            { userId: savedUser._id, role: savedUser.role },
+            process.env.JWT_SECRET,
+            { expiresIn: "24h" }
+          );
+
+          res.status(201).json({
+            message: "Utilisateur créé !",
+            userId: savedUser._id,
+            role: savedUser.role,
+            token: token,
+          });
+        })
+        .catch((error) => {
+          console.error("Erreur lors de l'enregistrement :", error);
+          res.status(400).json({ error });
+        });
     })
     .catch((error) => {
-      console.error("Erreur login:", error);
+      console.error("Erreur lors du hash :", error);
       res.status(500).json({ error });
     });
 };
@@ -43,7 +60,7 @@ exports.login = (req, res, next) => {
             role: user.role,
             token: jwt.sign(
               { userId: user._id, role: user.role },
-              "RANDOM_TOKEN_SECRET",
+              process.env.JWT_SECRET,
               { expiresIn: "24h" }
             ),
           });

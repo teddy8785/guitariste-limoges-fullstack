@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PasswordInput from "../components/PasswordInput";
 import Footer from "../components/Footer";
+import { useDispatch } from "react-redux";
+import { login } from "../Store/authSlice";
 
 function Inscription() {
   const [credentials, setCredentials] = useState({
@@ -10,6 +12,7 @@ function Inscription() {
   });
 
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -36,8 +39,13 @@ function Inscription() {
         console.log("Inscription réussie :", data);
         alert("Inscription réussie !");
         // Ici tu peux stocker le token ou rediriger l'utilisateur
-        // localStorage.setItem("token", data.token);
-        navigate("/connexion");
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("userId", data.userId);
+        localStorage.setItem("role", data.role);
+        dispatch(
+          login({ token: data.token, userId: data.userId, role: data.role })
+        );
+        navigate("/profil");
       })
       .catch((error) => {
         console.error("Erreur :", error);
@@ -72,7 +80,7 @@ function Inscription() {
           S'inscrire
         </button>
       </form>
-        <Footer />
+      <Footer />
     </div>
   );
 }

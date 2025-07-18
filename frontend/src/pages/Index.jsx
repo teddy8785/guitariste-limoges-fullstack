@@ -27,7 +27,7 @@ function Index() {
     dispatch(logout()); // Mise à jour du store Redux
     window.dispatchEvent(new Event("logout"));
   }, [dispatch]);
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
 
@@ -46,8 +46,14 @@ function Index() {
           return res.json();
         })
         .then((data) => {
-          setHasProfile(true);
-          setUserSlug(data.slug);
+            console.log("Données reçues:", data);
+          if (data && data.slug) {
+            setHasProfile(true);
+            setUserSlug(data.slug);
+          } else {
+            setHasProfile(false);
+            setUserSlug(null);
+          }
         })
         .catch(() => setHasProfile(false));
     } else {
