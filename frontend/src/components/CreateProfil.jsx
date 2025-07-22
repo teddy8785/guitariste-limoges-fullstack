@@ -4,7 +4,7 @@ import { allInstruments, allStyles } from "../assets/data";
 import ErrorDisplay from "./ErrorDisplay";
 
 function CreateProfil({ onSubmit, initialData = {} }) {
-  const [error, setError] = useState(null);
+  const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     nom: "",
     ville: "",
@@ -67,49 +67,38 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     });
   }, [initialData]);
 
-  useEffect(() => {
-    const photoExists =
-      formData.photo instanceof File ||
-      (formData.photoPreview && formData.photoPreview !== "");
-    const audioExists =
-      formData.audio instanceof File ||
-      (formData.audioPreview && formData.audioPreview !== "");
-
-    const mediaExists = photoExists || audioExists;
-
-    if (!mediaExists) {
-      // Si la case est cochée, on la décoche
-      if (formData.copyrightAccepted) {
-        setFormData((prev) => ({
-          ...prev,
-          copyrightAccepted: false,
-        }));
-      }
-      // Si un message d'erreur est affiché, on le supprime
-      if (error) {
-        setError(null);
-      }
-    }
-  }, [
-    formData.photo,
-    formData.photoPreview,
-    formData.audio,
-    formData.audioPreview,
-    formData.copyrightAccepted,
-    error,
-  ]);
-
-  useEffect(() => {
-    if (formData.copyrightAccepted && error) {
-      setError(null);
-    }
-  }, [formData.copyrightAccepted, error]);
+  const YOUTUBE_REGEX = /^https:\/\/(www\.youtube\.com)\//;
+  const X_REGEX = /^https:\/\/(x\.com)\//;
+  const INSTAGRAM_REGEX = /^https:\/\/(www\.instagram\.com)\//;
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
+    const { name, value, type, checked } = e.target;
 
+    if (type === "checkbox") {
+      setFormData((prev) => ({ ...prev, [name]: checked }));
+    } else {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+    }
+
+    if (errors.general && Array.isArray(errors.general)) {
+      // Créer un tableau filtré en enlevant seulement l'erreur liée au champ modifié
+      let filteredErrors = errors.general.filter((msg) => {
+        if (name === "lienx") return !msg.includes("Le lien X");
+        if (name === "lieninstagram") return !msg.includes("Instagram");
+        if (name === "lienyoutube") return !msg.includes("YouTube");
+        if (name === "copyrightAccepted") {
+          // supprimer uniquement l'erreur liée au copyright, pas les autres
+          return !msg.toLowerCase().includes("droits d'auteur");
+        }
+        return true; // garder les autres erreurs
+      });
+
+      setErrors((prev) => ({
+        ...prev,
+        general: filteredErrors.length > 0 ? filteredErrors : undefined,
+      }));
+    }
+  };
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -136,16 +125,85 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     }
   };
 
+  function removeCopyrightErrors(errors) {
+    if (!errors.general) return errors;
+
+    const filteredErrors = errors.general.filter(
+      (msg) => !msg.toLowerCase().includes("droits d'auteur")
+    );
+
+    if (filteredErrors.length > 0) {
+      return { ...errors, general: filteredErrors };
+    } else {
+      const { general, ...rest } = errors;
+      return rest;
+    }
+  }
+
+  const validateForm = () => {
+    const errorMessages = [];
+
+    if (formData.lienx && !X_REGEX.test(formData.lienx.trim())) {
+      errorMessages.push("Le lien X doit commencer par https://x.com/");
+    }
+
+    if (
+      formData.lieninstagram &&
+      !INSTAGRAM_REGEX.test(formData.lieninstagram.trim())
+    ) {
+      errorMessages.push(
+        "Le lien Instagram doit commencer par https://www.instagram.com/"
+      );
+    }
+
+    if (
+      formData.lienyoutube &&
+      !YOUTUBE_REGEX.test(formData.lienyoutube.trim())
+    ) {
+      errorMessages.push(
+        "Le lien YouTube doit commencer par https://www.youtube.com/"
+      );
+    }
+
+    const photoExists =
+      formData.photo instanceof File ||
+      (formData.photoPreview && formData.photoPreview !== "");
+    const audioExists =
+      formData.audio instanceof File ||
+      (formData.audioPreview && formData.audioPreview !== "");
+
+    if (photoExists && audioExists && !formData.copyrightAccepted) {
+      errorMessages.push(
+        "Vous devez certifier que les droits d'auteur sont respectés pour la photo et l'audio."
+      );
+    } else if (photoExists && !audioExists && !formData.copyrightAccepted) {
+      errorMessages.push(
+        "Vous devez certifier que les droits d'auteur sont respectés pour la photo."
+      );
+    } else if (!photoExists && audioExists && !formData.copyrightAccepted) {
+      errorMessages.push(
+        "Vous devez certifier que les droits d'auteur sont respectés pour l'audio."
+      );
+    }
+
+    const newErrors = {};
+    if (errorMessages.length > 0) {
+      newErrors.general = errorMessages;
+    }
+    return newErrors;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
 
-    if (hasMedia() && !formData.copyrightAccepted) {
-      setError(
-        "Vous devez certifier que les droits d'auteur sont respectés pour la photo ou l'audio."
-      );
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
+
+    setErrors({});
 
     const sanitizeArray = (val) => {
       if (Array.isArray(val)) return val;
@@ -355,6 +413,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           className="form__input"
           type="text"
           name="lienx"
+          placeholder="https://x.com/"
           value={formData.lienx}
           onChange={handleChange}
         />
@@ -364,6 +423,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           className="form-profil__input"
           type="text"
           name="lieninstagram"
+          placeholder="https://www.instagram.com/"
           value={formData.lieninstagram}
           onChange={handleChange}
         />
@@ -373,6 +433,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           className="form-profil__input"
           type="text"
           name="lienyoutube"
+          placeholder="https://www.youtube.com/"
           value={formData.lienyoutube}
           onChange={handleChange}
         />
@@ -390,18 +451,23 @@ function CreateProfil({ onSubmit, initialData = {} }) {
               type="checkbox"
               name="copyrightAccepted"
               checked={formData.copyrightAccepted || false}
-              onChange={(e) =>
+              onChange={(e) => {
+                const checked = e.target.checked;
                 setFormData((prev) => ({
                   ...prev,
-                  copyrightAccepted: e.target.checked,
-                }))
-              }
+                  copyrightAccepted: checked,
+                }));
+
+                if (checked) {
+                  setErrors((prev) => removeCopyrightErrors(prev));
+                }
+              }}
             />
             Je certifie que les droits d'auteur des contenus publiés sont
             respectés
           </label>
         )}
-        {error && <ErrorDisplay message={error} />}
+        {errors.general && <ErrorDisplay message={errors.general} />}
         <button className="form-profil__button" type="submit">
           Valider
         </button>

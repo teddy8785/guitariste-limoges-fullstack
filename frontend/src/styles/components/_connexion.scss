@@ -63,9 +63,9 @@
     cursor: pointer;
   }
 
-  &__input::placeholder {
-    color: color.$color-secondary;
-  }
+  // &__input::placeholder {
+  //   color: color.$color-secondary;
+  // }
 
   &__error {
     position: absolute;

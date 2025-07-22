@@ -51,10 +51,11 @@
   }
 
   & .form__error {
-  position: static !important;
-  margin-top: 1rem;
-  margin-bottom: 2rem;
-}
+    position: static !important;
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+    padding: 10px;
+  }
 
   &__button {
     background-color: color.$color-third;
@@ -83,9 +84,9 @@
     resize: vertical;
   }
 
-  &__input::placeholder {
-    color: color.$color-secondary;
-  }
+  // &__input::placeholder {
+  //   color: color.$color-secondary;
+  // }
 
   @media (max-width: 700px) {
     &__title {
