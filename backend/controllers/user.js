@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
+const crypto = require("crypto");
+// const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Guitariste = require("../models/guitaristes");
@@ -99,5 +101,64 @@ exports.getLikedProfiles = async (req, res) => {
   } catch (error) {
     console.error("Erreur getLikedProfiles:", error);
     res.status(500).json({ error: "Erreur serveur" });
+  }
+};
+
+//Forgot Password
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      const token = crypto.randomBytes(32).toString("hex");
+
+      user.resetPasswordToken = token;
+      user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 min
+      await user.save();
+
+      const resetUrl = `http://localhost:3000/reset-password/${token}`;
+      console.log(`✅ Lien de réinitialisation : ${resetUrl}`);
+    }
+
+    res.json({ message: "Si ce compte existe, un lien a été envoyé." });
+  } catch (error) {
+    console.error("Erreur forgotPassword :", error);
+    res.status(500).json({ error: "Erreur serveur." });
+  }
+};
+
+//Reset Password
+exports.resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  console.log("Token reçu :", token);
+  console.log("Date actuelle (timestamp) :", Date.now());
+
+  try {
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpires: { $gt: Date.now() },
+    });
+
+    console.log("User trouvé :", user);
+
+    if (!user) {
+      return res.status(400).json({ error: "Lien invalide ou expiré." });
+    }
+
+    // Continue avec la réinitialisation
+    const hashedPassword = await bcrypt.hash(password, 10);
+    user.password = hashedPassword;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    res.json({ message: "Mot de passe réinitialisé avec succès." });
+  } catch (error) {
+    console.error("Erreur resetPassword :", error);
+    res.status(500).json({ error: "Erreur serveur." });
   }
 };

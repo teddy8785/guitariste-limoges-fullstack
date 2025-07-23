@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import PasswordInput from "../components/PasswordInput";
 import ErrorDisplay from "../components/ErrorDisplay";
@@ -110,9 +110,10 @@ function Connexion() {
             placeholder="Votre mot de passe"
           />
         </div>
-        <button className="form__button form__button--space" type="submit">
+        <button className="form__button" type="submit">
           Se connecter
         </button>
+        <NavLink className="form__forgotPassword" to={`/forgot-password`}>Mot de passe oublié ?</NavLink>
         {errorMessage && <ErrorDisplay message={errorMessage} />}
       </form>
       <Footer />

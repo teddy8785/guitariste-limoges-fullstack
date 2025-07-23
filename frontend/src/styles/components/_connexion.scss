@@ -36,7 +36,12 @@
   }
 
   &__button--space {
-    margin-bottom: 100%;
+    margin-bottom: 120%;
+  }
+
+  &__forgotPassword {
+    margin-bottom: 95%;
+    color: color.$color-secondary;
   }
 
   &__input {
@@ -69,23 +74,45 @@
 
   &__error {
     position: absolute;
-    top: 220px;
+    top: 250px;
     left: 0;
     right: 0;
+    padding: 10px;
     background-color: color.$color-third;
     color: color.$color-annonce;
     text-align: center;
     border-radius: 50px;
   }
 
-  @media (max-width: 420px) {
+  @media (max-width: 650px) {
     &__title {
-      font-size: 40px;
+      font-size: 53px;
+    }
+
+     &__forgotPassword {
+      margin-bottom: 370px;
+    }
+
+    &__button--space {
+      margin-bottom: 370px;
+    }
+  }
+
+  @media (max-width: 430px) {
+    &__title {
+      font-size: 38px;
     }
 
     &__input {
-      width: 90%;
-      padding: 8px 20px 8px 0px;
+      padding: 8px 25px 8px 0px;
+    }
+
+    &__forgotPassword {
+      margin-bottom: 420px;
+    }
+
+    &__button--space {
+      margin-bottom: 450px;
     }
   }
 }

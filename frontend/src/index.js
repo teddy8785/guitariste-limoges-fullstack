@@ -15,6 +15,8 @@ import Confidentialite from "./pages/Confidentialite.jsx";
 // Redux
 import { Provider } from "react-redux";
 import store from './Store/index.js';
+import ForgotPassword from "./pages/ForgotPassword.jsx";
+import ResetPassword from "./pages/ResetPassword.jsx";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -41,6 +43,8 @@ root.render(
         <Route path="/artiste/:slug" element={<Presentation />} />
         <Route path="/inscription" element={<Inscription />} />
         <Route path="/connexion" element={<Connexion />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/profil" element={<CreateProfil />} />
         <Route path="/profil/:id?" element={<CreateProfil />} />
         <Route path="/mentions-legales" element={<MentionsLegales />} />
