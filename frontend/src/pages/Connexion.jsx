@@ -95,6 +95,7 @@ function Connexion() {
         <input
           type="email"
           name="email"
+          placeholder="Votre adresse email"
           value={credentials.email}
           onChange={handleChange}
           className="form__input"

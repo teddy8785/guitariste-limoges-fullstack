@@ -5,6 +5,8 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Guitariste = require("../models/guitaristes");
+const fsPromises = require('fs').promises;
+const path = require('path');
 
 exports.signup = (req, res, next) => {
   bcrypt
@@ -160,5 +162,47 @@ exports.resetPassword = async (req, res) => {
   } catch (error) {
     console.error("Erreur resetPassword :", error);
     res.status(500).json({ error: "Erreur serveur." });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.auth.userId;
+
+    // Vérifie si un profil guitariste existe
+    const guitariste = await Guitariste.findOne({ userId });
+
+    if (guitariste) {
+      // Supprimer fichiers liés
+      if (guitariste.photo) {
+        const filenameJpg = guitariste.photo.split("/images/")[1];
+        await fsPromises
+          .unlink(path.join("images", filenameJpg))
+          .catch(() => {});
+      }
+      if (guitariste.photoDown) {
+        const filenameWebp = guitariste.photoDown.split("/images/")[1];
+        await fsPromises
+          .unlink(path.join("images", filenameWebp))
+          .catch(() => {});
+      }
+      if (guitariste.audio) {
+        const filenameAudio = guitariste.audio.split("/audios/")[1];
+        await fsPromises
+          .unlink(path.join("audios", filenameAudio))
+          .catch(() => {});
+      }
+
+      // Supprimer le profil
+      await Guitariste.deleteOne({ userId });
+    }
+
+    // Supprimer le user
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({ message: "Compte (et profil associé) supprimés !" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Erreur serveur" });
   }
 };

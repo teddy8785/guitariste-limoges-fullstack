@@ -40,40 +40,6 @@ const Report = ({ profileId, slug }) => {
 
   // Vérification du statut signalement
   useEffect(() => {
-    if (!profileId) return;
-
-    const checkStatus = async () => {
-      try {
-        let queryParams = new URLSearchParams({ profileId });
-        const headers = { "Content-Type": "application/json" };
-
-        if (token) {
-          headers["Authorization"] = `Bearer ${token}`;
-        } else if (visitorId) {
-          queryParams.append("visitorId", visitorId);
-        } else {
-          return;
-        }
-
-        const res = await fetch(
-          `http://localhost:4000/api/report/status?${queryParams}`,
-          {
-            method: "GET",
-            headers,
-          }
-        );
-
-        const data = await res.json();
-        setReported(!!data.reported);
-      } catch (err) {
-        console.error("Erreur récupération statut signalement:", err);
-      }
-    };
-
-    checkStatus();
-  }, [profileId, token, visitorId]);
-
-  useEffect(() => {
     const fetchReportsDetails = async () => {
       if (!isAdmin || !profileId) return;
 

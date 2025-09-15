@@ -9,7 +9,7 @@ import { HashLink } from "react-router-hash-link";
 import { useCallback, useEffect, useState } from "react";
 import StatusIndicator from "../components/StatusIndicator";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../Store/authSlice"; // adapte le chemin si besoin
+import { logout } from "../Store/authSlice";
 
 function Index() {
   const dispatch = useDispatch();
@@ -21,6 +21,9 @@ function Index() {
   const [hasProfile, setHasProfile] = useState(false);
   const [userSlug, setUserSlug] = useState(null);
   const [annonces, setAnnonces] = useState([]);
+
+  const [showWarning, setShowWarning] = useState(false);
+  const [deleteMessage, setDeleteMessage] = useState("");
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
@@ -89,6 +92,34 @@ function Index() {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const deleteAccount = async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setDeleteMessage("Non connecté, impossible de supprimer le compte.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:4000/api/auth/me", {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (!response.ok) throw new Error("Erreur suppression du compte");
+
+      // Remplace le contenu de la modale
+      setDeleteMessage(
+        "Ton compte a été supprimé avec succès 😢. Merci d’avoir été parmi nous ! On espère te revoir bientôt !"
+      );
+
+      // Déconnexion automatique
+      handleLogout();
+    } catch (err) {
+      console.error(err);
+      setDeleteMessage("Erreur : " + err.message);
+    }
+  };
+
   return (
     <div>
       <Header>
@@ -109,10 +140,21 @@ function Index() {
           <div className="header__user">
             {isLogged ? (
               <>
-                {hasProfile && userSlug ? (
-                  <NavLink className="header__link" to={`/artiste/${userSlug}`}>
-                    Mon profil
-                  </NavLink>
+                {isLogged && hasProfile && userSlug ? (
+                  <>
+                    <NavLink
+                      className="header__link"
+                      to={`/artiste/${userSlug}`}
+                    >
+                      Mon profil
+                    </NavLink>
+                    <button
+                      className="header__link"
+                      onClick={() => setShowWarning(true)}
+                    >
+                      Supprimer mon compte
+                    </button>
+                  </>
                 ) : (
                   <NavLink className="header__link" to={`/profil`}>
                     Créer son profil
@@ -180,6 +222,30 @@ function Index() {
         </nav>
         <h1 className="header__title">GUITARISTES LIMOGES</h1>
       </Header>
+      {showWarning && (
+        <div className="header__modal">
+          <div className="header__modal--content">
+            {!deleteMessage ? (
+              <>
+                <h2>⚠️ Suppression définitive</h2>
+                <p>
+                  Cette action supprimera ton compte et ton profil si tu as un.
+                  <br />
+                  Elle est <strong>irréversible</strong>. Veux-tu continuer ?
+                </p>
+                <button onClick={deleteAccount}>Oui, supprimer</button>
+                <button onClick={() => setShowWarning(false)}>Annuler</button>
+              </>
+            ) : (
+              <>
+                <h2>🎉 Compte supprimé !</h2>
+                <p>{deleteMessage}</p>
+                <button onClick={() => setShowWarning(false)}>Fermer</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
       <Heroheader />
       <Main>
         <section id="new">
