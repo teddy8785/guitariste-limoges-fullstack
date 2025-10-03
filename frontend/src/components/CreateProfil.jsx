@@ -1,3 +1,4 @@
+import villes from "../assets/villes.json";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { allInstruments, allStyles } from "../assets/data";
@@ -5,6 +6,7 @@ import ErrorDisplay from "./ErrorDisplay";
 
 function CreateProfil({ onSubmit, initialData = {} }) {
   const [errors, setErrors] = useState({});
+  const [suggestions, setSuggestions] = useState([]);
   const [formData, setFormData] = useState({
     nom: "",
     ville: "",
@@ -203,6 +205,27 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       return;
     }
 
+    // On récupère la ville saisie et on la met en minuscule pour comparer
+    const villeSaisie = formData.ville.trim().toLowerCase();
+
+    // On cherche la version correcte dans le fichier villes.json
+    const villeCorrecte = villes.find((v) => v.toLowerCase() === villeSaisie);
+
+    if (!villeCorrecte) {
+      const errorMessage = "La ville saisie n'existe pas.";
+      setErrors((prev) => {
+        const general = prev.general || [];
+        if (!general.includes(errorMessage)) {
+          return { ...prev, general: [...general, errorMessage] };
+        }
+        return prev;
+      });
+      return;
+    }
+
+    // Si on a trouvé la ville correcte, on remplace la saisie par celle du fichier
+    setFormData((prev) => ({ ...prev, ville: villeCorrecte }));
+
     setErrors({});
 
     const sanitizeArray = (val) => {
@@ -248,6 +271,14 @@ function CreateProfil({ onSubmit, initialData = {} }) {
     }
   };
 
+  function normalizeString(str) {
+    return str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "") // enlever accents
+      .replace(/[\s-]/g, ""); // enlever espaces et tirets
+  }
+
   return (
     <div className="header">
       <button className="header__button" onClick={() => navigate("/")}>
@@ -273,8 +304,52 @@ function CreateProfil({ onSubmit, initialData = {} }) {
           type="text"
           name="ville"
           value={formData.ville}
-          onChange={handleChange}
+          autoComplete="off"
+          onChange={(e) => {
+            const value = e.target.value;
+            setFormData((prev) => ({ ...prev, ville: value }));
+
+            if (value.length > 0) {
+              const filtered = villes.filter((v) =>
+                normalizeString(v).startsWith(normalizeString(value))
+              );
+              setSuggestions(filtered);
+            } else {
+              setSuggestions([]);
+            }
+          }}
+          onBlur={() => {
+            if (suggestions.length > 0) {
+              setFormData((prev) => ({ ...prev, ville: suggestions[0] }));
+            }
+            setTimeout(() => setSuggestions([]), 100);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
         />
+
+        {/* Suggestions */}
+        {suggestions.length > 0 && (
+          <ul className="form-profil__suggestions-list">
+            {suggestions.map((v, idx) => (
+              <li
+                key={idx}
+                onMouseDown={(e) => {
+                  e.preventDefault(); // pour ne pas perdre le focus
+                  // mettre la version avec tirets dans l'input
+                  setFormData((prev) => ({
+                    ...prev,
+                    ville: v.replace(/\s+/g, "-"),
+                  }));
+                  setSuggestions([]);
+                }}
+              >
+                {v} {/* on affiche la ville avec espaces pour lisibilité */}
+              </li>
+            ))}
+          </ul>
+        )}
 
         <label className="form-profil__label">Photo (fichier local):</label>
         <input

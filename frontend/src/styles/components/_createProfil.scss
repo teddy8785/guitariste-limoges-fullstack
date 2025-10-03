@@ -84,6 +84,27 @@
     resize: vertical;
   }
 
+  &__suggestions-list {
+    border: 1px solid color.$color-primary;
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: color.$color-secondary;
+    list-style: none;
+    padding: 0;
+    margin-top: 150px;
+    position: absolute;
+    width: 50%;
+    z-index: 10;
+  }
+
+  &__suggestions-list li {
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+
+  &__suggestions-list li:hover {
+    background-color: color.$color-secondary;
+  }
   // &__input::placeholder {
   //   color: color.$color-secondary;
   // }
@@ -91,6 +112,10 @@
   @media (max-width: 700px) {
     &__title {
       font-size: 35px;
+    }
+
+     &__suggestions-list {
+      width: 70%;
     }
   }
 
