@@ -39,7 +39,7 @@ exports.createGuitariste = async (req, res) => {
 
       photoUrl = `${req.protocol}://${req.get("host")}/images/${jpgFilename}`;
       photoDownUrl = `${req.protocol}://${req.get(
-        "host"
+        "host",
       )}/images/${webpFilename}`;
     }
 
@@ -52,12 +52,12 @@ exports.createGuitariste = async (req, res) => {
         .split(".")[0];
       const timestamp = Date.now();
       const audioFilename = `${originalName}_${timestamp}${path.extname(
-        audioFile.originalname
+        audioFile.originalname,
       )}`;
 
       await fsPromises.writeFile(
         path.join("audios", audioFilename),
-        audioFile.buffer
+        audioFile.buffer,
       );
 
       audioUrl = `${req.protocol}://${req.get("host")}/audios/${audioFilename}`;
@@ -89,16 +89,17 @@ exports.createGuitariste = async (req, res) => {
 
     const guitariste = new Guitariste({
       ...req.body,
-      photo: photoUrl, // URL JPG
-      photoDown: photoDownUrl, // URL WebP
-      audio: audioUrl, // URL audio
+      photo: photoUrl,
+      photoDown: photoDownUrl,
+      audio: audioUrl,
       userId: req.auth.userId,
     });
 
     await guitariste.save();
     res.status(201).json({ message: "Guitariste enregistré !" });
   } catch (error) {
-    console.error(error);
+    console.error("SAVE ERROR:", error);
+
     res.status(400).json({ error });
   }
 };
@@ -168,27 +169,37 @@ exports.getRecentAnnonces = (req, res) => {
 
 async function deleteFileIfExists(fileUrl) {
   if (!fileUrl) return;
+
   const filename = fileUrl.split("/images/")[1];
   if (!filename) return;
+
   const filepath = path.join("images", filename);
 
   try {
+    await fsPromises.access(filepath); // vérifie existence
     await fsPromises.unlink(filepath);
   } catch (err) {
-     console.error(`Erreur suppression fichier ${filename}:`, err.message);
+    if (err.code !== "ENOENT") {
+      console.error(`Erreur suppression fichier ${filename}:`, err.message);
+    }
   }
 }
 
 async function deleteAudioFileIfExists(audioUrl) {
   if (!audioUrl) return;
+
   const filename = audioUrl.split("/audios/")[1];
   if (!filename) return;
+
   const filepath = path.join("audios", filename);
 
   try {
+    await fsPromises.access(filepath);
     await fsPromises.unlink(filepath);
   } catch (err) {
-    console.error(`Erreur suppression fichier audio ${filename}:`, err.message);
+    if (err.code !== "ENOENT") {
+      console.error("Erreur suppression audio:", err.message);
+    }
   }
 }
 
@@ -246,9 +257,16 @@ exports.updateMyGuitariste = async (req, res) => {
     }
 
     // Suppression audio si demandé
-    if (req.body.audioDeleted === "true") {
+    const audioDeleted =
+      req.body.audioDeleted === "true" || req.body.audioDeleted === true;
+
+    if (audioDeleted) {
       await deleteAudioFileIfExists(guitariste.audio);
       updatedData.audio = null;
+    }
+
+    if (req.files?.audio?.[0]) {
+      await deleteAudioFileIfExists(guitariste.audio);
     }
 
     // Gestion image (upload et redimension)
@@ -279,10 +297,10 @@ exports.updateMyGuitariste = async (req, res) => {
         .toFile(path.join("images", webpFilename));
 
       updatedData.photo = `${req.protocol}://${req.get(
-        "host"
+        "host",
       )}/images/${jpgFilename}`;
       updatedData.photoDown = `${req.protocol}://${req.get(
-        "host"
+        "host",
       )}/images/${webpFilename}`;
     }
 
@@ -297,16 +315,16 @@ exports.updateMyGuitariste = async (req, res) => {
         .split(".")[0];
       const timestampAudio = Date.now();
       const audioFilename = `${audioOriginalName}_${timestampAudio}${path.extname(
-        audioFile.originalname
+        audioFile.originalname,
       )}`;
 
       await fsPromises.writeFile(
         path.join("audios", audioFilename),
-        audioFile.buffer
+        audioFile.buffer,
       );
 
       updatedData.audio = `${req.protocol}://${req.get(
-        "host"
+        "host",
       )}/audios/${audioFilename}`;
     }
 
@@ -338,7 +356,7 @@ exports.updateMyGuitariste = async (req, res) => {
     const updatedGuitariste = await Guitariste.findByIdAndUpdate(
       guitariste._id,
       updatedData,
-      { new: true }
+      { new: true },
     );
 
     res

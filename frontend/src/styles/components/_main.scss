@@ -5,6 +5,7 @@
   margin-top: 50px;
   display: flex;
   flex-direction: column;
+  flex: 1;
 
   &__title {
     font-family: police.$font-secondary;

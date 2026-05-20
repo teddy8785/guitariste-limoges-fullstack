@@ -238,7 +238,7 @@ function CreateProfil({ onSubmit, initialData = {} }) {
       ...formData,
       style: sanitizeArray(formData.style),
       instrument: sanitizeArray(formData.instrument),
-      photo: formData.photo ? formData.photo : formData.photoPreview,
+      photo: formData.photo,
     };
 
     if (

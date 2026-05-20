@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import PasswordInput from "../components/PasswordInput";
 import ErrorDisplay from "../components/ErrorDisplay";
+import Main from "../components/Main";
 import Footer from "../components/Footer";
 
 // Import actions
@@ -88,8 +89,9 @@ function Connexion() {
   };
 
   return (
-    <div>
+    <div className="index">
       <h2 className="form__title">Connexion</h2>
+      <Main>
       <form className="form" onSubmit={handleSubmit}>
         <label className="form__label">Email :</label>
         <input
@@ -114,9 +116,10 @@ function Connexion() {
         <button className="form__button" type="submit">
           Se connecter
         </button>
-        <NavLink className="form__forgotPassword" to={`/forgot-password`}>Mot de passe oublié ?</NavLink>
+        {/* <NavLink className="form__forgotPassword" to={`/forgot-password`}>Mot de passe oublié ?</NavLink> */}
         {errorMessage && <ErrorDisplay message={errorMessage} />}
       </form>
+      </Main>
       <Footer />
     </div>
   );

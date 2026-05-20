@@ -5,6 +5,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
+  width: 100%;
   max-width: 400px;
   margin: 20px auto;
   padding: 15px;
@@ -35,17 +36,9 @@
     transition: background-color 0.3s ease;
   }
 
-  &__button--space {
-    margin-bottom: 120%;
-  }
-
-  &__forgotPassword {
-    margin-bottom: 95%;
-    color: color.$color-secondary;
-  }
-
   &__input {
-    width: 90%;
+    width: 100%;
+    box-sizing: border-box;
     margin-bottom: 15px;
     padding: 8px 20px 8px 15px;
     border-radius: 4px;
@@ -89,7 +82,7 @@
       font-size: 53px;
     }
 
-     &__forgotPassword {
+    &__forgotPassword {
       margin-bottom: 370px;
     }
 

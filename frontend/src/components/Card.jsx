@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 import Heart from "./Heart";
 import Report from "./Report";
 
@@ -20,6 +21,9 @@ function Card({
   profileId,
 }) {
   const backendUrl = "http://localhost:4000";
+
+  const auth = useSelector((state) => state.auth);
+  const isLogged = !!auth.token;
 
   const photoSrc = photo
     ? photo.startsWith("http")
@@ -67,6 +71,7 @@ function Card({
         color="black"
         itemId={itemId}
         itemType={type}
+        disabled={!isLogged}
       />
       <Report profileId={profileId} />
       <NavLink className="card__link" to={`/artiste/${slug}`}>
@@ -83,7 +88,15 @@ function Card({
           </audio>
         )}
       </NavLink>
-      {annonce && <span className="card__annonce">Annonce</span>}
+      {annonce && (
+        <span
+          className={`card__annonce ${
+            isLogged ? "card__annonce--logged" : "card__annonce--guest"
+          }`}
+        >
+          Annonce
+        </span>
+      )}
     </article>
   );
 }

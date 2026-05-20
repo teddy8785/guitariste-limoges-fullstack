@@ -11,6 +11,7 @@ function Heart({
   itemId,
   itemType = "like",
   variant = "",
+  disabled = false,
 }) {
   const dispatch = useDispatch();
 
@@ -55,7 +56,7 @@ function Heart({
       })
       .then((data) => {
         dispatch(
-          setLikeStatus({ itemId, liked: data.liked, count: data.count })
+          setLikeStatus({ itemId, liked: data.liked, count: data.count }),
         );
       })
       .catch((err) => {
@@ -64,6 +65,7 @@ function Heart({
   }, [itemId, itemType, dispatch]);
 
   const handleClick = async () => {
+    if (disabled) return;
     if (!itemId) {
       console.warn("itemId non défini, impossible d'envoyer le like");
       return;
@@ -110,7 +112,7 @@ function Heart({
           itemId,
           liked: statusData.liked,
           count: statusData.count,
-        })
+        }),
       );
     } catch (err) {
       console.error("Erreur enregistrement ou récupération like :", err);
@@ -119,18 +121,26 @@ function Heart({
 
   return (
     <div className="card__heart--content">
+      <div>
       <i
         className={`fa-heart ${liked ? "fa-solid" : "fa-regular"} ${
           liked ? "card__heart--liked" : ""
-        } ${className}`}
-        style={{ color: liked ? "darkred" : color || "inherit" }}
-        onClick={handleClick}
-      ></i>
+        } ${className} ${disabled ? "card__heart--disabled" : ""}`}
+        style={{
+          color: disabled ? "#aaa" : liked ? "darkred" : color || "inherit",
+          cursor: disabled ? "not-allowed" : "pointer",
+        }}
+        onClick={disabled ? undefined : handleClick}
+      />
       <span
         className={`${variant === "presentation" ? "presentation__count" : ""}`}
       >
         {count}
       </span>
+      </div>
+      {disabled && (
+        <small>Connecte-toi pour liker</small>
+      )}
     </div>
   );
 }

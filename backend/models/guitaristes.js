@@ -7,11 +7,11 @@ const guitaristeSchema = mongoose.Schema(
     nom: { type: String, required: true },
     slug: { type: String },
     ville: { type: String },
-    photo: { type: String },
-    photoDown: { type: String },
+    audio: { type: String, default: null },
+    photo: { type: String, default: null },
+    photoDown: { type: String, default: null },
     style: { type: [String] },
     instrument: { type: [String] },
-    audio: { type: String },
     histoire: { type: String },
     mail: { type: String },
     lienx: { type: String },
@@ -51,7 +51,7 @@ const guitaristeSchema = mongoose.Schema(
       },
     ],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 guitaristeSchema.pre("save", async function (next) {

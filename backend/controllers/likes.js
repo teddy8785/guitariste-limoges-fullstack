@@ -3,43 +3,74 @@ const Guitariste = require("../models/guitaristes");
 const Like = require("../models/likes");
 const User = require("../models/user");
 
-async function toggleLike({ userId, visitorKey, profileId }) {
-  if (!userId && !visitorKey) throw new Error("userId ou visitorKey requis");
+async function toggleLike(req, res) {
+  try {
+    const userId = req.auth?.userId || null;
+    const visitorKey = req.body.visitorKey || null;
+    const profileId = req.params.id;
 
-  const query = { profileId };
-  if (userId) query.userId = userId;
-  else query.visitorKey = visitorKey;
-
-  const existingLike = await Like.findOne(query);
-
-  let liked;
-
-  if (existingLike) {
-    await Like.deleteOne({ _id: existingLike._id });
-
-    if (userId) {
-      await User.findByIdAndUpdate(userId, {
-        $pull: { likedProfiles: { profileId } },
+    if (!userId && !visitorKey) {
+      return res.status(400).json({
+        error: "userId ou visitorKey requis",
       });
     }
 
-    liked = false;
-  } else {
-    await Like.create(query);
+    const query = { profileId };
 
     if (userId) {
-      await User.findByIdAndUpdate(userId, {
-        $addToSet: { likedProfiles: { profileId, likedAt: new Date() } },
-      });
+      query.userId = userId;
+    } else {
+      query.visitorKey = visitorKey;
     }
 
-    liked = true;
+    const existingLike = await Like.findOne(query);
+
+    let liked;
+
+    if (existingLike) {
+      await Like.deleteOne({ _id: existingLike._id });
+
+      if (userId) {
+        await User.findByIdAndUpdate(userId, {
+          $pull: { likedProfiles: { profileId } },
+        });
+      }
+
+      liked = false;
+    } else {
+      await Like.create(query);
+
+      if (userId) {
+        await User.findByIdAndUpdate(userId, {
+          $addToSet: {
+            likedProfiles: {
+              profileId,
+              likedAt: new Date(),
+            },
+          },
+        });
+      }
+
+      liked = true;
+    }
+
+    const newCount = await Like.countDocuments({ profileId });
+
+    await Guitariste.findByIdAndUpdate(profileId, {
+      likes: newCount,
+    });
+
+    return res.json({
+      liked,
+      count: newCount,
+    });
+  } catch (err) {
+    console.error("TOGGLE LIKE ERROR:", err);
+
+    return res.status(500).json({
+      error: err.message,
+    });
   }
-
-  const newCount = await Like.countDocuments({ profileId });
-  await Guitariste.findByIdAndUpdate(profileId, { likes: newCount });
-
-  return { liked, newCount };
 }
 
 async function getLikeStatus(req, res) {
