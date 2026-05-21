@@ -46,7 +46,7 @@ const Report = ({ profileId, slug }) => {
       try {
         const token = localStorage.getItem("token");
         const res = await fetch(
-          `http://localhost:4000/api/admin/guitaristes/${profileId}/reports`,
+          `${process.env.REACT_APP_API_URL}/api/admin/guitaristes/${profileId}/reports`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -98,7 +98,7 @@ const Report = ({ profileId, slug }) => {
         return;
       }
 
-      const res = await fetch("http://localhost:4000/api/report", {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/report`, {
         method: "POST",
         headers,
         body: JSON.stringify(bodyData),

@@ -14,7 +14,7 @@ function Heroheader() {
       setLoading(true);
       try {
         const res = await fetch(
-          "http://localhost:4000/api/report/admin/reported-profiles",
+          `${process.env.REACT_APP_API_URL}/api/report/admin/reported-profiles`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

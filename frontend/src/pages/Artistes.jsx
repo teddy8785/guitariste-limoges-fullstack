@@ -28,7 +28,7 @@ function Artistes() {
   const maxCards = 20;
 
   useEffect(() => {
-    fetch("http://localhost:4000/api/guitaristes")
+    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes`)
       .then((res) => {
         if (!res.ok) throw new Error("Erreur lors du chargement");
         return res.json();
@@ -55,7 +55,7 @@ function Artistes() {
       return;
     }
 
-    fetch("http://localhost:4000/api/report/admin/reported-profiles", {
+    fetch(`${process.env.REACT_APP_API_URL}/api/report/admin/reported-profiles`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

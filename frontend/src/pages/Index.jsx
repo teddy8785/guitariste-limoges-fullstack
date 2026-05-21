@@ -35,7 +35,7 @@ function Index() {
     window.scrollTo(0, 0);
 
     if (token) {
-      fetch("http://localhost:4000/api/guitaristes/me", {
+      fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -62,7 +62,7 @@ function Index() {
       setHasProfile(false);
     }
 
-    fetch("http://localhost:4000/api/guitaristes/recents")
+    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/recents`)
       .then((res) => {
         if (!res.ok)
           throw new Error("Erreur lors du chargement des guitaristes");
@@ -71,7 +71,7 @@ function Index() {
       .then((data) => setGuitaristes(data))
       .catch(console.error);
 
-    fetch("http://localhost:4000/api/guitaristes/annonces/recentes")
+    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/annonces/recentes`)
       .then((res) => {
         if (!res.ok) throw new Error("Erreur lors du chargement des annonces");
         return res.json();
@@ -100,7 +100,7 @@ function Index() {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/api/auth/me", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });

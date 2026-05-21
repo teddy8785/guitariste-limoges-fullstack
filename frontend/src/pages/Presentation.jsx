@@ -22,7 +22,7 @@ function Presentation({ type }) {
   const role =
     useSelector((state) => state.auth.role) || localStorage.getItem("role");
   const isAdmin = role === "admin";
-  const backendUrl = "http://localhost:4000";
+  const backendUrl = `${process.env.REACT_APP_API_URL}`;
 
   useEffect(() => {
     if (post) {
@@ -35,7 +35,7 @@ function Presentation({ type }) {
     const token = localStorage.getItem("token");
     setIsLogged(!!token);
 
-    fetch(`http://localhost:4000/api/guitaristes/slug/${slug}`)
+    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/slug/${slug}`)
       .then((res) => {
         if (!res.ok) throw new Error("Artiste non trouvé");
         return res.json();
@@ -65,8 +65,8 @@ function Presentation({ type }) {
     const token = localStorage.getItem("token");
 
     const url = isAdmin
-      ? `http://localhost:4000/api/admin/guitaristes/${post._id}`
-      : `http://localhost:4000/api/guitaristes/me`;
+      ? `${process.env.REACT_APP_API_URL}/api/admin/guitaristes/${post._id}`
+      : `${process.env.REACT_APP_API_URL}/api/guitaristes/me`;
 
     const response = await fetch(url, {
       method: "DELETE",

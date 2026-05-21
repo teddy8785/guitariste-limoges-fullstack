@@ -11,7 +11,7 @@ function CreateProfilPage() {
   useEffect(() => {
     if (id) {
       // Chargement du profil existant pour modification
-      fetch(`http://localhost:4000/api/guitaristes/id/${id}`, {
+      fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/id/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -51,15 +51,15 @@ function CreateProfilPage() {
 
       if (!id) {
         // CREATE
-        url = "http://localhost:4000/api/guitaristes";
+        url = `${process.env.REACT_APP_API_URL}/api/guitaristes`;
         method = "POST";
       } else if (role === "admin") {
         // ADMIN UPDATE
-        url = `http://localhost:4000/api/admin/guitaristes/${id}`;
+        url = `${process.env.REACT_APP_API_URL}/api/admin/guitaristes/${id}`;
         method = "PUT";
       } else {
         // USER UPDATE
-        url = "http://localhost:4000/api/guitaristes/me";
+        url = `${process.env.REACT_APP_API_URL}/api/guitaristes/me`;
         method = "PUT";
       }
       if (!url) {

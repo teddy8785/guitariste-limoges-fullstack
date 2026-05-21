@@ -30,7 +30,7 @@ function Heart({
       localStorage.setItem("visitor_key", visitorKey);
     }
 
-    const backendUrl = "http://localhost:4000";
+    const backendUrl = `${process.env.REACT_APP_API_URL}`;
     const token = localStorage.getItem("token");
 
     const url = token
@@ -71,7 +71,7 @@ function Heart({
       return;
     }
 
-    const backendUrl = "http://localhost:4000";
+    const backendUrl = `${process.env.REACT_APP_API_URL}`;
     const token = localStorage.getItem("token");
     const visitorKey = !token ? localStorage.getItem("visitor_key") : null;
 

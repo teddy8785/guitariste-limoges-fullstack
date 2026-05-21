@@ -20,7 +20,7 @@ function Card({
   type,
   profileId,
 }) {
-  const backendUrl = "http://localhost:4000";
+  const backendUrl = `${process.env.REACT_APP_API_URL}`;
 
   const auth = useSelector((state) => state.auth);
   const isLogged = !!auth.token;

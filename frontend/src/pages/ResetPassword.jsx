@@ -26,7 +26,7 @@ function ResetPassword() {
       setLoading(true);
 
       const response = await fetch(
-        `http://localhost:4000/api/auth/reset-password/${token}`,
+        `${process.env.REACT_APP_API_URL}/api/auth/reset-password/${token}`,
         {
           method: "POST",
           headers: {
