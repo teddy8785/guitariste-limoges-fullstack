@@ -1,5 +1,6 @@
 const http = require("http");
 const app = require("./app");
+const fs = require("fs");
 
 const normalizePort = (val) => {
   const port = parseInt(val, 10);
@@ -36,14 +37,17 @@ const errorHandler = (error) => {
   }
 };
 
-const fs = require("fs");
+const path = require("path");
 
-if (!fs.existsSync("images")) {
-  fs.mkdirSync("images");
+const imagesDir = path.join(__dirname, "images");
+const audiosDir = path.join(__dirname, "audios");
+
+if (!fs.existsSync(imagesDir)) {
+  fs.mkdirSync(imagesDir);
 }
 
-if (!fs.existsSync("audios")) {
-  fs.mkdirSync("audios");
+if (!fs.existsSync(audiosDir)) {
+  fs.mkdirSync(audiosDir);
 }
 
 const server = http.createServer(app);
