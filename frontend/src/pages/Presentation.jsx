@@ -5,6 +5,7 @@ import Main from "../components/Main";
 import Footer from "../components/Footer";
 import Heart from "../components/Heart";
 import { gestionErreurPhoto } from "../components/Card";
+import { useSelector } from "react-redux";
 
 function Presentation({ type }) {
   const { slug } = useParams();
@@ -16,9 +17,11 @@ function Presentation({ type }) {
   const [error, setError] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
 
-  const userId = localStorage.getItem("userId");
-  const userRole = localStorage.getItem("role");
-  const isAdmin = userRole === "admin";
+  const userId =
+    useSelector((state) => state.auth.userId) || localStorage.getItem("userId");
+  const role =
+    useSelector((state) => state.auth.role) || localStorage.getItem("role");
+  const isAdmin = role === "admin";
   const backendUrl = "http://localhost:4000";
 
   useEffect(() => {
@@ -60,34 +63,22 @@ function Presentation({ type }) {
     if (!confirmDelete) return;
 
     const token = localStorage.getItem("token");
-    if (!token) {
-      alert("Non connecté, token manquant.");
-      return;
-    }
 
-    try {
-      let url;
-      if (isAdmin && post?._id) {
-        url = `http://localhost:4000/api/admin/guitaristes/${post._id}`;
-      } else {
-        url = "http://localhost:4000/api/guitaristes/me";
-      }
+    const url = isAdmin
+      ? `http://localhost:4000/api/admin/guitaristes/${post._id}`
+      : `http://localhost:4000/api/guitaristes/me`;
 
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    const response = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      if (!response.ok) throw new Error("Erreur suppression profil");
+    if (!response.ok) throw new Error("Erreur suppression");
 
-      alert("Profil supprimé !");
-      navigate("/");
-    } catch (err) {
-      console.error(err);
-      alert("Erreur : " + err.message);
-    }
+    alert("Profil supprimé !");
+    navigate("/");
   };
 
   return (

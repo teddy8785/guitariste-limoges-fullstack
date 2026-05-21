@@ -34,20 +34,36 @@ function CreateProfilPage() {
 
   const handleProfilSubmit = async (formData) => {
     try {
-      const userRole = localStorage.getItem("role");
-      let url;
-      let method;
-
-      if (id) {
-        method = "PUT";
-        if (userRole === "admin") {
-          url = `http://localhost:4000/api/admin/guitaristes/id/${id}`;
-        } else {
-          url = `http://localhost:4000/api/guitaristes/me`;
+      const getRoleFromToken = () => {
+        const token = localStorage.getItem("token");
+        if (!token) return null;
+        try {
+          return JSON.parse(atob(token.split(".")[1])).role;
+        } catch {
+          return null;
         }
-      } else {
-        method = "POST";
+      };
+
+      const role = getRoleFromToken();
+
+      let url = "";
+      let method = "";
+
+      if (!id) {
+        // CREATE
         url = "http://localhost:4000/api/guitaristes";
+        method = "POST";
+      } else if (role === "admin") {
+        // ADMIN UPDATE
+        url = `http://localhost:4000/api/admin/guitaristes/${id}`;
+        method = "PUT";
+      } else {
+        // USER UPDATE
+        url = "http://localhost:4000/api/guitaristes/me";
+        method = "PUT";
+      }
+      if (!url) {
+        throw new Error("URL non définie (id ou role manquant)");
       }
 
       const dataToSend = new FormData();
@@ -57,13 +73,13 @@ function CreateProfilPage() {
           formData.style.forEach((s) => dataToSend.append("style", s));
         } else if (key === "instrument" && Array.isArray(formData.instrument)) {
           formData.instrument.forEach((i) =>
-            dataToSend.append("instrument", i)
+            dataToSend.append("instrument", i),
           );
         } else if (key === "photo" && formData.photo instanceof File) {
           dataToSend.append("image", formData.photo);
         } else if (key === "audio" && formData.audio instanceof File) {
           dataToSend.append("audio", formData.audio);
-        } else if (key === "photoDeleted" && formData.photoDeleted === true) {
+        } else if (key === "photoDeleted" && formData.photoDeleted) {
           dataToSend.append("photoDeleted", "true");
         } else if (key !== "photoDeleted") {
           dataToSend.append(key, formData[key]);
@@ -82,10 +98,9 @@ function CreateProfilPage() {
 
       const data = await response.json();
 
-      // On retourne le slug pour la navigation côté CreateProfil
       return data.slug || initialData?.slug || null;
     } catch (error) {
-      console.error("Erreur :", error);
+      console.error(error);
       throw error;
     }
   };

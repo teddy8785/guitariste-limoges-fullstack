@@ -14,30 +14,38 @@ exports.createGuitariste = async (req, res) => {
     // Gestion image
     if (req.files && req.files["image"] && req.files["image"][0]) {
       const imageFile = req.files["image"][0];
-      const originalName = imageFile.originalname
-        .split(" ")
-        .join("_")
-        .split(".")[0];
-      const timestamp = Date.now();
-      const jpgFilename = `${originalName}_${timestamp}.jpg`;
-      const webpFilename = `${originalName}_${timestamp}.webp`;
 
-      // Redimensionner automatiquement à 300x400
-      const resizedImage = sharp(imageFile.buffer).resize({
-        width: 300,
-        height: 400,
-        fit: "cover", // crop si nécessaire pour remplir complètement
+      const originalName = imageFile.originalname.split(".")[0];
+
+      const safeName = slugify(originalName, {
+        lower: true,
+        strict: true,
       });
 
-      await resizedImage
+      const timestamp = Date.now();
+
+      const jpgFilename = `${safeName}_${timestamp}.jpg`;
+      const webpFilename = `${safeName}_${timestamp}.webp`;
+
+      // Redimensionner automatiquement à 300x400
+      const resizedBuffer = await sharp(imageFile.buffer)
+        .resize({
+          width: 300,
+          height: 400,
+          fit: "cover",
+        })
+        .toBuffer();
+
+      await sharp(resizedBuffer)
         .jpeg({ quality: 90 })
         .toFile(path.join("images", jpgFilename));
 
-      await resizedImage
+      await sharp(resizedBuffer)
         .webp({ quality: 80 })
         .toFile(path.join("images", webpFilename));
 
       photoUrl = `${req.protocol}://${req.get("host")}/images/${jpgFilename}`;
+
       photoDownUrl = `${req.protocol}://${req.get(
         "host",
       )}/images/${webpFilename}`;
@@ -283,16 +291,19 @@ exports.updateMyGuitariste = async (req, res) => {
       const jpgFilename = `${originalName}_${timestamp}.jpg`;
       const webpFilename = `${originalName}_${timestamp}.webp`;
 
-      const resizedImage = sharp(imageFile.buffer).resize({
-        width: 300,
-        height: 400,
-        fit: "cover",
-      });
+      const resizedBuffer = await sharp(imageFile.buffer)
+        .resize({
+          width: 300,
+          height: 400,
+          fit: "cover",
+        })
+        .toBuffer();
 
-      await resizedImage
+      await sharp(resizedBuffer)
         .jpeg({ quality: 90 })
         .toFile(path.join("images", jpgFilename));
-      await resizedImage
+
+      await sharp(resizedBuffer)
         .webp({ quality: 80 })
         .toFile(path.join("images", webpFilename));
 
@@ -306,7 +317,7 @@ exports.updateMyGuitariste = async (req, res) => {
 
     // Gestion audio
     if (req.files && req.files["audio"] && req.files["audio"][0]) {
-      await deleteFileIfExists(guitariste.audio);
+      await deleteAudioFileIfExists(guitariste.audio);
 
       const audioFile = req.files["audio"][0];
       const audioOriginalName = audioFile.originalname

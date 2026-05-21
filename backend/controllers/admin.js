@@ -31,8 +31,8 @@ async function deleteFileIfExists(fileUrl) {
   const filename = fileUrl.includes("/images/")
     ? fileUrl.split("/images/")[1]
     : fileUrl.includes("/audios/")
-    ? fileUrl.split("/audios/")[1]
-    : null;
+      ? fileUrl.split("/audios/")[1]
+      : null;
   if (!filename) return;
 
   const folder = fileUrl.includes("/images/") ? "images" : "audios";
@@ -98,7 +98,9 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
     }
 
     // Gestion suppression photo uniquement si photoDeleted === "true"
-    if (req.body.photoDeleted === "true") {
+    const photoDeleted = String(req.body.photoDeleted) === "true";
+
+    if (photoDeleted) {
       await deleteFileIfExists(guitariste.photo);
       await deleteFileIfExists(guitariste.photoDown);
       updatedData.photo = null;
@@ -134,10 +136,10 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
         .toFile(path.join("images", webpFilename));
 
       updatedData.photo = `${req.protocol}://${req.get(
-        "host"
+        "host",
       )}/images/${jpgFilename}`;
       updatedData.photoDown = `${req.protocol}://${req.get(
-        "host"
+        "host",
       )}/images/${webpFilename}`;
     }
 
@@ -152,16 +154,16 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
         .split(".")[0];
       const timestampAudio = Date.now();
       const audioFilename = `${audioOriginalName}_${timestampAudio}${path.extname(
-        audioFile.originalname
+        audioFile.originalname,
       )}`;
 
       await fsPromises.writeFile(
         path.join("audios", audioFilename),
-        audioFile.buffer
+        audioFile.buffer,
       );
 
       updatedData.audio = `${req.protocol}://${req.get(
-        "host"
+        "host",
       )}/audios/${audioFilename}`;
     }
 
@@ -170,9 +172,22 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
       updatedData.annonceDate = new Date();
     }
 
-    await Guitariste.updateOne({ _id: req.params.id }, updatedData);
+    await Guitariste.findByIdAndUpdate(req.params.id, updatedData, {
+      new: true,
+      runValidators: true,
+    });
 
-    res.status(200).json({ message: "Profil mis à jour par admin !" });
+    const updated = await Guitariste.findByIdAndUpdate(
+      req.params.id,
+      updatedData,
+      { new: true, runValidators: true },
+    );
+
+    return res.status(200).json({
+      message: "Profil mis à jour par admin !",
+      slug: updated.slug,
+      id: updated._id,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
