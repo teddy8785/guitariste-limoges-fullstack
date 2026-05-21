@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const path = require("path");
@@ -9,10 +10,9 @@ const userRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
 const likesRoutes = require("./routes/likes");
 const reportRoutes = require("./routes/reports");
+const uploadRoutes = require("./routes/upload");
 
 const app = express();
-
-require("dotenv").config();
 
 // Connexion MongoDB
 mongoose
@@ -56,5 +56,6 @@ app.use("/api/auth", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/likes", likesRoutes);
 app.use("/api/report", reportRoutes);
+app.use("/api/upload", uploadRoutes);
 
 module.exports = app;
