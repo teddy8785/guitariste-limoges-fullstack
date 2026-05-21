@@ -7,7 +7,7 @@ const cors = require("cors");
 const guitaristeRoutes = require("./routes/guitaristes");
 const userRoutes = require("./routes/auth");
 const adminRoutes = require("./routes/admin");
-const likesRoutes = require('./routes/likes');
+const likesRoutes = require("./routes/likes");
 const reportRoutes = require("./routes/reports");
 
 const app = express();
@@ -23,23 +23,17 @@ mongoose
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch((err) => console.log("Connexion à MongoDB échouée !", err));
 
-// Middleware CORS (dev + future prod)
-const allowedOrigins = [
-  "http://localhost:3000", // Ton frontend local
-  // "https://www.tonsite.com",  ← Tu pourras le décommenter quand tu auras un domaine
-];
-
+// Middleware CORS
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("CORS non autorisé : " + origin));
-      }
-    },
+    origin: [
+      "http://localhost:3000",
+      "https://guitariste-limoges-fullstack.vercel.app",
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
-  })
+  }),
 );
 
 // Middleware corps de requêtes
@@ -60,7 +54,7 @@ app.use((req, res, next) => {
 app.use("/api/guitaristes", guitaristeRoutes);
 app.use("/api/auth", userRoutes);
 app.use("/api/admin", adminRoutes);
-app.use('/api/likes', likesRoutes);
+app.use("/api/likes", likesRoutes);
 app.use("/api/report", reportRoutes);
 
 module.exports = app;
