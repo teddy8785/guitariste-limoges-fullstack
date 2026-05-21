@@ -4,26 +4,37 @@ const cloudinary = require("../config/cloudinary");
 
 // CREATE
 exports.createGuitariste = async (req, res) => {
+  console.log("FILES:", req.files);
+console.log("BODY:", req.body);
   try {
     let style = [];
     if (typeof req.body.style === "string") {
-      style = req.body.style.split(",").map(s => s.trim()).filter(Boolean);
+      style = req.body.style
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
     } else if (Array.isArray(req.body.style)) {
-      style = req.body.style.map(s => s.trim());
+      style = req.body.style.map((s) => s.trim());
     }
 
     let instrument = [];
     if (typeof req.body.instrument === "string") {
-      instrument = req.body.instrument.split(",").map(s => s.trim()).filter(Boolean);
+      instrument = req.body.instrument
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean);
     } else if (Array.isArray(req.body.instrument)) {
-      instrument = req.body.instrument.map(s => s.trim());
+      instrument = req.body.instrument.map((s) => s.trim());
     }
 
-    const photo = req.files?.image?.[0]?.path || null;
-    const photoPublicId = req.files?.image?.[0]?.filename || null;
+    const photoFile = req.files?.image?.[0];
+    const audioFile = req.files?.audio?.[0];
 
-    const audio = req.files?.audio?.[0]?.path || null;
-    const audioPublicId = req.files?.audio?.[0]?.filename || null;
+    const photo = photoFile?.path || null;
+    const photoPublicId = getPublicId(photoFile);
+
+    const audio = audioFile?.path || null;
+    const audioPublicId = getPublicId(audioFile);
 
     const guitariste = new Guitariste({
       ...req.body,
@@ -130,18 +141,24 @@ exports.updateMyGuitariste = async (req, res) => {
     // styles
     updatedData.style =
       typeof req.body.style === "string"
-        ? req.body.style.split(",").map(s => s.trim()).filter(Boolean)
+        ? req.body.style
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : Array.isArray(req.body.style)
-        ? req.body.style.map(s => s.trim())
-        : [];
+          ? req.body.style.map((s) => s.trim())
+          : [];
 
     // instruments
     updatedData.instrument =
       typeof req.body.instrument === "string"
-        ? req.body.instrument.split(",").map(s => s.trim()).filter(Boolean)
+        ? req.body.instrument
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : Array.isArray(req.body.instrument)
-        ? req.body.instrument.map(s => s.trim())
-        : [];
+          ? req.body.instrument.map((s) => s.trim())
+          : [];
 
     // IMAGE UPDATE
     if (req.files?.image?.[0]) {
@@ -184,7 +201,7 @@ exports.updateMyGuitariste = async (req, res) => {
     const updated = await Guitariste.findByIdAndUpdate(
       guitariste._id,
       updatedData,
-      { new: true }
+      { new: true },
     );
 
     res.status(200).json({
