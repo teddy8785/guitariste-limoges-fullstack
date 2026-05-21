@@ -69,18 +69,24 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
     // styles
     updatedData.style =
       typeof req.body.style === "string"
-        ? req.body.style.split(",").map(s => s.trim()).filter(Boolean)
+        ? req.body.style
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : Array.isArray(req.body.style)
-        ? req.body.style.map(s => s.trim())
-        : [];
+          ? req.body.style.map((s) => s.trim())
+          : [];
 
     // instruments
     updatedData.instrument =
       typeof req.body.instrument === "string"
-        ? req.body.instrument.split(",").map(s => s.trim()).filter(Boolean)
+        ? req.body.instrument
+            .split(",")
+            .map((s) => s.trim())
+            .filter(Boolean)
         : Array.isArray(req.body.instrument)
-        ? req.body.instrument.map(s => s.trim())
-        : [];
+          ? req.body.instrument.map((s) => s.trim())
+          : [];
 
     // DELETE PHOTO
     if (String(req.body.photoDeleted) === "true") {
@@ -115,15 +121,23 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
         await cloudinary.uploader.destroy(g.photoPublicId);
       }
 
-      updatedData.photo = req.files.image[0].path;
-      updatedData.photoPublicId = req.files.image[0].filename;
+      const result = await cloudinary.uploader.upload(req.files.image[0].path, {
+        folder: "guitaristes/images",
+      });
 
-      if (g.photoDownPublicId) {
-        await cloudinary.uploader.destroy(g.photoDownPublicId);
-      }
+      updatedData.photo = result.secure_url;
+      updatedData.photoPublicId = result.public_id;
 
-      updatedData.photoDown = req.files.image[0].path;
-      updatedData.photoDownPublicId = req.files.image[0].filename;
+      const resultSmall = await cloudinary.uploader.upload(
+        req.files.image[0].path,
+        {
+          folder: "guitaristes/images_small",
+          transformation: [{ width: 400, crop: "scale" }],
+        },
+      );
+
+      updatedData.photoDown = resultSmall.secure_url;
+      updatedData.photoDownPublicId = resultSmall.public_id;
     }
 
     // UPLOAD AUDIO
@@ -134,8 +148,13 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
         });
       }
 
-      updatedData.audio = req.files.audio[0].path;
-      updatedData.audioPublicId = req.files.audio[0].filename;
+      const result = await cloudinary.uploader.upload(req.files.audio[0].path, {
+        resource_type: "video",
+        folder: "guitaristes/audio",
+      });
+
+      updatedData.audio = result.secure_url;
+      updatedData.audioPublicId = result.public_id;
     }
 
     // ANNOUNCE DATE
@@ -146,7 +165,7 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
     const updated = await Guitariste.findByIdAndUpdate(
       req.params.id,
       updatedData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     res.status(200).json({
@@ -154,7 +173,6 @@ exports.updateGuitaristeByAdmin = async (req, res) => {
       slug: updated.slug,
       id: updated._id,
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });

@@ -5,8 +5,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Guitariste = require("../models/guitaristes");
-const fsPromises = require('fs').promises;
-const path = require('path');
+const cloudinary = require("../config/cloudinary");
 
 exports.signup = (req, res, next) => {
   bcrypt
@@ -24,7 +23,7 @@ exports.signup = (req, res, next) => {
           const token = jwt.sign(
             { userId: savedUser._id, role: savedUser.role },
             process.env.JWT_SECRET,
-            { expiresIn: "24h" }
+            { expiresIn: "24h" },
           );
 
           res.status(201).json({
@@ -65,7 +64,7 @@ exports.login = (req, res, next) => {
             token: jwt.sign(
               { userId: user._id, role: user.role },
               process.env.JWT_SECRET,
-              { expiresIn: "24h" }
+              { expiresIn: "24h" },
             ),
           });
         })
@@ -169,38 +168,31 @@ exports.deleteUser = async (req, res) => {
   try {
     const userId = req.auth.userId;
 
-    // Vérifie si un profil guitariste existe
     const guitariste = await Guitariste.findOne({ userId });
 
     if (guitariste) {
-      // Supprimer fichiers liés
-      if (guitariste.photo) {
-        const filenameJpg = guitariste.photo.split("/images/")[1];
-        await fsPromises
-          .unlink(path.join("images", filenameJpg))
-          .catch(() => {});
-      }
-      if (guitariste.photoDown) {
-        const filenameWebp = guitariste.photoDown.split("/images/")[1];
-        await fsPromises
-          .unlink(path.join("images", filenameWebp))
-          .catch(() => {});
-      }
-      if (guitariste.audio) {
-        const filenameAudio = guitariste.audio.split("/audios/")[1];
-        await fsPromises
-          .unlink(path.join("audios", filenameAudio))
-          .catch(() => {});
+      // DELETE IMAGE CLOUDINARY
+      if (guitariste.photoPublicId) {
+        await cloudinary.uploader.destroy(guitariste.photoPublicId);
       }
 
-      // Supprimer le profil
+      // DELETE AUDIO CLOUDINARY
+      if (guitariste.audioPublicId) {
+        await cloudinary.uploader.destroy(guitariste.audioPublicId, {
+          resource_type: "video",
+        });
+      }
+
+      // DELETE DB PROFILE
       await Guitariste.deleteOne({ userId });
     }
 
-    // Supprimer le user
+    // DELETE USER
     await User.findByIdAndDelete(userId);
 
-    res.status(200).json({ message: "Compte (et profil associé) supprimés !" });
+    res.status(200).json({
+      message: "Compte supprimé + médias Cloudinary supprimés !",
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });

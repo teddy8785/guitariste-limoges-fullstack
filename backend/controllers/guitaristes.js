@@ -6,6 +6,7 @@ const cloudinary = require("../config/cloudinary");
 exports.createGuitariste = async (req, res) => {
   try {
     let style = [];
+
     if (typeof req.body.style === "string") {
       style = req.body.style
         .split(",")
@@ -16,6 +17,7 @@ exports.createGuitariste = async (req, res) => {
     }
 
     let instrument = [];
+
     if (typeof req.body.instrument === "string") {
       instrument = req.body.instrument
         .split(",")
@@ -25,35 +27,37 @@ exports.createGuitariste = async (req, res) => {
       instrument = req.body.instrument.map((s) => s.trim());
     }
 
+    // FILES (déjà sur Cloudinary)
     const photoFile = req.files?.image?.[0];
     const audioFile = req.files?.audio?.[0];
 
-    const photo = photoFile?.path || null;
-    const photoPublicId = photoFile?.filename || null;
-
-    const audio = audioFile?.path || null;
-    const audioPublicId = audioFile?.filename || null;
+    if (!req.files?.image && !req.files?.audio) {
+      console.log("No files uploaded");
+    }
 
     const guitariste = new Guitariste({
       ...req.body,
       style,
       instrument,
-      photo,
-      photoPublicId,
-      audio,
-      audioPublicId,
+
+      photo: photoFile?.path || null,
+      photoPublicId: photoFile?.filename || null,
+
+      audio: audioFile?.path || null,
+      audioPublicId: audioFile?.filename || null,
+
       userId: req.auth.userId,
     });
 
     await guitariste.save();
 
     res.status(201).json({
-      message: "Guitariste enregistré !",
+      message: "Guitariste créé avec succès",
       guitariste,
     });
-  } catch (error) {
-    console.error("CREATE ERROR:", error);
-    res.status(400).json({ error: error.message });
+  } catch (err) {
+    console.error(err);
+    res.status(400).json({ error: err.message });
   }
 };
 
@@ -179,7 +183,6 @@ exports.updateMyGuitariste = async (req, res) => {
       updatedData.audio = req.files.audio[0].path;
       updatedData.audioPublicId = req.files.audio[0].filename;
     }
-
     // slug update
     if (updatedData.nom && updatedData.nom !== guitariste.nom) {
       const baseSlug = slugify(updatedData.nom, { lower: true, strict: true });

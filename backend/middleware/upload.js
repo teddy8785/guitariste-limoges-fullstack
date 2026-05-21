@@ -5,7 +5,7 @@ const cloudinary = require("../config/cloudinary");
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
-    folder: "music-app",
+    folder: "guitaristes",
     resource_type: "auto",
   },
 });
