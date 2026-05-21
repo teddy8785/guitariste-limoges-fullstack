@@ -4,6 +4,7 @@ import Heart from "./Heart";
 import Report from "./Report";
 
 export const defaultPhoto = `${process.env.PUBLIC_URL}/photos/sansphoto.webP`;
+
 export const gestionErreurPhoto = (e) => {
   e.target.onerror = null;
   e.target.src = defaultPhoto;
@@ -20,52 +21,21 @@ function Card({
   type,
   profileId,
 }) {
-  const backendUrl = `${process.env.REACT_APP_API_URL}`;
-
   const auth = useSelector((state) => state.auth);
   const isLogged = !!auth.token;
 
-  const photoSrc = photo
-    ? photo.startsWith("http")
-      ? photo
-      : `${backendUrl}/${photo}`
-    : defaultPhoto;
+  const photoSrc = photo || defaultPhoto;
 
-  const photoDownSrc = photoDown
-    ? photoDown.startsWith("http")
-      ? photoDown
-      : `${backendUrl}/${photoDown}`
-    : null;
+  const photoDownSrc = photoDown || null;
 
   const photoDownWebpSrc = photoDownSrc
     ? photoDownSrc.replace(/\.(jpg|jpeg|png)$/i, ".webp")
     : null;
 
-  const picturesSources = (
-    <picture>
-      {photoDownWebpSrc && (
-        <source
-          srcSet={photoDownWebpSrc}
-          type="image/webp"
-          media="(max-width: 768px)"
-        />
-      )}
-      <img
-        className="card__img"
-        src={photoSrc}
-        alt={
-          nom
-            ? `${nom} - Photo de l'artiste`
-            : "Photo de l'artiste non disponible"
-        }
-        onError={gestionErreurPhoto}
-      />
-    </picture>
-  );
-
   return (
     <article className="card">
       <p className="card__name">{nom}</p>
+
       <Heart
         className="card__heart"
         color="black"
@@ -73,21 +43,38 @@ function Card({
         itemType={type}
         disabled={!isLogged}
       />
+
       <Report profileId={profileId} />
+
       <NavLink className="card__link" to={`/artiste/${slug}`}>
-        {picturesSources}
-        {audio && audio.length > 0 && (
-          <audio
-            controls
-            className="card__audio"
-            aria-label={`extrait musical de l'artiste nommé ${nom}`}
-          >
+        <picture>
+          {photoDownWebpSrc && (
             <source
-              src={audio.startsWith("http") ? audio : `${backendUrl}/${audio}`}
+              srcSet={photoDownWebpSrc}
+              type="image/webp"
+              media="(max-width: 768px)"
             />
+          )}
+
+          <img
+            className="card__img"
+            src={photoSrc}
+            alt={
+              nom
+                ? `${nom} - Photo de l'artiste`
+                : "Photo de l'artiste non disponible"
+            }
+            onError={gestionErreurPhoto}
+          />
+        </picture>
+
+        {audio && (
+          <audio controls className="card__audio">
+            <source src={audio} />
           </audio>
         )}
       </NavLink>
+
       {annonce && (
         <span
           className={`card__annonce ${

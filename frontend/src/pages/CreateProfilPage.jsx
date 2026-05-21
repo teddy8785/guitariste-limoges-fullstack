@@ -68,22 +68,37 @@ function CreateProfilPage() {
 
       const dataToSend = new FormData();
 
-      for (const key in formData) {
-        if (key === "style" && Array.isArray(formData.style)) {
-          formData.style.forEach((s) => dataToSend.append("style", s));
-        } else if (key === "instrument" && Array.isArray(formData.instrument)) {
-          formData.instrument.forEach((i) =>
-            dataToSend.append("instrument", i),
-          );
-        } else if (key === "photo" && formData.photo instanceof File) {
-          dataToSend.append("image", formData.photo);
-        } else if (key === "audio" && formData.audio instanceof File) {
-          dataToSend.append("audio", formData.audio);
-        } else if (key === "photoDeleted" && formData.photoDeleted) {
-          dataToSend.append("photoDeleted", "true");
-        } else if (key !== "photoDeleted") {
-          dataToSend.append(key, formData[key]);
-        }
+      // TEXT FIELDS
+      dataToSend.append("nom", formData.nom);
+      dataToSend.append("ville", formData.ville);
+      dataToSend.append("histoire", formData.histoire || "");
+      dataToSend.append("mail", formData.mail || "");
+      dataToSend.append("lienx", formData.lienx || "");
+      dataToSend.append("lieninstagram", formData.lieninstagram || "");
+      dataToSend.append("lienyoutube", formData.lienyoutube || "");
+      dataToSend.append("annonce", formData.annonce || "");
+
+      // ARRAYS
+      formData.style.forEach((s) => dataToSend.append("style", s));
+
+      formData.instrument.forEach((i) => dataToSend.append("instrument", i));
+
+      // FILES
+      if (formData.photo instanceof File) {
+        dataToSend.append("image", formData.photo);
+      }
+
+      if (formData.audio instanceof File) {
+        dataToSend.append("audio", formData.audio);
+      }
+
+      // FLAGS
+      if (formData.photoDeleted) {
+        dataToSend.append("photoDeleted", "true");
+      }
+
+      if (formData.audioDeleted) {
+        dataToSend.append("audioDeleted", "true");
       }
 
       const response = await fetch(url, {
