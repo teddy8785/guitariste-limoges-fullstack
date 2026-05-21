@@ -4,8 +4,6 @@ const cloudinary = require("../config/cloudinary");
 
 // CREATE
 exports.createGuitariste = async (req, res) => {
-  console.log("FILES:", req.files);
-console.log("BODY:", req.body);
   try {
     let style = [];
     if (typeof req.body.style === "string") {
@@ -31,10 +29,10 @@ console.log("BODY:", req.body);
     const audioFile = req.files?.audio?.[0];
 
     const photo = photoFile?.path || null;
-    const photoPublicId = getPublicId(photoFile);
+    const photoPublicId = photoFile?.filename || null;
 
     const audio = audioFile?.path || null;
-    const audioPublicId = getPublicId(audioFile);
+    const audioPublicId = audioFile?.filename || null;
 
     const guitariste = new Guitariste({
       ...req.body,
