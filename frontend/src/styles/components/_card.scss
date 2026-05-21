@@ -132,11 +132,23 @@
     font-family: police.$font-secondary;
   }
 
+  &__link {
+    display: block;
+  }
+
+  &__link picture {
+    display: block;
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+  }
+
   &__img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: top;
+    display: block;
   }
 
   &__audio {
