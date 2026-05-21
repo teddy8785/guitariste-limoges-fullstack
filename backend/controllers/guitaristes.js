@@ -1,429 +1,229 @@
-const fs = require("fs");
-const fsPromises = fs.promises;
-const path = require("path");
-const sharp = require("sharp");
 const slugify = require("slugify");
 const Guitariste = require("../models/guitaristes");
+const cloudinary = require("../config/cloudinary");
 
+// CREATE
 exports.createGuitariste = async (req, res) => {
   try {
-    let photoUrl = "";
-    let photoDownUrl = "";
-    let audioUrl = "";
-
-    // Gestion image
-    if (req.files && req.files["image"] && req.files["image"][0]) {
-      const imageFile = req.files["image"][0];
-
-      const originalName = imageFile.originalname.split(".")[0];
-
-      const safeName = slugify(originalName, {
-        lower: true,
-        strict: true,
-      });
-
-      const timestamp = Date.now();
-
-      const jpgFilename = `${safeName}_${timestamp}.jpg`;
-      const webpFilename = `${safeName}_${timestamp}.webp`;
-
-      // Redimensionner automatiquement à 300x400
-      const resizedBuffer = await sharp(imageFile.buffer)
-        .resize({
-          width: 300,
-          height: 400,
-          fit: "cover",
-        })
-        .toBuffer();
-
-      await sharp(resizedBuffer)
-        .jpeg({ quality: 90 })
-        .toFile(path.join("images", jpgFilename));
-
-      await sharp(resizedBuffer)
-        .webp({ quality: 80 })
-        .toFile(path.join("images", webpFilename));
-
-      photoUrl = `${req.protocol}://${req.get("host")}/images/${jpgFilename}`;
-
-      photoDownUrl = `${req.protocol}://${req.get(
-        "host",
-      )}/images/${webpFilename}`;
-    }
-
-    // Gestion audio
-    if (req.files && req.files["audio"] && req.files["audio"][0]) {
-      const audioFile = req.files["audio"][0];
-      const originalName = audioFile.originalname
-        .split(" ")
-        .join("_")
-        .split(".")[0];
-      const timestamp = Date.now();
-      const audioFilename = `${originalName}_${timestamp}${path.extname(
-        audioFile.originalname,
-      )}`;
-
-      await fsPromises.writeFile(
-        path.join("audios", audioFilename),
-        audioFile.buffer,
-      );
-
-      audioUrl = `${req.protocol}://${req.get("host")}/audios/${audioFilename}`;
-    }
-
-    // Conversion des styles texte -> tableau
+    let style = [];
     if (typeof req.body.style === "string") {
-      req.body.style = req.body.style
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
+      style = req.body.style.split(",").map(s => s.trim()).filter(Boolean);
     } else if (Array.isArray(req.body.style)) {
-      req.body.style = req.body.style.map((s) => s.trim());
-    } else {
-      req.body.style = [];
+      style = req.body.style.map(s => s.trim());
     }
 
-    // Conversion des instruments texte -> tableau
+    let instrument = [];
     if (typeof req.body.instrument === "string") {
-      req.body.instrument = req.body.instrument
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
+      instrument = req.body.instrument.split(",").map(s => s.trim()).filter(Boolean);
     } else if (Array.isArray(req.body.instrument)) {
-      req.body.instrument = req.body.instrument.map((s) => s.trim());
-    } else {
-      req.body.instrument = [];
+      instrument = req.body.instrument.map(s => s.trim());
     }
+
+    const photo = req.files?.image?.[0]?.path || null;
+    const photoPublicId = req.files?.image?.[0]?.filename || null;
+
+    const audio = req.files?.audio?.[0]?.path || null;
+    const audioPublicId = req.files?.audio?.[0]?.filename || null;
 
     const guitariste = new Guitariste({
       ...req.body,
-      photo: photoUrl,
-      photoDown: photoDownUrl,
-      audio: audioUrl,
+      style,
+      instrument,
+      photo,
+      photoPublicId,
+      audio,
+      audioPublicId,
       userId: req.auth.userId,
     });
 
     await guitariste.save();
-    res.status(201).json({ message: "Guitariste enregistré !" });
-  } catch (error) {
-    console.error("SAVE ERROR:", error);
 
+    res.status(201).json({
+      message: "Guitariste enregistré !",
+      guitariste,
+    });
+  } catch (error) {
+    console.error("CREATE ERROR:", error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// GET ALL
+exports.getAllGuitaristes = async (req, res) => {
+  try {
+    const data = await Guitariste.find();
+    res.status(200).json(data);
+  } catch (error) {
     res.status(400).json({ error });
   }
 };
 
-exports.getAllGuitaristes = (req, res) => {
-  Guitariste.find()
-    .then((guitaristes) => res.status(200).json(guitaristes))
-    .catch((error) => res.status(400).json({ error }));
-};
-
-exports.getMyGuitariste = (req, res) => {
-  Guitariste.findOne({ userId: req.auth.userId })
-    .then((guitariste) => {
-      if (!guitariste) {
-        if (!guitariste) {
-          return res.status(200).json(null); // ou {}
-        }
-      }
-      res.status(200).json(guitariste);
-    })
-    .catch((error) => res.status(500).json({ error }));
+// GET ONE (USER)
+exports.getMyGuitariste = async (req, res) => {
+  try {
+    const guitariste = await Guitariste.findOne({ userId: req.auth.userId });
+    res.status(200).json(guitariste || null);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 };
 
 exports.getGuitaristeById = async (req, res) => {
   try {
-    const guitariste = await Guitariste.findById(req.params.id);
-    if (!guitariste) {
-      return res.status(404).json({ message: "Guitariste non trouvé" });
-    }
-    res.status(200).json(guitariste);
+    const g = await Guitariste.findById(req.params.id);
+    if (!g) return res.status(404).json({ message: "Non trouvé" });
+    res.status(200).json(g);
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur", error });
+    res.status(500).json({ error });
   }
 };
 
 exports.getGuitaristeBySlug = async (req, res) => {
   try {
-    const guitariste = await Guitariste.findOne({ slug: req.params.slug });
-    if (!guitariste) {
-      return res.status(404).json({ message: "Profil non trouvé" });
-    }
-    res.status(200).json(guitariste);
+    const g = await Guitariste.findOne({ slug: req.params.slug });
+    if (!g) return res.status(404).json({ message: "Non trouvé" });
+    res.status(200).json(g);
   } catch (error) {
-    res.status(500).json({ message: "Erreur serveur" });
+    res.status(500).json({ error });
   }
 };
 
+// RECENTS
 exports.getRecentGuitaristes = async (req, res) => {
   try {
-    const guitaristes = await Guitariste.find()
-      .sort({ createdAt: -1 })
-      .limit(4);
-    res.status(200).json(guitaristes);
+    const g = await Guitariste.find().sort({ createdAt: -1 }).limit(4);
+    res.status(200).json(g);
   } catch (error) {
-    console.error("Erreur getRecentGuitaristes:", error);
-    res.status(500).json({ message: "Erreur serveur", error: error.message });
+    res.status(500).json({ error });
   }
 };
 
-exports.getRecentAnnonces = (req, res) => {
-  Guitariste.find({ annonce: { $exists: true, $ne: "" } }) // filtre pour les profils qui ont une annonce non vide
-    .sort({ annonceDate: -1 }) // trie par date d'annonce décroissante (les plus récentes en premier)
-    .limit(4) // limite à 4 résultats
-    .then((guitaristes) => res.status(200).json(guitaristes))
-    .catch((error) => res.status(400).json({ error }));
+exports.getRecentAnnonces = async (req, res) => {
+  try {
+    const g = await Guitariste.find({ annonce: { $exists: true, $ne: "" } })
+      .sort({ annonceDate: -1 })
+      .limit(4);
+
+    res.status(200).json(g);
+  } catch (error) {
+    res.status(500).json({ error });
+  }
 };
 
-async function deleteFileIfExists(fileUrl) {
-  if (!fileUrl) return;
-
-  const filename = fileUrl.split("/images/")[1];
-  if (!filename) return;
-
-  const filepath = path.join("images", filename);
-
-  try {
-    await fsPromises.access(filepath); // vérifie existence
-    await fsPromises.unlink(filepath);
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      console.error(`Erreur suppression fichier ${filename}:`, err.message);
-    }
-  }
-}
-
-async function deleteAudioFileIfExists(audioUrl) {
-  if (!audioUrl) return;
-
-  const filename = audioUrl.split("/audios/")[1];
-  if (!filename) return;
-
-  const filepath = path.join("audios", filename);
-
-  try {
-    await fsPromises.access(filepath);
-    await fsPromises.unlink(filepath);
-  } catch (err) {
-    if (err.code !== "ENOENT") {
-      console.error("Erreur suppression audio:", err.message);
-    }
-  }
-}
-
+// UPDATE (CLEAN CLOUDINARY LOGIC)
 exports.updateMyGuitariste = async (req, res) => {
   try {
     const userId = req.auth.userId;
     const isAdmin = req.auth.isAdmin;
+    const id = isAdmin ? req.params.id : null;
 
-    // Si admin, peut modifier un profil via params.id, sinon c'est le profil de l'utilisateur connecté
-    const guitaristeId = isAdmin && req.params.id ? req.params.id : null;
+    let guitariste = id
+      ? await Guitariste.findById(id)
+      : await Guitariste.findOne({ userId });
 
-    let guitariste;
-    if (isAdmin && guitaristeId) {
-      guitariste = await Guitariste.findById(guitaristeId);
-      if (!guitariste)
-        return res.status(404).json({ error: "Profil non trouvé" });
-    } else {
-      guitariste = await Guitariste.findOne({ userId });
-      if (!guitariste)
-        return res.status(404).json({ error: "Profil non trouvé" });
+    if (!guitariste) {
+      return res.status(404).json({ error: "Profil non trouvé" });
     }
 
     let updatedData = { ...req.body };
 
-    // Conversion styles
-    if (typeof req.body.style === "string") {
-      updatedData.style = req.body.style
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-    } else if (Array.isArray(req.body.style)) {
-      updatedData.style = req.body.style.map((s) => s.trim());
-    } else {
-      updatedData.style = [];
+    // styles
+    updatedData.style =
+      typeof req.body.style === "string"
+        ? req.body.style.split(",").map(s => s.trim()).filter(Boolean)
+        : Array.isArray(req.body.style)
+        ? req.body.style.map(s => s.trim())
+        : [];
+
+    // instruments
+    updatedData.instrument =
+      typeof req.body.instrument === "string"
+        ? req.body.instrument.split(",").map(s => s.trim()).filter(Boolean)
+        : Array.isArray(req.body.instrument)
+        ? req.body.instrument.map(s => s.trim())
+        : [];
+
+    // IMAGE UPDATE
+    if (req.files?.image?.[0]) {
+      if (guitariste.photoPublicId) {
+        await cloudinary.uploader.destroy(guitariste.photoPublicId);
+      }
+
+      updatedData.photo = req.files.image[0].path;
+      updatedData.photoPublicId = req.files.image[0].filename;
     }
 
-    // Conversion instruments
-    if (typeof req.body.instrument === "string") {
-      updatedData.instrument = req.body.instrument
-        .split(",")
-        .map((s) => s.trim())
-        .filter((s) => s.length > 0);
-    } else if (Array.isArray(req.body.instrument)) {
-      updatedData.instrument = req.body.instrument.map((s) => s.trim());
-    } else {
-      updatedData.instrument = [];
-    }
-
-    // Suppression photo si demandé
-    if (req.body.photoDeleted === "true") {
-      await deleteFileIfExists(guitariste.photo);
-      await deleteFileIfExists(guitariste.photoDown);
-      updatedData.photo = null;
-      updatedData.photoDown = null;
-    }
-
-    // Suppression audio si demandé
-    const audioDeleted =
-      req.body.audioDeleted === "true" || req.body.audioDeleted === true;
-
-    if (audioDeleted) {
-      await deleteAudioFileIfExists(guitariste.audio);
-      updatedData.audio = null;
-    }
-
+    // AUDIO UPDATE
     if (req.files?.audio?.[0]) {
-      await deleteAudioFileIfExists(guitariste.audio);
+      if (guitariste.audioPublicId) {
+        await cloudinary.uploader.destroy(guitariste.audioPublicId, {
+          resource_type: "video",
+        });
+      }
+
+      updatedData.audio = req.files.audio[0].path;
+      updatedData.audioPublicId = req.files.audio[0].filename;
     }
 
-    // Gestion image (upload et redimension)
-    if (req.files && req.files["image"] && req.files["image"][0]) {
-      await deleteFileIfExists(guitariste.photo);
-      await deleteFileIfExists(guitariste.photoDown);
-
-      const imageFile = req.files["image"][0];
-      const originalName = imageFile.originalname
-        .split(" ")
-        .join("_")
-        .split(".")[0];
-      const timestamp = Date.now();
-      const jpgFilename = `${originalName}_${timestamp}.jpg`;
-      const webpFilename = `${originalName}_${timestamp}.webp`;
-
-      const resizedBuffer = await sharp(imageFile.buffer)
-        .resize({
-          width: 300,
-          height: 400,
-          fit: "cover",
-        })
-        .toBuffer();
-
-      await sharp(resizedBuffer)
-        .jpeg({ quality: 90 })
-        .toFile(path.join("images", jpgFilename));
-
-      await sharp(resizedBuffer)
-        .webp({ quality: 80 })
-        .toFile(path.join("images", webpFilename));
-
-      updatedData.photo = `${req.protocol}://${req.get(
-        "host",
-      )}/images/${jpgFilename}`;
-      updatedData.photoDown = `${req.protocol}://${req.get(
-        "host",
-      )}/images/${webpFilename}`;
-    }
-
-    // Gestion audio
-    if (req.files && req.files["audio"] && req.files["audio"][0]) {
-      await deleteAudioFileIfExists(guitariste.audio);
-
-      const audioFile = req.files["audio"][0];
-      const audioOriginalName = audioFile.originalname
-        .split(" ")
-        .join("_")
-        .split(".")[0];
-      const timestampAudio = Date.now();
-      const audioFilename = `${audioOriginalName}_${timestampAudio}${path.extname(
-        audioFile.originalname,
-      )}`;
-
-      await fsPromises.writeFile(
-        path.join("audios", audioFilename),
-        audioFile.buffer,
-      );
-
-      updatedData.audio = `${req.protocol}://${req.get(
-        "host",
-      )}/audios/${audioFilename}`;
-    }
-
-    // Mise à jour date annonce si modif annonce
-    if (req.body.annonce) {
-      updatedData.annonceDate = new Date();
-    }
-
-    // Recalcul du slug si nom modifié
+    // slug update
     if (updatedData.nom && updatedData.nom !== guitariste.nom) {
       const baseSlug = slugify(updatedData.nom, { lower: true, strict: true });
 
-      let uniqueSlug = baseSlug;
+      let slug = baseSlug;
       let counter = 1;
 
-      while (
-        await Guitariste.findOne({
-          slug: uniqueSlug,
-          _id: { $ne: guitariste._id },
-        })
-      ) {
-        uniqueSlug = `${baseSlug}-${counter++}`;
+      while (await Guitariste.findOne({ slug, _id: { $ne: guitariste._id } })) {
+        slug = `${baseSlug}-${counter++}`;
       }
 
-      updatedData.slug = uniqueSlug;
+      updatedData.slug = slug;
     }
-    // On interdit la modification du userId
+
     delete updatedData.userId;
-    const updatedGuitariste = await Guitariste.findByIdAndUpdate(
+
+    const updated = await Guitariste.findByIdAndUpdate(
       guitariste._id,
       updatedData,
-      { new: true },
+      { new: true }
     );
 
-    res
-      .status(200)
-      .json({ message: "Profil mis à jour !", slug: updatedGuitariste.slug });
+    res.status(200).json({
+      message: "Profil mis à jour !",
+      slug: updated.slug,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Erreur serveur" });
   }
 };
 
+//DELETE (CLEAN CLOUDINARY)
 exports.deleteMyGuitariste = async (req, res) => {
   try {
     const userId = req.auth.userId;
-    const isAdmin = req.auth.isAdmin; // suppose que tu as ce booléen dans auth
+    const isAdmin = req.auth.isAdmin;
 
-    // L'id du profil à supprimer :
-    // - admin peut passer un id dans params
-    // - user normal supprime son propre profil (userId)
-    const guitaristeId = isAdmin ? req.params.id : null;
+    const id = isAdmin ? req.params.id : null;
 
-    let guitariste;
-    if (isAdmin && guitaristeId) {
-      guitariste = await Guitariste.findById(guitaristeId);
-      if (!guitariste)
-        return res.status(404).json({ error: "Profil non trouvé" });
-    } else {
-      guitariste = await Guitariste.findOne({ userId });
-      if (!guitariste)
-        return res.status(404).json({ error: "Profil non trouvé" });
+    const guitariste = id
+      ? await Guitariste.findById(id)
+      : await Guitariste.findOne({ userId });
+
+    if (!guitariste) {
+      return res.status(404).json({ error: "Profil non trouvé" });
     }
 
-    // Supprimer les fichiers
-    if (guitariste.photo) {
-      const filenameJpg = guitariste.photo.split("/images/")[1];
-      await fsPromises.unlink(path.join("images", filenameJpg)).catch(() => {});
-    }
-    if (guitariste.photoDown) {
-      const filenameWebp = guitariste.photoDown.split("/images/")[1];
-      await fsPromises
-        .unlink(path.join("images", filenameWebp))
-        .catch(() => {});
-    }
-    if (guitariste.audio) {
-      const filenameAudio = guitariste.audio.split("/audios/")[1];
-      await fsPromises
-        .unlink(path.join("audios", filenameAudio))
-        .catch(() => {});
+    if (guitariste.photoPublicId) {
+      await cloudinary.uploader.destroy(guitariste.photoPublicId);
     }
 
-    // Supprimer la fiche dans la DB
-    if (isAdmin && guitaristeId) {
-      await Guitariste.findByIdAndDelete(guitaristeId);
-    } else {
-      await Guitariste.deleteOne({ userId });
+    if (guitariste.audioPublicId) {
+      await cloudinary.uploader.destroy(guitariste.audioPublicId, {
+        resource_type: "video",
+      });
     }
+
+    await Guitariste.findByIdAndDelete(guitariste._id);
 
     res.status(200).json({ message: "Profil supprimé !" });
   } catch (error) {
