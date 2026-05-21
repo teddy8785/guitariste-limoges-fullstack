@@ -31,7 +31,7 @@ const likesSlice = createSlice({
 
 export const fetchUserLikes = (userId, token) => async (dispatch) => {
   try {
-    const backendUrl = "http://localhost:4000";
+    const backendUrl =  `${process.env.REACT_APP_API_URL}`;
     const res = await fetch(
       `${backendUrl}/api/likes/user/${userId}/liked-profiles`,
       {
