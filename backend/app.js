@@ -63,12 +63,4 @@ app.use("/api/admin", adminRoutes);
 app.use('/api/likes', likesRoutes);
 app.use("/api/report", reportRoutes);
 
-// Servir frontend React
-app.use(express.static(frontendBuildPath));
-
-// Fallback React pour toute route non API
-app.get("*", (req, res) => {
-  res.sendFile(path.join(frontendBuildPath, "index.html"));
-});
-
 module.exports = app;
