@@ -15,7 +15,7 @@ import ResetPassword from "./pages/ResetPassword.jsx";
 
 export default function App() {
   return (
-    <BrowserRouter basename="/guitaristes-limoges">
+    <BrowserRouter>
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/gallery" element={<Artistes />} />
