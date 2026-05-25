@@ -2,7 +2,7 @@ import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { makeSelectLikeForItem } from "../Store/selectors/likesSelectors";
 import { v4 as uuidv4 } from "uuid";
-import { setLikeStatus } from "../Store/likesSlice"; // ajuste le chemin selon ton projet
+import { setLikeStatus } from "../Store/likesSlice";
 
 function Heart({
   className = "",
@@ -139,7 +139,7 @@ function Heart({
       </span>
       </div>
       {disabled && (
-        <small>Connecte-toi pour liker</small>
+        <small style={{ color }}>Connecte-toi pour liker</small>
       )}
     </div>
   );

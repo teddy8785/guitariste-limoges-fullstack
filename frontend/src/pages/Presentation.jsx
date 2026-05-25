@@ -123,6 +123,7 @@ function Presentation({ type }) {
             color="white"
             itemId={post._id}
             itemType={type}
+            disabled={!isLogged}
             variant="presentation"
           />
         )}
