@@ -122,21 +122,21 @@ function Heart({
   return (
     <div className="card__heart--content">
       <div>
-      <i
-        className={`fa-heart ${liked ? "fa-solid" : "fa-regular"} ${
-          liked ? "card__heart--liked" : ""
-        } ${className} ${disabled ? "card__heart--disabled" : ""}`}
-        style={{
-          color: disabled ? "#aaa" : liked ? "darkred" : color || "inherit",
-          cursor: disabled ? "not-allowed" : "pointer",
-        }}
-        onClick={disabled ? undefined : handleClick}
-      />
-      <span
-        className={`${variant === "presentation" ? "presentation__count" : ""}`}
-      >
-        {count}
-      </span>
+        <i
+          role="button"
+          className={`fa-heart ${liked ? "fa-solid" : "fa-regular"} ${liked ? "card__heart--liked" : ""
+            } ${className} ${disabled ? "card__heart--disabled" : ""}`}
+          style={{
+            color: disabled ? "#aaa" : liked ? "darkred" : color || "inherit",
+            cursor: disabled ? "not-allowed" : "pointer",
+          }}
+          onClick={disabled ? undefined : handleClick}
+        />
+        <span
+          className={`${variant === "presentation" ? "presentation__count" : ""}`}
+        >
+          {count}
+        </span>
       </div>
       {disabled && (
         <small style={{ color }}>Connecte-toi pour liker</small>

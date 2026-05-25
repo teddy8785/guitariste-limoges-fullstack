@@ -34,7 +34,7 @@ function Card({
 
   return (
     <article className="card">
-      <p className="card__name">{nom}</p>
+      <h3 className="card__name">{nom}</h3>
 
       <Heart
         className="card__heart"
@@ -59,18 +59,19 @@ function Card({
           <img
             className="card__img"
             src={photoSrc}
-            alt={
-              nom
-                ? `${nom} - Photo de l'artiste`
-                : "Photo de l'artiste non disponible"
-            }
+            alt={nom ? `Portrait de ${nom}` : "Photo indisponible"}
             onError={gestionErreurPhoto}
           />
         </picture>
 
         {audio && (
-          <audio controls className="card__audio">
-            <source src={audio} />
+          <audio
+            controls
+            className="card__audio"
+            aria-label={`Extrait audio de ${nom}`}
+            title={`Extrait audio de ${nom}`}
+          >
+            <source src={audio}/>
           </audio>
         )}
       </NavLink>

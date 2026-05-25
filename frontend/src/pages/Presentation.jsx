@@ -146,7 +146,7 @@ function Presentation({ type }) {
                 <img
                   className="presentation__image"
                   src={post.photo} // fallback
-                  alt={post.nom}
+                  alt={`Portrait de ${post.nom}`}
                   onError={gestionErreurPhoto}
                 />
               </picture>
@@ -154,7 +154,8 @@ function Presentation({ type }) {
             {post.audio && (
               <audio
                 controls
-                aria-label={`extrait musical de l'artiste nommé ${post.nom}`}
+                aria-label={`Extrait musical de l'artiste ${post.nom}`}
+                title={`Audio de ${post.nom}`}
               >
                 <source
                   src={
