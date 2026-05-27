@@ -9,6 +9,7 @@ const optionalAuth = require("../middleware/optionalAuth");
 router.get("/user/:userId/liked-profiles", userCtrl.getLikedProfiles);
 
 // GET état like
+router.post("/bulk", optionalAuth, likesCtrl.getBulkLikeStatus);
 router.get("/:id/like-status", optionalAuth, likesCtrl.getLikeStatus);
 
 // GET nombre de likes

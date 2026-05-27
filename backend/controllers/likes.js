@@ -3,7 +3,7 @@ const Guitariste = require("../models/guitaristes");
 const Like = require("../models/likes");
 const User = require("../models/user");
 
-async function toggleLike(req, res) {
+exports.toggleLike = async (req, res) => {
   try {
     const userId = req.auth?.userId || null;
     const visitorKey = req.body.visitorKey || null;
@@ -71,9 +71,9 @@ async function toggleLike(req, res) {
       error: err.message,
     });
   }
-}
+};
 
-async function getLikeStatus(req, res) {
+exports.getLikeStatus = async (req, res) => {
   try {
     const userId = req.auth ? req.auth.userId : null;
     const profileId = req.params.id;
@@ -96,9 +96,62 @@ async function getLikeStatus(req, res) {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
-}
+};
 
-async function toggleLikeAnonymous(req, res) {
+exports.getBulkLikeStatus = async (req, res) => {
+  try {
+    const userId = req.auth?.userId || null;
+    const visitorKey = req.body.visitorKey || null;
+    const { ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({ error: "ids requis" });
+    }
+
+    // récupérer tous les likes en 1 requête
+    const likes = await Like.find({
+      profileId: { $in: ids },
+    }).select("profileId userId visitorKey");
+
+    // compter par profileId
+    const countMap = {};
+    const likedMap = {};
+
+    for (const like of likes) {
+      const id = like.profileId.toString();
+
+      // count
+      countMap[id] = (countMap[id] || 0) + 1;
+
+      // liked (user connecté)
+      if (userId && like.userId?.toString() === userId) {
+        likedMap[id] = true;
+      }
+
+      // liked (visitor)
+      if (!userId && visitorKey && like.visitorKey === visitorKey) {
+        likedMap[id] = true;
+      }
+    }
+
+    // format final propre pour le front
+    const result = {};
+
+    for (const id of ids) {
+      result[id] = {
+        liked: !!likedMap[id],
+        count: countMap[id] || 0,
+      };
+    }
+
+    return res.json(result);
+  } catch (err) {
+    console.error("BULK LIKE ERROR:", err);
+    return res.status(500).json({ error: err.message });
+  }
+};
+
+exports.toggleLikeAnonymous = async (req, res) => {
   try {
     const profileId = req.params.id;
     const { visitorKey } = req.body;
@@ -122,9 +175,8 @@ async function toggleLikeAnonymous(req, res) {
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }
-}
-
-async function getLikeCount(req, res) {
+};
+exports.getLikeCount = async (req, res) => {
   try {
     const profileId = req.params.id;
 
@@ -138,9 +190,9 @@ async function getLikeCount(req, res) {
     console.error("Erreur getLikeCount:", err);
     res.status(500).json({ error: "Erreur lors du comptage des likes" });
   }
-}
+};
 
-async function transferVisitorLikesToUser(req, res) {
+exports.transferVisitorLikesToUser = async (req, res) => {
   const { visitorKey } = req.body;
   const userId = req.auth.userId;
 
@@ -177,12 +229,4 @@ async function transferVisitorLikesToUser(req, res) {
     console.error("Erreur lors du transfert des likes:", error);
     res.status(500).json({ error: error.message });
   }
-}
-
-module.exports = {
-  toggleLike,
-  getLikeStatus,
-  toggleLikeAnonymous,
-  getLikeCount,
-  transferVisitorLikesToUser,
 };

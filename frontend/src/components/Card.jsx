@@ -18,18 +18,16 @@ function Card({
   photoDown,
   audio,
   annonce,
-  type,
   profileId,
+  likeInfo,
 }) {
   const auth = useSelector((state) => state.auth);
   const isLogged = !!auth.token;
 
   const photoSrc = photo || defaultPhoto;
 
-  const photoDownSrc = photoDown || null;
-
-  const photoDownWebpSrc = photoDownSrc
-    ? photoDownSrc.replace(/\.(jpg|jpeg|png)$/i, ".webp")
+  const photoDownWebpSrc = photoDown
+    ? photoDown.replace(/\.(jpg|jpeg|png)$/i, ".webp")
     : null;
 
   return (
@@ -37,11 +35,11 @@ function Card({
       <h3 className="card__name">{nom}</h3>
 
       <Heart
-        className="card__heart"
-        color="black"
         itemId={itemId}
-        itemType={type}
+        itemType="guitaristes"
         disabled={!isLogged}
+        liked={likeInfo?.liked}
+        count={likeInfo?.count}
       />
 
       <Report profileId={profileId} />
@@ -59,28 +57,21 @@ function Card({
           <img
             className="card__img"
             src={photoSrc}
-            alt={nom ? `Portrait de ${nom}` : "Photo indisponible"}
+            alt={nom}
             onError={gestionErreurPhoto}
           />
         </picture>
 
         {audio && (
-          <audio
-            controls
-            className="card__audio"
-            aria-label={`Extrait audio de ${nom}`}
-            title={`Extrait audio de ${nom}`}
-          >
-            <source src={audio}/>
+          <audio controls className="card__audio">
+            <source src={audio} />
           </audio>
         )}
       </NavLink>
 
       {annonce && (
         <span
-          className={`card__annonce ${
-            isLogged ? "card__annonce--logged" : "card__annonce--guest"
-          }`}
+          className={`card__annonce ${isLogged ? "card__annonce--logged" : ""}`}
         >
           Annonce
         </span>

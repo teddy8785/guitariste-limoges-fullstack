@@ -17,7 +17,14 @@ const likeSchema = mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true }
+  { timestamps: true },
+);
+
+likeSchema.index({ userId: 1, profileId: 1 }, { unique: true, sparse: true });
+
+likeSchema.index(
+  { visitorKey: 1, profileId: 1 },
+  { unique: true, sparse: true },
 );
 
 const Like = mongoose.model("Like", likeSchema);

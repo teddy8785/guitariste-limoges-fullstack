@@ -1,121 +1,63 @@
-import { useEffect, useMemo } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { makeSelectLikeForItem } from "../Store/selectors/likesSelectors";
+import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
-import { setLikeStatus } from "../Store/likesSlice";
 
-function Heart({
-  className = "",
-  color,
-  initialCount = 0,
-  itemId,
-  itemType = "like",
-  variant = "",
-  disabled = false,
-}) {
-  const dispatch = useDispatch();
-
-  const selectLike = useMemo(() => makeSelectLikeForItem(itemId), [itemId]);
-  const likeState = useSelector(selectLike);
-
-  const liked = likeState.liked || false;
-  const count = likeState.count ?? initialCount;
+function Heart({ className = "", color, itemId, disabled = false }) {
+  const [liked, setLiked] = useState(false);
+  const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (!itemId) return;
 
-    let visitorKey = localStorage.getItem("visitor_key");
-    if (!visitorKey) {
-      visitorKey = uuidv4();
-      localStorage.setItem("visitor_key", visitorKey);
-    }
+    const visitorKey =
+      localStorage.getItem("visitor_key") ||
+      (() => {
+        const key = uuidv4();
+        localStorage.setItem("visitor_key", key);
+        return key;
+      })();
 
-    const backendUrl = `${process.env.REACT_APP_API_URL}`;
     const token = localStorage.getItem("token");
 
     const url = token
-      ? `${backendUrl}/api/likes/${itemId}/like-status`
-      : `${backendUrl}/api/likes/${itemId}/like-status?visitorKey=${visitorKey}`;
+      ? `${process.env.REACT_APP_API_URL}/api/likes/${itemId}/like-status`
+      : `${process.env.REACT_APP_API_URL}/api/likes/${itemId}/like-status?visitorKey=${visitorKey}`;
 
     fetch(url, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
-      .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text(); // <-- récupère le texte brut
-          throw new Error(`Erreur HTTP ${res.status} : ${text}`);
-        }
-
-        const contentType = res.headers.get("Content-Type") || "";
-        if (!contentType.includes("application/json")) {
-          const text = await res.text();
-          throw new Error(`Réponse non-JSON : ${text}`);
-        }
-
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
-        dispatch(
-          setLikeStatus({ itemId, liked: data.liked, count: data.count }),
-        );
+        setLiked(data.liked);
+        setCount(data.count);
       })
-      .catch((err) => {
-        console.error("Erreur récupération like-status :", err);
-      });
-  }, [itemId, itemType, dispatch]);
+      .catch(console.error);
+  }, [itemId]);
 
   const handleClick = async () => {
-    if (disabled) return;
-    if (!itemId) {
-      console.warn("itemId non défini, impossible d'envoyer le like");
-      return;
-    }
+    if (disabled || !itemId) return;
 
-    const backendUrl = `${process.env.REACT_APP_API_URL}`;
     const token = localStorage.getItem("token");
     const visitorKey = !token ? localStorage.getItem("visitor_key") : null;
 
     try {
-      // Envoi du like
-      const res = await fetch(`${backendUrl}/api/${itemType}s/${itemId}/like`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token && { Authorization: `Bearer ${token}` }),
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/likes/${itemId}/like`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            ...(token && { Authorization: `Bearer ${token}` }),
+          },
+          body: JSON.stringify(visitorKey ? { visitorKey } : {}),
         },
-        body: JSON.stringify({ ...(visitorKey && { visitorKey }) }),
-      });
-
-      if (!res.ok) {
-        const text = await res.text();
-        throw new Error(`Erreur HTTP ${res.status} : ${text}`);
-      }
-
-      // Après le POST, on refait un GET pour récupérer l’état à jour
-      const statusUrl = token
-        ? `${backendUrl}/api/likes/${itemId}/like-status`
-        : `${backendUrl}/api/likes/${itemId}/like-status?visitorKey=${visitorKey}`;
-
-      const statusRes = await fetch(statusUrl, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-
-      if (!statusRes.ok) {
-        const text = await statusRes.text();
-        throw new Error(`Erreur HTTP ${statusRes.status} : ${text}`);
-      }
-
-      const statusData = await statusRes.json();
-
-      dispatch(
-        setLikeStatus({
-          itemId,
-          liked: statusData.liked,
-          count: statusData.count,
-        }),
       );
+
+      const data = await res.json();
+
+      setLiked(data.liked);
+      setCount(data.count);
     } catch (err) {
-      console.error("Erreur enregistrement ou récupération like :", err);
+      console.error("like error:", err);
     }
   };
 
@@ -124,23 +66,20 @@ function Heart({
       <div>
         <i
           role="button"
-          className={`fa-heart ${liked ? "fa-solid" : "fa-regular"} ${liked ? "card__heart--liked" : ""
-            } ${className} ${disabled ? "card__heart--disabled" : ""}`}
+          className={`fa-heart ${
+            liked ? "fa-solid card__heart--liked" : "fa-regular"
+          } ${className} ${disabled ? "card__heart--disabled" : ""}`}
           style={{
             color: disabled ? "#aaa" : liked ? "darkred" : color || "inherit",
             cursor: disabled ? "not-allowed" : "pointer",
           }}
           onClick={disabled ? undefined : handleClick}
         />
-        <span
-          className={`${variant === "presentation" ? "presentation__count" : ""}`}
-        >
-          {count}
-        </span>
+
+        <span>{count}</span>
       </div>
-      {disabled && (
-        <small style={{ color }}>Connecte-toi pour liker</small>
-      )}
+
+      {disabled && <small style={{ color }}>Connecte-toi pour liker</small>}
     </div>
   );
 }

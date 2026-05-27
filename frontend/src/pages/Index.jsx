@@ -10,6 +10,7 @@ import { useCallback, useEffect, useState } from "react";
 import StatusIndicator from "../components/StatusIndicator";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Store/authSlice";
+import { useLikes } from "../hooks/useLikes";
 
 function Index() {
   const dispatch = useDispatch();
@@ -18,105 +19,69 @@ function Index() {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [guitaristes, setGuitaristes] = useState([]);
+  const [annonces, setAnnonces] = useState([]);
   const [hasProfile, setHasProfile] = useState(false);
   const [userSlug, setUserSlug] = useState(null);
-  const [annonces, setAnnonces] = useState([]);
-
   const [showWarning, setShowWarning] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
 
+  // LIKE STATE CENTRALISÉ (IMPORTANT)
+  const likesState = useLikes(guitaristes, token);
+
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
-    dispatch(logout()); // Mise à jour du store Redux
-    window.dispatchEvent(new Event("logout"));
+    dispatch(logout());
   }, [dispatch]);
 
+  // PROFILE
   useEffect(() => {
-    window.scrollTo(0, 0);
+    if (!token) return setHasProfile(false);
 
-    if (token) {
-      fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        setHasProfile(!!data?.slug);
+        setUserSlug(data?.slug || null);
       })
-        .then((res) => {
-          if (res.status === 401) {
-            handleLogout();
-            throw new Error("Token invalide");
-          }
-          if (!res.ok) throw new Error("Aucun profil trouvé");
-          return res.json();
-        })
-        .then((data) => {
-          if (data && data.slug) {
-            setHasProfile(true);
-            setUserSlug(data.slug);
-          } else {
-            setHasProfile(false);
-            setUserSlug(null);
-          }
-        })
-        .catch(() => setHasProfile(false));
-    } else {
-      setHasProfile(false);
-    }
+      .catch(() => setHasProfile(false));
+  }, [token]);
 
+  // GUITARISTES RECENTS
+  useEffect(() => {
     fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/recents`)
-      .then((res) => {
-        if (!res.ok)
-          throw new Error("Erreur lors du chargement des guitaristes");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => setGuitaristes(data))
       .catch(console.error);
-
-    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/annonces/recentes`)
-      .then((res) => {
-        if (!res.ok) throw new Error("Erreur lors du chargement des annonces");
-        return res.json();
-      })
-      .then((json) => setAnnonces(json))
-      .catch(console.error);
-  }, [token, handleLogout]); // Attention ici on dépend du token !
-
-  useEffect(() => {
-    const handleGlobalLogout = () => {
-      // Plus besoin de setIsLogged ici, redux gère ça
-    };
-    window.addEventListener("logout", handleGlobalLogout);
-    return () => window.removeEventListener("logout", handleGlobalLogout);
   }, []);
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  // ANNONCES RECENTES
+  useEffect(() => {
+    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/annonces/recentes`)
+      .then((res) => res.json())
+      .then((data) => setAnnonces(data))
+      .catch(console.error);
+  }, []);
+
+  const toggleMenu = () => setIsMenuOpen((v) => !v);
 
   const deleteAccount = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
-      setDeleteMessage("Non connecté, impossible de supprimer le compte.");
-      return;
-    }
+    if (!token) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
+      const res = await fetch(`${process.env.REACT_APP_API_URL}/api/auth/me`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!response.ok) throw new Error("Erreur suppression du compte");
+      if (!res.ok) throw new Error();
 
-      // Remplace le contenu de la modale
-      setDeleteMessage(
-        "Ton compte a été supprimé avec succès 😢. Merci d’avoir été parmi nous ! On espère te revoir bientôt !"
-      );
-
-      // Déconnexion automatique
+      setDeleteMessage("Compte supprimé avec succès 😢");
       handleLogout();
     } catch (err) {
-      console.error(err);
-      setDeleteMessage("Erreur : " + err.message);
+      setDeleteMessage("Erreur suppression compte");
     }
   };
 
@@ -124,132 +89,94 @@ function Index() {
     <div>
       <Header>
         <i className="fa-solid fa-bars" onClick={toggleMenu}></i>
+
         <button
           className="header__button--fixed header__button"
           onClick={toggleMenu}
         >
           MENU
         </button>
+
         <StatusIndicator />
+
         <nav
-          onClick={toggleMenu}
-          className={`header__link--container ${
-            isMenuOpen ? "" : "header__link--hidden"
-          }`}
+          className={`header__link--container ${isMenuOpen ? "" : "header__link--hidden"}`}
         >
           <div className="header__user">
             {isLogged ? (
               <>
-                {isLogged && hasProfile && userSlug ? (
-                  <>
-                    <NavLink
-                      className="header__link"
-                      to={`/artiste/${userSlug}`}
-                    >
-                      Mon profil
-                    </NavLink>
-                    <button
-                      className="header__link"
-                      onClick={() => setShowWarning(true)}
-                    >
-                      Supprimer mon compte
-                    </button>
-                  </>
+                {hasProfile && userSlug ? (
+                  <NavLink className="header__link" to={`/artiste/${userSlug}`}>
+                    Mon profil
+                  </NavLink>
                 ) : (
                   <NavLink className="header__link" to={`/profil`}>
                     Créer son profil
                   </NavLink>
                 )}
-                <button
-                  className="header__link header__link--logout"
-                  onClick={handleLogout}
-                >
+
+                <button className="header__link" onClick={handleLogout}>
                   Déconnexion
                 </button>
               </>
             ) : (
               <>
-                <NavLink
-                  className="header__link"
-                  to={`/inscription`}
-                  onClick={toggleMenu}
-                >
+                <NavLink className="header__link" to="/inscription">
                   S'inscrire
                 </NavLink>
-                <NavLink
-                  className="header__link"
-                  to={`/connexion`}
-                  onClick={toggleMenu}
-                >
+                <NavLink className="header__link" to="/connexion">
                   Se connecter
                 </NavLink>
               </>
             )}
           </div>
-          <NavLink
-            className="header__link"
-            to={`/Gallery`}
-            onClick={toggleMenu}
-          >
+
+          <NavLink className="header__link" to="/Gallery">
             Voir tous les musiciens
           </NavLink>
+
           <div className="header__ancre--container">
-            <HashLink
-              smooth
-              to="#new"
-              className="header__ancre"
-              onClick={toggleMenu}
-            >
+            <HashLink smooth to="#new" className="header__ancre">
               Nouveaux
             </HashLink>
-            <HashLink
-              smooth
-              to="#annonce"
-              className="header__ancre"
-              onClick={toggleMenu}
-            >
-              annonces
+            <HashLink smooth to="#annonce" className="header__ancre">
+              Annonces
             </HashLink>
-            <HashLink
-              smooth
-              to="#contact"
-              className="header__ancre"
-              onClick={toggleMenu}
-            >
-              contact
+            <HashLink smooth to="#contact" className="header__ancre">
+              Contact
             </HashLink>
           </div>
         </nav>
+
         <h1 className="header__title">GUITARISTES LIMOGES</h1>
       </Header>
+
       {showWarning && (
         <div className="header__modal">
           <div className="header__modal--content">
             {!deleteMessage ? (
               <>
-                <h2>⚠️ Suppression définitive</h2>
-                <p>
-                  Cette action supprimera ton compte et ton profil si tu as un.
-                  <br />
-                  Elle est <strong>irréversible</strong>. Veux-tu continuer ?
-                </p>
-                <button onClick={deleteAccount}>Oui, supprimer</button>
+                <h2>⚠️ Suppression</h2>
+                <p>Action irréversible</p>
+                <button onClick={deleteAccount}>Oui supprimer</button>
                 <button onClick={() => setShowWarning(false)}>Annuler</button>
               </>
             ) : (
               <>
-                <h2>🎉 Compte supprimé !</h2>
+                <h2>Compte supprimé</h2>
                 <p>{deleteMessage}</p>
-                <button onClick={() => setShowWarning(false)}>Fermer</button>
               </>
             )}
           </div>
         </div>
       )}
+
       <Heroheader />
+
       <Main>
         <section id="new">
           <h2 className="main__title">NOUVEAUX MUSICIENS</h2>
+
           <div className="main__new">
             {guitaristes.slice(0, 4).map((post) => (
               <Card
@@ -262,12 +189,16 @@ function Index() {
                 audio={post.audio}
                 annonce={post.annonce}
                 profileId={post._id}
+                type="like"
+                likeInfo={likesState[post._id]}
               />
             ))}
           </div>
         </section>
+
         <section id="annonce">
           <h2 className="main__title">NOUVELLES ANNONCES</h2>
+
           <div className="main__new">
             {annonces.slice(0, 4).map((post) => (
               <Card
@@ -280,12 +211,16 @@ function Index() {
                 audio={post.audio}
                 annonce={post.annonce}
                 profileId={post._id}
+                type="like"
+                likeInfo={likesState[post._id]}
               />
             ))}
           </div>
         </section>
+
         <Contact />
       </Main>
+
       <Footer />
     </div>
   );
