@@ -1,53 +1,104 @@
-function confidentialite() {
+function Confidentialite() {
   return (
-    <div className="footer__copyright p-6 max-w-3xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Conditions Générales d’Utilisation</h1>
+    <main className="footer__copyright">
+      <h1>Politique de Confidentialité</h1>
 
-      <p className="mb-4">
-        Les présentes Conditions Générales d’Utilisation (CGU) ont pour objet de définir les règles d’utilisation du site
-        www.guitaristes-limoges.fr. En naviguant sur le site ou en créant un profil, vous acceptez ces conditions.
-      </p>
+      <section>
+        <h2>1. Introduction</h2>
+        <p>
+          Cette politique explique comment le site Guitaristes Limoges collecte,
+          utilise et protège les données personnelles des utilisateurs.
+        </p>
+      </section>
 
-      <h2 className="text-xl font-semibold mt-4">1. Objet du site</h2>
-      <p>
-        Le site a pour but de rassembler des musiciens autour de Limoges, de partager des informations, des profils d’artistes,
-        et de promouvoir la musique locale. Il ne s’agit pas d’un service commercial.
-      </p>
+      <section>
+        <h2>2. Données collectées</h2>
+        <p>Lors de l’utilisation du site, nous pouvons collecter :</p>
+        <ul>
+          <li>Nom ou pseudo</li>
+          <li>Adresse email</li>
+          <li>Photo de profil</li>
+          <li>Fichiers audio envoyés par l’utilisateur</li>
+          <li>Liens vers réseaux sociaux</li>
+          <li>Données de connexion (token, session)</li>
+        </ul>
+      </section>
 
-      <h2 className="text-xl font-semibold mt-4">2. Création de profil</h2>
-      <p>
-        Les musiciens peuvent créer un profil en fournissant des informations telles que nom, style musical, bio, et liens vers
-        des contenus externes. Ces profils sont visibles publiquement.
-      </p>
-      <p>
-        Vous vous engagez à ne pas publier de contenus inappropriés, diffamatoires, ou portant atteinte aux droits d’autrui.
-      </p>
+      <section>
+        <h2>3. Utilisation des données</h2>
+        <p>Les données sont utilisées uniquement pour :</p>
+        <ul>
+          <li>Créer et gérer les profils utilisateurs</li>
+          <li>Afficher les musiciens sur le site</li>
+          <li>Permettre les fonctionnalités (likes, commentaires, etc.)</li>
+          <li>Assurer la sécurité et le bon fonctionnement du service</li>
+        </ul>
+      </section>
 
-      <h2 className="text-xl font-semibold mt-4">3. Données personnelles</h2>
-      <p>
-        Les données personnelles collectées lors de la création d’un profil sont traitées conformément à notre
-        <a href="/confidentialite" className="underline ml-1">politique de confidentialité</a>.
-        Chaque utilisateur peut demander à modifier ou supprimer ses données en écrivant à : contact@guitaristes-limoges.fr
-      </p>
+      <section>
+        <h2>4. Partage des données</h2>
+        <p>
+          Les données personnelles ne sont jamais vendues ni cédées à des tiers.
+          Elles sont uniquement accessibles dans le cadre du fonctionnement du
+          site.
+        </p>
+      </section>
 
-      <h2 className="text-xl font-semibold mt-4">4. Responsabilités</h2>
-      <p>
-        L’association ne peut être tenue responsable des contenus publiés par les utilisateurs. Tout abus peut être signalé à
-        l’adresse e-mail mentionnée ci-dessus.
-      </p>
+      <section>
+        <h2>5. Stockage et sécurité</h2>
+        <p>
+          Les données sont stockées sur des serveurs sécurisés. Des mesures sont
+          mises en place pour éviter tout accès non autorisé.
+        </p>
+      </section>
 
-      <h2 className="text-xl font-semibold mt-4">5. Modération</h2>
-      <p>
-        L’équipe se réserve le droit de supprimer tout contenu non conforme ou de désactiver un profil sans préavis
-        en cas de non-respect de ces conditions.
-      </p>
+      <section>
+        <h2>6. Cookies</h2>
+        <p>Le site utilise des cookies techniques uniquement pour :</p>
+        <ul>
+          <li>Maintenir la session utilisateur</li>
+          <li>Améliorer l’expérience utilisateur</li>
+        </ul>
+        <p>Aucun cookie publicitaire n’est utilisé.</p>
+      </section>
 
-      <h2 className="text-xl font-semibold mt-4">6. Modifications</h2>
-      <p>
-        Ces conditions peuvent être mises à jour à tout moment. Les utilisateurs seront informés en cas de changement majeur.
-      </p>
-    </div>
+      <section>
+        <h2>7. Durée de conservation</h2>
+        <p>
+          Les données sont conservées tant que le compte utilisateur est actif.
+          Elles peuvent être supprimées à la demande de l’utilisateur.
+        </p>
+      </section>
+
+      <section>
+        <h2>8. Droits des utilisateurs</h2>
+        <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+        <ul>
+          <li>Droit d’accès à vos données</li>
+          <li>Droit de rectification</li>
+          <li>Droit de suppression (droit à l’oubli)</li>
+          <li>Droit d’opposition</li>
+        </ul>
+        <p>Pour exercer vos droits : projetWebT@gmail.com</p>
+      </section>
+
+      <section>
+        <h2>9. Suppression du compte</h2>
+        <p>
+          Vous pouvez supprimer votre compte à tout moment depuis votre profil
+          ou en contactant l’éditeur du site.
+        </p>
+      </section>
+
+      <section>
+        <h2>10. Contact</h2>
+        <p>
+          Pour toute question relative à la confidentialité :<br />
+          <strong>projetWebT@gmail.com</strong>
+        </p>
+      </section>
+    </main>
   );
 }
 
-export default confidentialite;
+export default Confidentialite;

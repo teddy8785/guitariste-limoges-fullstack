@@ -10,15 +10,13 @@
   justify-content: end;
 
   &__copyright {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     color: color.$color-secondary;
     margin: 0;
     text-align: center;
-  }
-
-  &__mentions {
-    display: flex;
-    justify-content: center;
-    align-items: center;
   }
 
   &__links--content {
