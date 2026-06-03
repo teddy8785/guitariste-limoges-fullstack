@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { optimizeCloudinary } from "../hooks/OptimizeCoudinary";
 import Heart from "./Heart";
 import Report from "./Report";
 
@@ -24,11 +25,9 @@ function Card({
   const auth = useSelector((state) => state.auth);
   const isLogged = !!auth.token;
 
-  const photoSrc = photo || defaultPhoto;
+  const photoSrc = photo ? optimizeCloudinary(photo, 400) : defaultPhoto;
 
-  const photoDownWebpSrc = photoDown
-    ? photoDown.replace(/\.(jpg|jpeg|png)$/i, ".webp")
-    : null;
+  const photoDownSrc = photoDown ? optimizeCloudinary(photoDown, 300) : null;
 
   return (
     <article className="card">
@@ -46,18 +45,16 @@ function Card({
 
       <NavLink className="card__link" to={`/artiste/${slug}`}>
         <picture>
-          {photoDownWebpSrc && (
-            <source
-              srcSet={photoDownWebpSrc}
-              type="image/webp"
-              media="(max-width: 768px)"
-            />
+          {photoDownSrc && (
+            <source srcSet={photoDownSrc} media="(max-width: 768px)" />
           )}
 
           <img
             className="card__img"
             src={photoSrc}
             alt={nom}
+            loading="lazy"
+            decoding="async"
             onError={gestionErreurPhoto}
           />
         </picture>
