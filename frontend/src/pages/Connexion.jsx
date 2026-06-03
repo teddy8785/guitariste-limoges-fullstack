@@ -56,27 +56,6 @@ function Connexion() {
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("role", data.role);
 
-      const visitorKey = localStorage.getItem("visitor_key");
-
-      if (visitorKey) {
-        const transferRes = await fetch(
-          `${process.env.REACT_APP_API_URL}/api/likes/transfer`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${data.token}`,
-            },
-            body: JSON.stringify({ visitorKey }),
-          }
-        );
-
-        if (!transferRes.ok) {
-          const errorText = await transferRes.text();
-          console.error("Erreur transfert likes :", errorText);
-        }
-      }
-
       dispatch(
         login({ token: data.token, userId: data.userId, role: data.role })
       );
