@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 
 function Heart({ className = "", color, itemId, disabled = false }) {
   const [liked, setLiked] = useState(false);
@@ -8,19 +7,9 @@ function Heart({ className = "", color, itemId, disabled = false }) {
   useEffect(() => {
     if (!itemId) return;
 
-    const visitorKey =
-      localStorage.getItem("visitor_key") ||
-      (() => {
-        const key = uuidv4();
-        localStorage.setItem("visitor_key", key);
-        return key;
-      })();
-
     const token = localStorage.getItem("token");
 
-    const url = token
-      ? `${process.env.REACT_APP_API_URL}/api/likes/${itemId}/like-status`
-      : `${process.env.REACT_APP_API_URL}/api/likes/${itemId}/like-status?visitorKey=${visitorKey}`;
+    const url = `${process.env.REACT_APP_API_URL}/api/likes/${itemId}/like-status`;
 
     fetch(url, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -37,7 +26,7 @@ function Heart({ className = "", color, itemId, disabled = false }) {
     if (disabled || !itemId) return;
 
     const token = localStorage.getItem("token");
-    const visitorKey = !token ? localStorage.getItem("visitor_key") : null;
+    if (!token) return;
 
     try {
       const res = await fetch(
@@ -46,9 +35,8 @@ function Heart({ className = "", color, itemId, disabled = false }) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            ...(token && { Authorization: `Bearer ${token}` }),
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(visitorKey ? { visitorKey } : {}),
         },
       );
 
@@ -65,7 +53,7 @@ function Heart({ className = "", color, itemId, disabled = false }) {
     <div className="card__heart--content">
       <div>
         <button
-        className="card__heart--button"
+          className="card__heart--button"
           type="button"
           aria-label={liked ? "Retirer le like" : "Ajouter un like"}
           onClick={disabled ? undefined : handleClick}

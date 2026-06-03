@@ -18,7 +18,4 @@ router.get("/:id/like-count", likesCtrl.getLikeCount);
 // POST like/unlike
 router.post("/:id/like", auth, likesCtrl.toggleLike);
 
-// TRANSFERT likes visiteur -> compte connecté
-router.post("/transfer", auth, likesCtrl.transferVisitorLikesToUser);
-
 module.exports = router;
