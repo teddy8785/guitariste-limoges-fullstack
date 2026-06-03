@@ -27,6 +27,54 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 50px;
+    animation: fadeIn 0.3s ease-in;
+    opacity: 1;
+    transition: opacity 0.25s ease;
+  }
+
+  &__new.is-loading {
+    opacity: 0.4;
+  }
+
+  &__skeleton {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 50px;
+    pointer-events: none;
+  }
+
+  &__skeleton--card {
+    flex: 1 1 220px;
+    max-width: 250px;
+    border-radius: 30px 30px 0 0;
+    background: #1e1e1e;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: pulse 1.2s infinite ease-in-out;
+  }
+
+  &__skeleton--img {
+    width: 100%;
+    aspect-ratio: 4 / 5;
+    background: #2a2a2a;
+  }
+
+  &__skeleton--name {
+    height: 20px;
+    width: 60%;
+    margin: 15px auto;
+    background: #333;
+    border-radius: 6px;
+  }
+
+  &__skeleton--line {
+    height: 12px;
+    width: 80%;
+    margin: 0 auto 10px;
+    background: #333;
+    border-radius: 6px;
   }
 
   #new {
@@ -58,6 +106,29 @@
     color: color.$grey-offline;
     font-size: 2rem;
     height: 300px;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 0.6;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.6;
+    }
   }
 
   @media (min-width: 768px) and (max-width: 1008px) {

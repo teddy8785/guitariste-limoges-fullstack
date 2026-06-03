@@ -24,9 +24,53 @@ function Index() {
   const [userSlug, setUserSlug] = useState(null);
   const [showWarning, setShowWarning] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
   // LIKE STATE CENTRALISÉ (IMPORTANT)
-  const likesState = useLikes(guitaristes, token);
+  const likesState = useLikes(guitaristes.length ? guitaristes : [], token);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const load = async () => {
+      setLoading(true);
+
+      const start = Date.now();
+
+      try {
+        const [recentsRes, annoncesRes] = await Promise.all([
+          fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/recents`),
+          fetch(
+            `${process.env.REACT_APP_API_URL}/api/guitaristes/annonces/recentes`,
+          ),
+        ]);
+
+        const recents = await recentsRes.json();
+        const annonces = await annoncesRes.json();
+
+        const elapsed = Date.now() - start;
+        const minDelay = 600;
+
+        const wait = Math.max(0, minDelay - elapsed);
+
+        setTimeout(() => {
+          if (!mounted) return;
+          setGuitaristes(recents);
+          setAnnonces(annonces);
+          setLoading(false);
+        }, wait);
+      } catch (e) {
+        console.error(e);
+        setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
@@ -47,22 +91,6 @@ function Index() {
       })
       .catch(() => setHasProfile(false));
   }, [token]);
-
-  // GUITARISTES RECENTS
-  useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/recents`)
-      .then((res) => res.json())
-      .then((data) => setGuitaristes(data))
-      .catch(console.error);
-  }, []);
-
-  // ANNONCES RECENTES
-  useEffect(() => {
-    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/annonces/recentes`)
-      .then((res) => res.json())
-      .then((data) => setAnnonces(data))
-      .catch(console.error);
-  }, []);
 
   const toggleMenu = () => setIsMenuOpen((v) => !v);
 
@@ -177,44 +205,68 @@ function Index() {
         <section id="new">
           <h2 className="main__title">NOUVEAUX MUSICIENS</h2>
 
-          <div className="main__new">
-            {guitaristes.slice(0, 4).map((post) => (
-              <Card
-                key={post._id}
-                itemId={post._id}
-                slug={post.slug}
-                nom={post.nom}
-                photo={post.photo}
-                photoDown={post.photoDown}
-                audio={post.audio}
-                annonce={post.annonce}
-                profileId={post._id}
-                type="like"
-                likeInfo={likesState[post._id]}
-              />
-            ))}
+          <div className={`main__new ${loading ? "is-loading" : ""}`}>
+            {loading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="main__skeleton--card">
+                    <div className="main__skeleton--img" />
+                    <div className="main__skeleton--name" />
+                    <div className="main__skeleton--line" />
+                  </div>
+                ))
+              : guitaristes
+                  .slice(0, 4)
+                  .map((post) => (
+                    <Card
+                      key={post._id}
+                      itemId={post._id}
+                      slug={post.slug}
+                      nom={post.nom}
+                      photo={post.photo}
+                      photoDown={post.photoDown}
+                      audio={post.audio}
+                      annonce={post.annonce}
+                      profileId={post._id}
+                      type="like"
+                      likeInfo={
+                        likesState?.[post._id] || { liked: false, count: 0 }
+                      }
+                    />
+                  ))}
           </div>
         </section>
 
         <section id="annonce">
           <h2 className="main__title">NOUVELLES ANNONCES</h2>
 
-          <div className="main__new">
-            {annonces.slice(0, 4).map((post) => (
-              <Card
-                key={post._id}
-                itemId={post._id}
-                slug={post.slug}
-                nom={post.nom}
-                photo={post.photo}
-                photoDown={post.photoDown}
-                audio={post.audio}
-                annonce={post.annonce}
-                profileId={post._id}
-                type="like"
-                likeInfo={likesState[post._id]}
-              />
-            ))}
+          <div className={`main__new ${loading ? "is-loading" : ""}`}>
+            {loading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="main__skeleton--card">
+                    <div className="main__skeleton--img" />
+                    <div className="main__skeleton--name" />
+                    <div className="main__skeleton--line" />
+                  </div>
+                ))
+              : annonces
+                  .slice(0, 4)
+                  .map((post) => (
+                    <Card
+                      key={post._id}
+                      itemId={post._id}
+                      slug={post.slug}
+                      nom={post.nom}
+                      photo={post.photo}
+                      photoDown={post.photoDown}
+                      audio={post.audio}
+                      annonce={post.annonce}
+                      profileId={post._id}
+                      type="like"
+                      likeInfo={
+                        likesState?.[post._id] || { liked: false, count: 0 }
+                      }
+                    />
+                  ))}
           </div>
         </section>
 
