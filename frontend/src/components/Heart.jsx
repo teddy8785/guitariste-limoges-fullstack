@@ -52,20 +52,16 @@ function Heart({ className = "", color, itemId, disabled = false }) {
   return (
     <div className="card__heart--content">
       <div>
-        <button
-          className="card__heart--button"
-          type="button"
-          aria-label={liked ? "Retirer le like" : "Ajouter un like"}
+        <i
+          className={`fa-heart ${
+            liked ? "fa-solid card__heart--liked" : "fa-regular"
+          } ${className} ${disabled ? "card__heart--disabled" : ""}`}
+          style={{
+            color: disabled ? "#aaa" : liked ? "darkred" : color || "inherit",
+            cursor: disabled ? "not-allowed" : "pointer",
+          }}
           onClick={disabled ? undefined : handleClick}
-          disabled={disabled}
-        >
-          <i
-            aria-hidden="true"
-            className={`fa-heart ${
-              liked ? "fa-solid card__heart--liked" : "fa-regular"
-            }`}
-          />
-        </button>
+        />
 
         <span>{count}</span>
       </div>
