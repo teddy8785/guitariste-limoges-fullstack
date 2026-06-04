@@ -90,6 +90,7 @@
   font-size: 20px;
   cursor: pointer;
   z-index: 1000;
+  align-self: flex-start;
 }
 .header__nav {
   display: flex;
@@ -133,6 +134,20 @@
   .header__title {
     font-size: 3.4rem;
   }
+  .header__nav--research {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .header__filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .header__research {
+    align-items: initial;
+    gap: 50px;
+  }
 }
 @media (max-width: 435px) {
   .header__title {
@@ -142,12 +157,6 @@
     width: 15px;
     height: 15px;
     margin: 30px 0 0 0;
-  }
-  .header__nav--research {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
   }
   .header .fa-bars {
     position: fixed;
@@ -182,14 +191,13 @@
   justify-content: end;
 }
 .footer__copyright {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   color: rgb(255, 255, 255);
   margin: 0;
   text-align: center;
-}
-.footer__mentions {
-  display: flex;
-  justify-content: center;
-  align-items: center;
 }
 .footer__links--content {
   display: flex;
@@ -280,6 +288,48 @@
   justify-content: center;
   flex-wrap: wrap;
   gap: 50px;
+  animation: fadeIn 0.3s ease-in;
+  opacity: 1;
+  transition: opacity 0.25s ease;
+}
+.main__new.is-loading {
+  opacity: 0.4;
+}
+.main__skeleton {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 50px;
+  pointer-events: none;
+}
+.main__skeleton--card {
+  flex: 1 1 220px;
+  max-width: 250px;
+  border-radius: 30px 30px 0 0;
+  background: #1e1e1e;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: pulse 1.2s infinite ease-in-out;
+}
+.main__skeleton--img {
+  width: 100%;
+  aspect-ratio: 4/5;
+  background: #2a2a2a;
+}
+.main__skeleton--name {
+  height: 20px;
+  width: 60%;
+  margin: 15px auto;
+  background: #333;
+  border-radius: 6px;
+}
+.main__skeleton--line {
+  height: 12px;
+  width: 80%;
+  margin: 0 auto 10px;
+  background: #333;
+  border-radius: 6px;
 }
 .main #new {
   scroll-margin-top: 40px;
@@ -307,6 +357,27 @@
   font-size: 2rem;
   height: 300px;
 }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
 @media (min-width: 768px) and (max-width: 1008px) {
   .main__link {
     margin: 7%;
@@ -327,7 +398,8 @@
   border: solid black 1px;
   border-radius: 30px 30px 0px 0px;
   background-color: rgb(255, 255, 255);
-  width: 17%;
+  flex: 1 1 220px;
+  max-width: 250px;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -342,6 +414,12 @@
   justify-content: center;
   align-items: center;
   flex-direction: column;
+}
+.card__heart--button {
+  background-color: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
 }
 .card__heart {
   margin-top: 3px;
@@ -428,9 +506,27 @@
   display: flex;
   gap: 5px;
 }
+.card__annonce {
+  background-color: darkred;
+  color: rgb(255, 255, 255);
+  width: 100px;
+  text-align: center;
+  position: absolute;
+  right: 0;
+  top: 83px;
+  font-size: 18px;
+  font-weight: 600;
+  font-family: "Nova Square", sans-serif;
+}
+.card__annonce--logged {
+  top: 67px;
+}
+.card__annonce--guest {
+  top: 95px;
+}
 @media (max-width: 1008px) {
   .card {
-    width: 40%;
+    flex: 1 1 40%;
   }
 }
 .card__name {
@@ -463,26 +559,9 @@
   position: absolute;
   bottom: 0;
 }
-.card__annonce {
-  background-color: darkred;
-  color: rgb(255, 255, 255);
-  width: 100px;
-  text-align: center;
-  position: absolute;
-  right: 0;
-  font-size: 18px;
-  font-weight: 600;
-  font-family: "Nova Square", sans-serif;
-}
-.card__annonce--logged {
-  top: 78px;
-}
-.card__annonce--guest {
-  top: 95px;
-}
 @media (max-width: 435px) {
   .card {
-    width: 80%;
+    flex: 1 1 80%;
   }
   .card__report {
     top: 10px;
@@ -790,6 +869,7 @@ code {
   padding: 15px;
   background-color: black;
   border-radius: 8px;
+  box-sizing: border-box;
 }
 .form__title {
   color: rgb(255, 255, 255);
@@ -822,7 +902,6 @@ code {
   background-color: rgb(255, 255, 255);
   color: black;
   font-size: 1rem;
-  resize: vertical;
 }
 .form__input--container {
   position: relative;

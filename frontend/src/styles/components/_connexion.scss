@@ -11,6 +11,7 @@
   padding: 15px;
   background-color: color.$color-primary;
   border-radius: 8px;
+  box-sizing: border-box;
 
   &__title {
     color: color.$color-secondary;
@@ -46,7 +47,7 @@
     background-color: color.$color-secondary;
     color: color.$color-primary;
     font-size: 1rem;
-    resize: vertical;
+    // resize: vertical;
   }
 
   &__input--container {
