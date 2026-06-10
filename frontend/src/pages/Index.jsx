@@ -208,6 +208,12 @@ function Index() {
           </NavLink>
 
           <div className="header__ancre--container">
+            <HashLink smooth to="#gold" className="header__ancre">
+              Membres Or
+            </HashLink>
+            <HashLink smooth to="#silver" className="header__ancre">
+              Membres Argent
+            </HashLink>
             <HashLink smooth to="#new" className="header__ancre">
               Nouveaux
             </HashLink>

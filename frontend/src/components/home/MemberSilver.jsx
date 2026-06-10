@@ -1,8 +1,8 @@
 import Card from "../Card";
 
-function MemberSilver({ members = [], loading, likesState, role, onVipChange  }) {
+function MemberSilver({ members = [], loading, likesState }) {
   return (
-    <section id="annonce">
+    <section id="silver">
       <h2 className="main__title">Membres VIP 🥈</h2>
 
       <div className={`main__new ${loading ? "is-loading" : ""}`}>
@@ -32,8 +32,6 @@ function MemberSilver({ members = [], loading, likesState, role, onVipChange  })
                     likesState?.[post._id] || { liked: false, count: 0 }
                   }
                   vip={post.vip}
-                  isAdmin={role === "admin"}
-                  onVipChange={onVipChange}
                 />
               ))}
       </div>
