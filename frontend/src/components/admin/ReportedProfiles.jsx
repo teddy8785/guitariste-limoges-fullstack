@@ -46,7 +46,9 @@ function ReportedProfiles() {
       <Link to="/gallery?onlyReported=true" className="heroheader__link">
         Voir tous les profils signalés →
       </Link>
-
+      <Link to="/gallery" className="heroheader__link">
+        Voir tous les profils →
+      </Link>
       <div className="main__new">
         {reportedProfiles.length === 0 ? (
           <p>Aucun profil signalé</p>
