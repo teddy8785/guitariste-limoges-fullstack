@@ -65,7 +65,7 @@ function Card({
         <div className="card__adminVip" onClick={(e) => e.stopPropagation()}>
           <button
             type="button"
-            className={`card__vipOption ${vip === "gold" ? "active-gold" : ""}`}
+            className={`card__vipOption ${localVip === "gold" ? "active-gold" : ""}`}
             onClick={() => handleVipChange("gold")}
           >
             🥇 Gold
@@ -73,7 +73,7 @@ function Card({
 
           <button
             type="button"
-            className={`card__vipOption ${vip === "silver" ? "active-silver" : ""}`}
+            className={`card__vipOption ${localVip === "silver" ? "active-silver" : ""}`}
             onClick={() => handleVipChange("silver")}
           >
             🥈 Silver
@@ -81,7 +81,7 @@ function Card({
 
           <button
             type="button"
-            className="card__vipOption"
+            className={`card__vipOption ${!localVip ? "active-normal" : ""}`}
             onClick={() => handleVipChange(null)}
           >
             ❌ Normal
