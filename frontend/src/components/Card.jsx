@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { optimizeCloudinary } from "../hooks/OptimizeCoudinary";
 import Heart from "./Heart";
 import Report from "./Report";
+import { useEffect, useState } from "react";
 
 export const defaultPhoto = `${process.env.PUBLIC_URL}/photos/sansphoto.webP`;
 
@@ -24,6 +25,7 @@ function Card({
   vip,
   onVipChange,
 }) {
+  const [localVip, setLocalVip] = useState(vip);
   const auth = useSelector((state) => state.auth);
   const isAdmin = useSelector((state) => state.auth.role === "admin");
   const isLogged = !!auth.token;
@@ -32,10 +34,28 @@ function Card({
 
   const photoDownSrc = photoDown ? optimizeCloudinary(photoDown, 300) : null;
 
+  useEffect(() => {
+    setLocalVip(vip);
+  }, [vip]);
+
+  const handleVipChange = async (newVip) => {
+    setLocalVip(newVip);
+
+    try {
+      const updatedUser = await onVipChange?.(profileId, newVip);
+
+      if (updatedUser?.vip !== undefined) {
+        setLocalVip(updatedUser.vip);
+      }
+    } catch (err) {
+      setLocalVip(vip);
+    }
+  };
+
   const vipClass =
-    vip === "gold"
+    localVip === "gold"
       ? "card__vip--gold"
-      : vip === "silver"
+      : localVip === "silver"
         ? "card__vip--silver"
         : "";
 
@@ -46,7 +66,7 @@ function Card({
           <button
             type="button"
             className={`card__vipOption ${vip === "gold" ? "active-gold" : ""}`}
-            onClick={() => onVipChange?.(profileId, "gold")}
+            onClick={() => handleVipChange("gold")}
           >
             🥇 Gold
           </button>
@@ -54,7 +74,7 @@ function Card({
           <button
             type="button"
             className={`card__vipOption ${vip === "silver" ? "active-silver" : ""}`}
-            onClick={() => onVipChange?.(profileId, "silver")}
+            onClick={() => handleVipChange("silver")}
           >
             🥈 Silver
           </button>
@@ -62,7 +82,7 @@ function Card({
           <button
             type="button"
             className="card__vipOption"
-            onClick={() => onVipChange?.(profileId, null)}
+            onClick={() => handleVipChange(null)}
           >
             ❌ Normal
           </button>
