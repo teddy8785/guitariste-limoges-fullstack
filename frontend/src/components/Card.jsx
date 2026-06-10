@@ -42,40 +42,27 @@ function Card({
   return (
     <article className={`card ${vipClass}`}>
       {isAdmin && (
-        <div className="card__adminVip">
-          <label
+        <div className="card__adminVip" onClick={(e) => e.stopPropagation()}>
+          <div
             className={`card__vipOption ${vip === "gold" ? "active-gold" : ""}`}
+            onClick={() => onVipChange?.(profileId, "gold")}
           >
-            <input
-              type="radio"
-              name={`vip-${profileId}`}
-              checked={vip === "gold"}
-              onChange={() => onVipChange?.(profileId, "gold")}
-            />
             🥇 Gold
-          </label>
+          </div>
 
-          <label
+          <div
             className={`card__vipOption ${vip === "silver" ? "active-silver" : ""}`}
+            onClick={() => onVipChange?.(profileId, "silver")}
           >
-            <input
-              type="radio"
-              name={`vip-${profileId}`}
-              checked={vip === "silver"}
-              onChange={() => onVipChange?.(profileId, "silver")}
-            />
             🥈 Silver
-          </label>
+          </div>
 
-          <label className="card__vipOption">
-            <input
-              type="radio"
-              name={`vip-${profileId}`}
-              checked={!vip}
-              onChange={() => onVipChange?.(profileId, null)}
-            />
+          <div
+            className="card__vipOption"
+            onClick={() => onVipChange?.(profileId, null)}
+          >
             ❌ Normal
-          </label>
+          </div>
         </div>
       )}
 
