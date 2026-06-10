@@ -187,13 +187,12 @@ function Artistes({ likesState, onVipChange }) {
 
       if (!res.ok) throw new Error();
 
-      const updatedUser = await res.json();
-
-      setData((prev) => prev.map((g) => (g._id === id ? updatedUser : g)));
+      setData((prev) => prev.map((g) => (g._id === id ? { ...g, vip } : g)));
     } catch (err) {
       console.error(err);
     }
   };
+  
   return (
     <div>
       <Header>
