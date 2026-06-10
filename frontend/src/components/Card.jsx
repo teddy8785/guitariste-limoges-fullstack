@@ -21,16 +21,64 @@ function Card({
   annonce,
   profileId,
   likeInfo,
+  vip,
+  onVipChange,
 }) {
   const auth = useSelector((state) => state.auth);
+  const isAdmin = useSelector((state) => state.auth.role === "admin");
   const isLogged = !!auth.token;
 
   const photoSrc = photo ? optimizeCloudinary(photo, 400) : defaultPhoto;
 
   const photoDownSrc = photoDown ? optimizeCloudinary(photoDown, 300) : null;
 
+  const vipClass =
+    vip === "gold"
+      ? "card__vip--gold"
+      : vip === "silver"
+        ? "card__vip--silver"
+        : "";
+
   return (
-    <article className="card">
+    <article className={`card ${vipClass}`}>
+      {isAdmin && (
+        <div className="card__adminVip">
+          <label
+            className={`card__vipOption ${vip === "gold" ? "active-gold" : ""}`}
+          >
+            <input
+              type="radio"
+              name={`vip-${profileId}`}
+              checked={vip === "gold"}
+              onChange={() => onVipChange?.(profileId, "gold")}
+            />
+            🥇 Gold
+          </label>
+
+          <label
+            className={`card__vipOption ${vip === "silver" ? "active-silver" : ""}`}
+          >
+            <input
+              type="radio"
+              name={`vip-${profileId}`}
+              checked={vip === "silver"}
+              onChange={() => onVipChange?.(profileId, "silver")}
+            />
+            🥈 Silver
+          </label>
+
+          <label className="card__vipOption">
+            <input
+              type="radio"
+              name={`vip-${profileId}`}
+              checked={!vip}
+              onChange={() => onVipChange?.(profileId, null)}
+            />
+            ❌ Normal
+          </label>
+        </div>
+      )}
+
       <h3 className="card__name">{nom}</h3>
 
       <Heart

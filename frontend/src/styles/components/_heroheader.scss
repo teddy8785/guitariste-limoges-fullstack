@@ -19,6 +19,17 @@
     text-align: center;
   }
 
+  &__hint {
+    display: flex;
+    flex-direction: column;
+    font-size: 20px;
+  }
+
+  &__hint--color {
+    color: color.$color-secondary;
+    font-size: 20px;
+  }
+
   &__link {
     display: flex;
     justify-content: center;

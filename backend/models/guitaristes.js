@@ -23,6 +23,11 @@ const guitaristeSchema = mongoose.Schema(
     annonce: { type: String },
     annonceDate: { type: Date },
     copyrightAccepted: { type: Boolean, required: true, default: false },
+    vip: {
+      type: String,
+      enum: ["silver", "gold"],
+      default: null,
+    },
     likes: {
       type: Number,
       default: 0,

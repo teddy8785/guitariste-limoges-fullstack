@@ -18,11 +18,27 @@ router.delete(
   "/users/:id",
   requireAuth,
   requireAdmin,
-  adminController.deleteUser
+  adminController.deleteUser,
 );
 
 router.get("/admin/dashboard", requireAuth, requireAdmin, (req, res) => {
   res.json({ message: "Bienvenue dans le panneau d’administration" });
+});
+
+router.put("/guitariste/:id/vip",requireAuth, requireAdmin, async (req, res) => {
+  const { vip } = req.body;
+
+  if (!["gold", "silver", null].includes(vip)) {
+    return res.status(400).json({ message: "Valeur invalide" });
+  }
+
+  const updated = await Guitariste.findByIdAndUpdate(
+    req.params.id,
+    { vip },
+    { new: true },
+  );
+
+  res.json(updated);
 });
 
 // Gestion guitaristes par admin
@@ -30,14 +46,14 @@ router.delete(
   "/guitaristes/:id",
   requireAuth,
   requireAdmin,
-  adminController.deleteGuitaristeByAdmin
+  adminController.deleteGuitaristeByAdmin,
 );
 router.put(
   "/guitaristes/:id",
   requireAuth,
   requireAdmin,
   multiUpload,
-  adminController.updateGuitaristeByAdmin
+  adminController.updateGuitaristeByAdmin,
 );
 
 // Route pour voir tous les profils signalés
@@ -55,7 +71,7 @@ router.get(
       console.error(err);
       res.status(500).json({ message: "Erreur serveur." });
     }
-  }
+  },
 );
 
 // Nouvelle route pour récupérer les signalements détaillés d’un guitariste
@@ -101,7 +117,7 @@ router.get(
               fromSlug: null,
             };
           }
-        })
+        }),
       );
 
       res.status(200).json({ reports: reportsWithSlug });
@@ -109,7 +125,7 @@ router.get(
       console.error(err);
       res.status(500).json({ message: "Erreur serveur." });
     }
-  }
+  },
 );
 
 module.exports = router;

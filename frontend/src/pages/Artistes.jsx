@@ -8,7 +8,7 @@ import { useSelector } from "react-redux";
 import { useLocation } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
 
-function Artistes() {
+function Artistes({ likesState, onVipChange }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedVille, setSelectedVille] = useState("");
   const [selectedStyle, setSelectedStyle] = useState("");
@@ -55,11 +55,14 @@ function Artistes() {
       return;
     }
 
-    fetch(`${process.env.REACT_APP_API_URL}/api/report/admin/reported-profiles`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
+    fetch(
+      `${process.env.REACT_APP_API_URL}/api/report/admin/reported-profiles`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
       .then((res) => {
         if (!res.ok) {
           throw new Error("Non autorisé");
@@ -87,10 +90,10 @@ function Artistes() {
           (!onlyWithAnnonce ||
             (artiste.annonce && artiste.annonce.trim() !== "")) &&
           (!onlyWithAudio || (artiste.audio && artiste.audio.trim() !== "")) &&
-          (!onlyWithPhoto || (artiste.photo && artiste.photo.trim() !== ""))
+          (!onlyWithPhoto || (artiste.photo && artiste.photo.trim() !== "")),
       )
       .filter((artiste) =>
-        onlyReported ? reportedProfilesIds.has(artiste._id) : true
+        onlyReported ? reportedProfilesIds.has(artiste._id) : true,
       );
   }, [
     cleanQuery,
@@ -148,26 +151,49 @@ function Artistes() {
       sorted.sort(
         (a, b) =>
           new Date(b.updatedAt || b.createdAt) -
-          new Date(a.updatedAt || a.createdAt)
+          new Date(a.updatedAt || a.createdAt),
       );
     } else if (sortOrder === "dateAsc") {
       sorted.sort(
         (a, b) =>
           new Date(a.updatedAt || a.createdAt) -
-          new Date(b.updatedAt || b.createdAt)
+          new Date(b.updatedAt || b.createdAt),
       );
     } else if (sortOrder === "alphaAsc") {
       sorted.sort((a, b) =>
-        a.nom.localeCompare(b.nom, "fr", { sensitivity: "base" })
+        a.nom.localeCompare(b.nom, "fr", { sensitivity: "base" }),
       );
     } else if (sortOrder === "alphaDesc") {
       sorted.sort((a, b) =>
-        b.nom.localeCompare(a.nom, "fr", { sensitivity: "base" })
+        b.nom.localeCompare(a.nom, "fr", { sensitivity: "base" }),
       );
     }
     return sorted;
   }, [filteredData, sortOrder]);
 
+  const updateVip = async (id, vip) => {
+    try {
+      const res = await fetch(
+        `${process.env.REACT_APP_API_URL}/api/admin/guitariste/${id}/vip`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ vip }),
+        },
+      );
+
+      if (!res.ok) throw new Error();
+
+      const updatedUser = await res.json();
+
+      setData((prev) => prev.map((g) => (g._id === id ? updatedUser : g)));
+    } catch (err) {
+      console.error(err);
+    }
+  };
   return (
     <div>
       <Header>
@@ -232,6 +258,11 @@ function Artistes() {
                   audio={post.audio}
                   annonce={post.annonce}
                   profileId={post._id}
+                  vip={post.vip}
+                  likeInfo={
+                    likesState?.[post._id] || { liked: false, count: 0 }
+                  }
+                  onVipChange={updateVip}
                 />
               ))}
             </div>

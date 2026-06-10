@@ -1,20 +1,25 @@
 import Header from "../components/Header";
 import Heroheader from "../components/Heroheader";
 import Main from "../components/Main";
-import Card from "../components/Card";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import { NavLink } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useMemo } from "react";
 import StatusIndicator from "../components/StatusIndicator";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../Store/authSlice";
 import { useLikes } from "../hooks/useLikes";
+import ReportedProfiles from "../components/admin/ReportedProfiles";
+import NewGuitaristes from "../components/home/NewGuitaristes";
+import NewAnnonces from "../components/home/NewAnnonces";
+import MemberGold from "../components/home/MemberGold";
+import MemberSilver from "../components/home/MemberSilver";
 
 function Index() {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
+  const role = useSelector((state) => state.auth.role);
   const isLogged = !!token;
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -25,9 +30,32 @@ function Index() {
   const [showWarning, setShowWarning] = useState(false);
   const [deleteMessage, setDeleteMessage] = useState("");
   const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState(null);
 
   // LIKE STATE CENTRALISÉ (IMPORTANT)
   const likesState = useLikes(guitaristes.length ? guitaristes : [], token);
+
+  // filtre les membres gold and silver
+  const goldMembers = useMemo(
+    () => guitaristes.filter((g) => g.vip === "gold"),
+    [guitaristes],
+  );
+
+  const silverMembers = useMemo(
+    () => guitaristes.filter((g) => g.vip === "silver"),
+    [guitaristes],
+  );
+
+  useEffect(() => {
+    if (!token) return;
+
+    fetch(`${process.env.REACT_APP_API_URL}/api/guitaristes/me`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => res.json())
+      .then((data) => setProfile(data))
+      .catch(() => setProfile(null));
+  }, [token]);
 
   useEffect(() => {
     let mounted = true;
@@ -199,76 +227,41 @@ function Index() {
         </div>
       )}
 
-      <Heroheader />
+      {role !== "admin" && (
+        <Heroheader nom={profile?.nom} isLogged={isLogged} />
+      )}
+      <ReportedProfiles />
 
       <Main>
-        <section id="new">
-          <h2 className="main__title">NOUVEAUX MUSICIENS</h2>
+        {!loading && goldMembers.length > 0 && (
+          <MemberGold
+            members={goldMembers}
+            loading={loading}
+            likesState={likesState}
+            role={role}
+          />
+        )}
 
-          <div className={`main__new ${loading ? "is-loading" : ""}`}>
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="main__skeleton--card">
-                    <div className="main__skeleton--img" />
-                    <div className="main__skeleton--name" />
-                    <div className="main__skeleton--line" />
-                  </div>
-                ))
-              : guitaristes
-                  .slice(0, 4)
-                  .map((post) => (
-                    <Card
-                      key={post._id}
-                      itemId={post._id}
-                      slug={post.slug}
-                      nom={post.nom}
-                      photo={post.photo}
-                      photoDown={post.photoDown}
-                      audio={post.audio}
-                      annonce={post.annonce}
-                      profileId={post._id}
-                      type="like"
-                      likeInfo={
-                        likesState?.[post._id] || { liked: false, count: 0 }
-                      }
-                    />
-                  ))}
-          </div>
-        </section>
+        {!loading && silverMembers.length > 0 && (
+          <MemberSilver
+            members={silverMembers}
+            loading={loading}
+            likesState={likesState}
+            role={role}
+          />
+        )}
 
-        <section id="annonce">
-          <h2 className="main__title">NOUVELLES ANNONCES</h2>
+        <NewGuitaristes
+          guitaristes={guitaristes}
+          loading={loading}
+          likesState={likesState}
+        />
 
-          <div className={`main__new ${loading ? "is-loading" : ""}`}>
-            {loading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="main__skeleton--card">
-                    <div className="main__skeleton--img" />
-                    <div className="main__skeleton--name" />
-                    <div className="main__skeleton--line" />
-                  </div>
-                ))
-              : annonces
-                  .slice(0, 4)
-                  .map((post) => (
-                    <Card
-                      key={post._id}
-                      itemId={post._id}
-                      slug={post.slug}
-                      nom={post.nom}
-                      photo={post.photo}
-                      photoDown={post.photoDown}
-                      audio={post.audio}
-                      annonce={post.annonce}
-                      profileId={post._id}
-                      type="like"
-                      likeInfo={
-                        likesState?.[post._id] || { liked: false, count: 0 }
-                      }
-                    />
-                  ))}
-          </div>
-        </section>
+        <NewAnnonces
+          annonces={annonces}
+          loading={loading}
+          likesState={likesState}
+        />
 
         <Contact />
       </Main>

@@ -38,9 +38,10 @@ function Confidentialite() {
       <section>
         <h2>4. Partage des données</h2>
         <p>
-          Les données personnelles ne sont jamais vendues ni cédées à des tiers.
-          Elles sont uniquement accessibles dans le cadre du fonctionnement du
-          site.
+          Les données personnelles ne sont ni vendues ni cédées à des fins
+          commerciales. Certaines données peuvent être traitées par des
+          prestataires techniques nécessaires au fonctionnement du site
+          (hébergement, stockage des médias, sécurité).
         </p>
       </section>
 
