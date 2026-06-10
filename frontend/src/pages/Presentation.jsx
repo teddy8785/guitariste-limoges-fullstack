@@ -7,7 +7,7 @@ import Heart from "../components/Heart";
 import { gestionErreurPhoto } from "../components/Card";
 import { useSelector } from "react-redux";
 
-function Presentation({ type }) {
+function Presentation({ type, vip }) {
   const { slug } = useParams();
   const navigate = useNavigate();
   const isSafeUrl = (url) => /^https?:\/\/[\w.-]+/i.test(url);
@@ -16,6 +16,11 @@ function Presentation({ type }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isLogged, setIsLogged] = useState(false);
+
+  const vipIcon = {
+    gold: "🥇",
+    silver: "🥈",
+  };
 
   const userId =
     useSelector((state) => state.auth.userId) || localStorage.getItem("userId");
@@ -108,7 +113,14 @@ function Presentation({ type }) {
             </button>
           )}
         </nav>
-        <h1 className="header__title--nom">{post.nom}</h1>
+        <h1 className="header__title--nom">
+          {post.nom}
+          {post.vip && (
+            <span className={`header__vip header__vip--${post.vip}`}>
+              {vipIcon[post.vip]}
+            </span>
+          )}
+        </h1>
       </Header>
       <Main>
         {post.annonce && (
