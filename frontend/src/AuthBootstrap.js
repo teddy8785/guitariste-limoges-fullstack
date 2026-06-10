@@ -8,21 +8,24 @@ function AuthBootstrap() {
   useEffect(() => {
     const token = localStorage.getItem("token");
 
-    if (token) {
-      try {
-        const payload = JSON.parse(atob(token.split(".")[1]));
+    if (!token || token.split(".").length !== 3) {
+      localStorage.removeItem("token");
+      return;
+    }
 
-        dispatch(
-          login({
-            token,
-            userId: payload.userId,
-            role: payload.role,
-          })
-        );
-      } catch (err) {
-        console.error("Token invalide", err);
-        localStorage.removeItem("token");
-      }
+    try {
+      const payload = JSON.parse(atob(token.split(".")[1]));
+
+      dispatch(
+        login({
+          token,
+          userId: payload.userId,
+          role: payload.role,
+        }),
+      );
+    } catch (err) {
+      console.error("Token invalide", err);
+      localStorage.removeItem("token");
     }
   }, [dispatch]);
 

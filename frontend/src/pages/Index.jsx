@@ -8,7 +8,7 @@ import { HashLink } from "react-router-hash-link";
 import { useCallback, useEffect, useState, useMemo } from "react";
 import StatusIndicator from "../components/StatusIndicator";
 import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../Store/authSlice";
+import { login, logout } from "../Store/authSlice";
 import { useLikes } from "../hooks/useLikes";
 import ReportedProfiles from "../components/admin/ReportedProfiles";
 import NewGuitaristes from "../components/home/NewGuitaristes";
@@ -45,6 +45,22 @@ function Index() {
     () => guitaristes.filter((g) => g.vip === "silver"),
     [guitaristes],
   );
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const userId = localStorage.getItem("userId");
+    const role = localStorage.getItem("role");
+
+    if (token && userId) {
+      dispatch(
+        login({
+          token,
+          userId,
+          role,
+        }),
+      );
+    }
+  }, [dispatch]);
 
   useEffect(() => {
     if (!token) return;

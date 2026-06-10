@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import PasswordInput from "../components/PasswordInput";
 import Footer from "../components/Footer";
-import { useDispatch } from "react-redux";
-import { login } from "../Store/authSlice";
+import ErrorDisplay from "../components/ErrorDisplay";
 
 function Inscription() {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
   const [credentials, setCredentials] = useState({
     email: "",
     password: "",
   });
-
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,7 +19,9 @@ function Inscription() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (loading) return;
 
+    setLoading(true);
     fetch(`${process.env.REACT_APP_API_URL}/api/auth/signup`, {
       method: "POST",
       headers: {
@@ -36,19 +36,17 @@ function Inscription() {
         return res.json();
       })
       .then((data) => {
-        alert("Inscription réussie !");
-        // Ici tu peux stocker le token ou rediriger l'utilisateur
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.userId);
-        localStorage.setItem("role", data.role);
-        dispatch(
-          login({ token: data.token, userId: data.userId, role: data.role })
+        setSuccess(
+          "Inscription réussie ! Vérifie ton email pour activer ton compte.",
         );
-        navigate("/profil");
+        setError("");
+
+        localStorage.setItem("userId", data.userId);
       })
       .catch((error) => {
         console.error("Erreur :", error);
-        alert("Échec de l'inscription. Vérifie tes identifiants.");
+        setError("Inscription en attente d’activation ou email déjà utilisé.");
+        setSuccess("");
       });
   };
 
@@ -80,6 +78,8 @@ function Inscription() {
           S'inscrire
         </button>
       </form>
+      <ErrorDisplay message={error} />
+      <ErrorDisplay title="Succès" message={success} />
       <Footer />
     </div>
   );

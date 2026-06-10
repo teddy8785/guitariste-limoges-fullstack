@@ -1,47 +1,59 @@
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-// const nodemailer = require("nodemailer");
+const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 const Guitariste = require("../models/guitaristes");
 const cloudinary = require("../config/cloudinary");
+const resend = require("../config/resend");
 
-exports.signup = (req, res, next) => {
-  bcrypt
-    .hash(req.body.password, 10)
-    .then((hash) => {
-      const user = new User({
-        email: req.body.email,
-        password: hash,
-        role: req.body.role || "user",
-      });
-      user
-        .save()
-        .then((savedUser) => {
-          // Crée un token comme dans login
-          const token = jwt.sign(
-            { userId: savedUser._id, role: savedUser.role },
-            process.env.JWT_SECRET,
-            { expiresIn: "24h" },
-          );
+exports.signup = async (req, res) => {
+  try {
+    const hash = await bcrypt.hash(req.body.password, 10);
 
-          res.status(201).json({
-            message: "Utilisateur créé !",
-            userId: savedUser._id,
-            role: savedUser.role,
-            token: token,
-          });
-        })
-        .catch((error) => {
-          console.error("Erreur lors de l'enregistrement :", error);
-          res.status(400).json({ error });
-        });
-    })
-    .catch((error) => {
-      console.error("Erreur lors du hash :", error);
-      res.status(500).json({ error });
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    const user = new User({
+      email: req.body.email,
+      password: hash,
+      role: req.body.role || "user",
+      isVerified: false,
+      verificationToken,
+      verificationTokenExpires: Date.now() + 1000 * 60 * 60,
     });
+
+    await user.save();
+
+    const verifyUrl = `${process.env.FRONT_URL}/verify-email/${verificationToken}`;
+
+    const result = await resend.emails.send({
+      from: "onboarding@resend.dev",
+      to: user.email,
+      subject: "Vérification de votre compte",
+      html: `
+    <h2>Bienvenue 👋</h2>
+    <p>Clique sur le lien :</p>
+    <a href="${verifyUrl}">Activer mon compte</a>
+  `,
+    });
+
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "24h" },
+    );
+
+    res.status(201).json({
+      message: "Utilisateur créé ! Vérifie ton email.",
+      userId: user._id,
+      role: user.role,
+      requiresVerification: true,
+    });
+  } catch (error) {
+    console.error("SIGNUP ERROR:", error);
+    res.status(500).json({ message: error.message });
+  }
 };
 
 exports.login = (req, res, next) => {
@@ -49,6 +61,11 @@ exports.login = (req, res, next) => {
     .then((user) => {
       if (!user) {
         return res.status(401).json({ message: "Identifiants incorrects." });
+      }
+      if (!user.isVerified) {
+        return res.status(403).json({
+          message: "Compte non vérifié. Vérifie ton email.",
+        });
       }
       bcrypt
         .compare(req.body.password, user.password)

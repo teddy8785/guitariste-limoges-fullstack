@@ -8,6 +8,13 @@ const userSchema = mongoose.Schema({
     unique: true,
     match: [/.+\@.+\..+/, "Email non valide"],
   },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
+
+  verificationToken: String,
+  verificationTokenExpires: Date,
   password: {
     type: String,
     required: true,

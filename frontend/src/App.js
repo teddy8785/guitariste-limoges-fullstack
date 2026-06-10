@@ -12,6 +12,7 @@ import MentionsLegales from "./pages/MentionsLegales.jsx";
 import Confidentialite from "./pages/Confidentialite.jsx";
 import ForgotPassword from "./pages/ForgotPassword.jsx";
 import ResetPassword from "./pages/ResetPassword.jsx";
+import VerifyEmail from "./pages/VerifyEmail.jsx";
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
         <Route path="/profil/:id?" element={<CreateProfil />} />
         <Route path="/mentions-legales" element={<MentionsLegales />} />
         <Route path="/confidentialite" element={<Confidentialite />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
         <Route path="/erreur" element={<Erreur />} />
         <Route path="*" element={<Erreur />} />
       </Routes>
