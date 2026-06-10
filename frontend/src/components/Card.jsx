@@ -43,26 +43,29 @@ function Card({
     <article className={`card ${vipClass}`}>
       {isAdmin && (
         <div className="card__adminVip" onClick={(e) => e.stopPropagation()}>
-          <div
+          <button
+            type="button"
             className={`card__vipOption ${vip === "gold" ? "active-gold" : ""}`}
             onClick={() => onVipChange?.(profileId, "gold")}
           >
             🥇 Gold
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             className={`card__vipOption ${vip === "silver" ? "active-silver" : ""}`}
             onClick={() => onVipChange?.(profileId, "silver")}
           >
             🥈 Silver
-          </div>
+          </button>
 
-          <div
+          <button
+            type="button"
             className="card__vipOption"
             onClick={() => onVipChange?.(profileId, null)}
           >
             ❌ Normal
-          </div>
+          </button>
         </div>
       )}
 
